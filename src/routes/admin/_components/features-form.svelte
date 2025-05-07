@@ -74,6 +74,21 @@
 				</Form.Field>
 				<Form.Field
 					{form}
+					name="forum_posts"
+					class="flex flex-row items-center justify-between rounded-lg border p-4"
+				>
+					<Form.Control let:attrs>
+						<div class="space-y-0.5">
+							<Form.Label>Forum</Form.Label>
+							<Form.Description>
+								Enable this feature to allow users to create posts.
+							</Form.Description>
+						</div>
+						<Switch includeInput {...attrs} bind:checked={$formData.forum_posts} />
+					</Form.Control>
+				</Form.Field>
+				<Form.Field
+					{form}
 					name="docs"
 					class="flex flex-row items-center justify-between rounded-lg border p-4"
 				>

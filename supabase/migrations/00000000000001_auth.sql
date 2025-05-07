@@ -16,7 +16,11 @@ create type public.user_permission as enum (
 	'map.create',
 	'map.update',
 	'map.delete',
-	'map.moderate'
+	'map.moderate',
+	'forum_posts.create',
+	'forum_posts.update',
+	'forum_posts.delete',
+	'forum_posts.moderate'
 );
 create type public.user_role as enum ('user', 'moderator', 'admin');
 create table public.user_roles (
@@ -121,8 +125,8 @@ insert on auth.users for each row execute procedure public.handle_new_user();
 create trigger handle_updated_at before
 update on public.profiles for each row execute procedure moddatetime (updated_at);
 -- Storage Buckets
--- insert into storage.buckets (id, name, public, allowed_mime_types)
--- values ('users', 'Users', true, '{"image/*"}');
+insert into storage.buckets (id, name, public, allowed_mime_types)
+values ('users', 'Users', true, '{"image/*"}');
 -- RLS policies
 alter table public.user_roles enable row level security;
 alter table public.role_permissions enable row level security;
@@ -157,6 +161,9 @@ values ('user', 'guides.create'),
 	('user', 'map.create'),
 	('user', 'map.update'),
 	('user', 'map.delete'),
+	('user', 'forum_posts.create'),
+	('user', 'forum_posts.update'),
+	('user', 'forum_posts.delete'),
 	('moderator', 'guides.create'),
 	('moderator', 'guides.update'),
 	('moderator', 'guides.delete'),
@@ -169,6 +176,10 @@ values ('user', 'guides.create'),
 	('moderator', 'map.update'),
 	('moderator', 'map.delete'),
 	('moderator', 'map.moderate'),
+	('moderator', 'forum_posts.create'),
+	('moderator', 'forum_posts.update'),
+	('moderator', 'forum_posts.delete'),
+	('moderator', 'forum_posts.moderate'),
 	('admin', 'user_roles.update'),
 	('admin', 'user_types.update'),
 	('admin', 'features.update'),
@@ -184,4 +195,8 @@ values ('user', 'guides.create'),
 	('admin', 'map.create'),
 	('admin', 'map.update'),
 	('admin', 'map.delete'),
-	('admin', 'map.moderate');
+	('admin', 'map.moderate'),
+	('admin', 'forum_posts.create'),
+	('admin', 'forum_posts.update'),
+	('admin', 'forum_posts.delete'),
+	('admin', 'forum_posts.moderate');

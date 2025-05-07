@@ -75,6 +75,18 @@
 						Map
 					</a>
 				</FeatureWrapper>
+				<FeatureWrapper feature="forum_posts">
+					<a
+						href="/forum"
+						on:click={() => (open = false)}
+						class={cn(
+							'transition-colors hover:text-foreground/80',
+							$page.url.pathname.startsWith('/forum') ? 'text-foreground' : 'text-foreground/60'
+						)}
+					>
+						Forum
+					</a>
+				</FeatureWrapper>
 			</nav>
 		</ScrollArea>
 	</Sheet.Content>

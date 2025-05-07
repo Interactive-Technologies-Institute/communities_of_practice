@@ -1,6 +1,6 @@
 /* ADMIN */
 -- Features
-create type public.feature as enum ('guides', 'events', 'map', 'docs');
+create type public.feature as enum ('guides', 'events', 'map', 'docs', 'forum_posts');
 create table public.feature_flags (
 	id public.feature primary key,
 	enabled boolean not null default false
@@ -39,8 +39,8 @@ end loop;
 end;
 $$;
 -- Storage Buckets
--- insert into storage.buckets (id, name, public, allowed_mime_types)
--- values ('branding', 'Branding', true, '{"image/*"}');
+insert into storage.buckets (id, name, public, allowed_mime_types)
+values ('branding', 'Branding', true, '{"image/*"}');
 -- RLS policies
 alter table public.feature_flags enable row level security;
 alter table public.user_types enable row level security;
@@ -102,7 +102,8 @@ insert into public.feature_flags (id, enabled)
 values ('guides'::public.feature, true),
 	('events'::public.feature, true),
 	('map'::public.feature, true),
-	('docs'::public.feature, true);
+	('docs'::public.feature, true),
+	('forum_posts'::public.feature, true);
 insert into public.user_types (slug, label, is_default)
 values ('default', 'Default', true);
 insert into public.branding (name, slogan, color_theme, radius)

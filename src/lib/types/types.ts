@@ -1,6 +1,6 @@
 import type { User } from '@supabase/supabase-js';
 
-export type Feature = 'map' | 'guides' | 'events' | 'docs';
+export type Feature = 'map' | 'guides' | 'events' | 'docs' | 'forum_posts';
 
 export type UserRole = 'user' | 'moderator' | 'admin';
 
@@ -111,6 +111,23 @@ export type Event = {
 export type EventWithAuthor = Event & { author: UserProfile };
 
 export type EventWithModeration = Event & { moderation: ModerationInfo[] };
+
+export type Post = {
+	id: number;
+	inserted_at: string;
+	updated_at: string;
+	user_id: string;
+	title: string;
+	content: string;
+	tags: string[];
+	moderation_status: ModerationStatus;
+};
+
+export type PostWithLikes = Post & { likes_count: number };
+
+export type PostWithAuthor = Post & { author: UserProfile };
+
+export type PostWithModeration = Post & { moderation: ModerationInfo[] };
 
 export type NotificationType =
 	| 'guide_pending'

@@ -77,6 +77,26 @@ export type Database = MergeDeep<
 						tag: string;
 					};
 				};
+				forum_posts_view: {
+					Row: {
+					  id: number;
+					  inserted_at: string;
+					  updated_at: string;
+					  title: string;
+					  content: string;
+					  tags: string[];
+					  fts: unknown;
+					  moderation_status: Database['public']['Enums']['moderation_status'];
+					  user_id: string;
+					};
+				  };
+				  
+				  forum_posts_tags: {
+					Row: {
+					  tag: string;
+					  count: number;
+					};
+				  };
 				latest_events_moderation: {
 					Row: {
 						comment: string;
@@ -107,6 +127,17 @@ export type Database = MergeDeep<
 						user_id: string;
 					};
 				};
+				latest_forum_posts_moderation: {
+					Row: {
+						comment: string;
+					  id: number;
+					  inserted_at: string;
+					  post_id: number;
+					  status: Database['public']['Enums']['moderation_status'];
+					  user_id: string;
+					};
+				  };
+				  
 				map_pins_view: {
 					Row: {
 						id: number;
@@ -143,6 +174,16 @@ export type Database = MergeDeep<
 					};
 					Returns: Database['public']['Views']['guides_view']['Row'][];
 				};
+				get_forum_post_likes_count: {
+					Args: {
+					  post_id: number;
+					  user_id?: string;
+					};
+					Returns: {
+					  count: number;
+					  has_likes: boolean;
+					}[];
+				  };
 			};
 		};
 	}
