@@ -9,7 +9,7 @@
 	import * as Popover from '@/components/ui/popover';
 	import { TagInput } from '@/components/ui/tag-input';
 	import { Textarea } from '@/components/ui/textarea';
-	import { createPostSchema, type CreatePostSchema } from '@/schemas/post';
+	import { createThreadSchema, type CreateThreadSchema } from '@/schemas/thread';
 	import { cn } from '@/utils';
 	import {
 		DateFormatter,
@@ -21,10 +21,10 @@
 	import { fileProxy, superForm, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient, type Infer } from 'sveltekit-superforms/adapters';
 
-	export let data: SuperValidated<Infer<CreatePostSchema>>;
+	export let data: SuperValidated<Infer<CreateThreadSchema>>;
 
 	const form = superForm(data, {
-		validators: zodClient(createPostSchema),
+		validators: zodClient(createThreadSchema),
 		taintedMessage: true,
 	});
 
@@ -35,7 +35,7 @@
 	<Card.Root>
 		<Card.Header>
 			<Card.Title>Information</Card.Title>
-			<Card.Description>Add details to this post</Card.Description>
+			<Card.Description>Add details to this thread</Card.Description>
 		</Card.Header>
 		<Card.Content class="space-y-4">
 			<Form.Field {form} name="title">

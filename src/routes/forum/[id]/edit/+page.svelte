@@ -1,13 +1,13 @@
 <script lang="ts">
 	import PageHeader from '@/components/page-header.svelte';
 	import { MetaTags } from 'svelte-meta-tags';
-	import PostForm from '../../_components/post-form.svelte';
+	import ThreadForm from '../../_components/thread-form.svelte';
 	export let data;
 </script>
 
-<MetaTags title="Edit Post" description="Edit this post" />
+<MetaTags title="Edit Thread" description="Edit this thread" />
 
-<PageHeader title="Edit Post" subtitle="Edit this post" />
+<PageHeader title="Edit Thread" subtitle="Edit this thread" />
 <div class="container mx-auto mb-20">
-	<PostForm data={data.updateForm} />
+	<ThreadForm data={data.updateForm} />
 </div>

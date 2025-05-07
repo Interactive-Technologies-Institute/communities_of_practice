@@ -77,7 +77,7 @@ export type Database = MergeDeep<
 						tag: string;
 					};
 				};
-				forum_posts_view: {
+				forum_threads_view: {
 					Row: {
 					  id: number;
 					  inserted_at: string;
@@ -91,7 +91,7 @@ export type Database = MergeDeep<
 					};
 				  };
 				  
-				  forum_posts_tags: {
+				  forum_threads_tags: {
 					Row: {
 					  tag: string;
 					  count: number;
@@ -127,12 +127,12 @@ export type Database = MergeDeep<
 						user_id: string;
 					};
 				};
-				latest_forum_posts_moderation: {
+				latest_forum_threads_moderation: {
 					Row: {
 						comment: string;
 					  id: number;
 					  inserted_at: string;
-					  post_id: number;
+					  thread_id: number;
 					  status: Database['public']['Enums']['moderation_status'];
 					  user_id: string;
 					};
@@ -174,9 +174,9 @@ export type Database = MergeDeep<
 					};
 					Returns: Database['public']['Views']['guides_view']['Row'][];
 				};
-				get_forum_post_likes_count: {
+				get_forum_thread_likes_count: {
 					Args: {
-					  post_id: number;
+					  thread_id: number;
 					  user_id?: string;
 					};
 					Returns: {

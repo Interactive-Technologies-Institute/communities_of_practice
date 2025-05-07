@@ -1,4 +1,4 @@
-import { createPostSchema } from '@/schemas/post';
+import { createThreadSchema } from '@/schemas/thread';
 import { handleFormAction, handleSignInRedirect } from '@/utils';
 import type { StorageError } from '@supabase/storage-js';
 import { error, fail, redirect } from '@sveltejs/kit';
@@ -13,38 +13,38 @@ export const load = async (event) => {
         return redirect(302, handleSignInRedirect(event));
     }
 
-    async function getPost(id: string) {
-        const { data: post, error: postError } = await event.locals.supabase
-            .from('forum_posts')
+    async function getThread(id: string) {
+        const { data: thread, error: threadError } = await event.locals.supabase
+            .from('forum_threads')
             .select('*')
             .eq('id', id)
             .single();
 
-        if (postError) {
-            const errorMessage = 'Error fetching post, please try again later.';
+        if (threadError) {
+            const errorMessage = 'Error fetching thread, please try again later.';
             setFlash({ type: 'error', message: errorMessage }, event.cookies);
             return error(500, errorMessage);
         }
-        return post;
+        return thread;
     }
 
-    const post = await getPost(event.params.id);
+    const thread = await getThread(event.params.id);
 
     return {
-        updateForm: await superValidate(post, zod(createPostSchema), {
-            id: 'update-post',
+        updateForm: await superValidate(thread, zod(createThreadSchema), {
+            id: 'update-thread',
         }),
     };
 };
 
 export const actions = {
     default: async (event) =>
-        handleFormAction(event, createPostSchema, 'update-post', async (event, userId, form) => {
+        handleFormAction(event, createThreadSchema, 'update-thread', async (event, userId, form) => {
 
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const data = form.data;
             const { error: supabaseError } = await event.locals.supabase
-                .from('forum_posts')
+                .from('forum_threads')
                 .update({ ...data, user_id: userId })
                 .eq('id', event.params.id);
 

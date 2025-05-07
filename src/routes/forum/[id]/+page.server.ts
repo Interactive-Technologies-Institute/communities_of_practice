@@ -1,5 +1,5 @@
-import { deletePostSchema, togglePostLikeSchema } from '@/schemas/post';
-import type { PostWithAuthor, ModerationInfo } from '@/types/types';
+import { deleteThreadSchema, toggleThreadLikeSchema } from '@/schemas/thread';
+import type { ThreadWithAuthor, ModerationInfo } from '@/types/types';
 import { handleFormAction } from '@/utils';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { setFlash } from 'sveltekit-flash-message/server';
@@ -9,28 +9,28 @@ import { zod } from 'sveltekit-superforms/adapters';
 export const load = async (event) => {
     const { user } = await event.locals.safeGetSession();
 
-    async function getPost(id: string): Promise<PostWithAuthor> {
-        const { data: post, error: postError } = await event.locals.supabase
-            .from('forum_posts_view')
+    async function getThread(id: string): Promise<ThreadWithAuthor> {
+        const { data: thread, error: threadError } = await event.locals.supabase
+            .from('forum_threads_view')
             .select('*, author:profiles_view!inner(*)')
             .eq('id', id)
             .single();
 
-        if (postError) {
-            const errorMessage = 'Error fetching post, please try again later.';
+        if (threadError) {
+            const errorMessage = 'Error fetching thread, please try again later.';
             setFlash({ type: 'error', message: errorMessage }, event.cookies);
             return error(500, errorMessage);
         }
 
         
-        return post;
+        return thread;
     }
 
-    async function getPostModeration(id: string): Promise<ModerationInfo[]> {
+    async function getThreadModeration(id: string): Promise<ModerationInfo[]> {
         const { data: moderation, error: moderationError } = await event.locals.supabase
-            .from('forum_posts_moderation')
+            .from('forum_threads_moderation')
             .select('*')
-            .eq('post_id', id)
+            .eq('thread_id', id)
             .order('inserted_at', { ascending: false });
 
         if (moderationError) {
@@ -44,8 +44,8 @@ export const load = async (event) => {
 
     async function getLikesCount(id: string): Promise<{ count: number; userLikes: boolean }> {
         const { data: likes, error: likesError } = await event.locals.supabase
-            .rpc('get_forum_post_likes_count', {
-                post_id: parseInt(id),
+            .rpc('get_forum_thread_likes_count', {
+                thread_id: parseInt(id),
                 user_id: user?.id,
             })
             .single();
@@ -63,25 +63,25 @@ export const load = async (event) => {
 
 
     return {
-        post: await getPost(event.params.id),
-        moderation: await getPostModeration(event.params.id),
+        thread: await getThread(event.params.id),
+        moderation: await getThreadModeration(event.params.id),
         likesCount: likesCount.count,
-        deleteForm: await superValidate(zod(deletePostSchema), {
-            id: 'delete-post',
+        deleteForm: await superValidate(zod(deleteThreadSchema), {
+            id: 'delete-thread',
         }),
         toggleLikeForm: await superValidate(
             { value: user ? likesCount.userLikes : false }, // Ensures only current user sees their state
-            zod(togglePostLikeSchema),
-            { id: 'toggle-post-like' }
+            zod(toggleThreadLikeSchema),
+            { id: 'toggle-thread-like' }
         ),
     };
 };
 
 export const actions = {
     delete: async (event) =>
-        handleFormAction(event, deletePostSchema, 'delete-post', async (event, userId, form) => {
+        handleFormAction(event, deleteThreadSchema, 'delete-thread', async (event, userId, form) => {
             const { error: supabaseError } = await event.locals.supabase
-                .from('forum_posts')
+                .from('forum_threads')
                 .delete()
                 .eq('id', form.data.id);
 
@@ -96,15 +96,15 @@ export const actions = {
     toggleLike: async (event) =>
         handleFormAction(
             event,
-            togglePostLikeSchema,
-            'toggle-post-like',
+            toggleThreadLikeSchema,
+            'toggle-thread-like',
             async (event, userId, form) => {
                 if (form.data.value) {
                     const { error: supabaseError } = await event.locals.supabase
-                        .from('forum_posts_liked')
+                        .from('forum_threads_liked')
                         .insert([
                             {
-                                post_id: parseInt(event.params.id),
+                                thread_id: parseInt(event.params.id),
                                 user_id: userId,
                             },
                         ]);
@@ -115,9 +115,9 @@ export const actions = {
                     }
                 } else {
                     const { error: supabaseError } = await event.locals.supabase
-                        .from('forum_posts_liked')
+                        .from('forum_threads_liked')
                         .delete()
-                        .eq('post_id', parseInt(event.params.id))
+                        .eq('thread_id', parseInt(event.params.id))
                         .eq('user_id', userId);
 
                     if (supabaseError) {

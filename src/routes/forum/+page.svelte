@@ -7,7 +7,7 @@
 	import { PlusCircle } from 'lucide-svelte';
 	import { MetaTags } from 'svelte-meta-tags';
 	import { queryParam } from 'sveltekit-search-params';
-	import PostItem from './_components/post-item.svelte';
+	import ThreadItem from './_components/thread-item.svelte';
 
 	export let data;
 
@@ -28,11 +28,11 @@
 	</div>
 	<Button href="/forum/create" class="w-10 p-0 sm:w-auto sm:px-4 sm:py-2">
 		<PlusCircle class="h-4 w-4 sm:mr-2" />
-		<span class="sr-only sm:not-sr-only">Create Post</span>
+		<span class="sr-only sm:not-sr-only">Create Thread</span>
 	</Button>
 </div>
 <div class="container mx-auto grid grid-cols-1 gap-6 py-10 max-w-2xl flex-col gap-y-4">
-	{#each data.forum_posts_with_likes as post}
-		<PostItem {post} />
+	{#each data.forum_threads_with_likes as thread}
+		<ThreadItem {thread} />
 	{/each}
 </div>

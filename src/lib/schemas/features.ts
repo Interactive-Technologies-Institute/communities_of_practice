@@ -5,7 +5,7 @@ export const updateFeaturesSchema = z.object({
 	events: z.boolean(),
 	map: z.boolean(),
 	docs: z.boolean(),
-	forum_posts: z.boolean(),
+	forum_threads: z.boolean(),
 });
 
 export type UpdateFeaturesSchema = typeof updateFeaturesSchema;

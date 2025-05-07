@@ -1,16 +1,16 @@
 <script lang="ts">
 	import PageHeader from '@/components/page-header.svelte';
 	import { MetaTags } from 'svelte-meta-tags';
-	import PostForm from '../_components/post-form.svelte';
+	import ThreadForm from '../_components/thread-form.svelte';
 	export let data;
 </script>
 
 <MetaTags
-	title="Create Post"
-	description="Create a new post for the forum of the community"
+	title="Create Thread"
+	description="Create a new thread for the forum of the community"
 />
 
-<PageHeader title="Create Event" subtitle="Create a new post for the forum of the community" />
+<PageHeader title="Create Thread" subtitle="Create a new thread for the forum of the community" />
 <div class="container mx-auto mb-20">
-	<PostForm data={data.createForm} />
+	<ThreadForm data={data.createForm} />
 </div>

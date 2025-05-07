@@ -1,4 +1,4 @@
-import { createPostSchema } from '@/schemas/post';
+import { createThreadSchema } from '@/schemas/thread';
 import { handleFormAction, handleSignInRedirect } from '@/utils';
 import { fail, redirect } from '@sveltejs/kit';
 import { setFlash } from 'sveltekit-flash-message/server';
@@ -12,17 +12,17 @@ export const load = async (event) => {
 	}
 
 	return {
-		createForm: await superValidate(zod(createPostSchema), {
-			id: 'create-post',
+		createForm: await superValidate(zod(createThreadSchema), {
+			id: 'create-thread',
 		}),
 	};
 };
 
 export const actions = {
 	default: async (event) =>
-		handleFormAction(event, createPostSchema, 'create-post', async (event, userId, form) => {
+		handleFormAction(event, createThreadSchema, 'create-thread', async (event, userId, form) => {
 			const { error } = await event.locals.supabase
-				.from('forum_posts')
+				.from('forum_threads')
 				.insert({
 					title: form.data.title,
 					content: form.data.content,

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const createPostSchema = z.object({
+export const createThreadSchema = z.object({
 	title: z
 		.string()
 		.min(5, { message: 'Title must be at least 5 characters' })
@@ -24,16 +24,16 @@ export const createPostSchema = z.object({
         }, 'Tags must be between 3 and 20 characters'),
 });
 
-export type CreatePostSchema = typeof createPostSchema;
+export type CreateThreadSchema = typeof createThreadSchema;
 
-export const deletePostSchema = z.object({
+export const deleteThreadSchema = z.object({
     id: z.number(),
 });
 
-export type DeletePostSchema = typeof deletePostSchema;
+export type DeleteThreadSchema = typeof deleteThreadSchema;
 
-export const togglePostLikeSchema = z.object({
+export const toggleThreadLikeSchema = z.object({
     value: z.boolean(),
 });
 
-export type TogglePostLikeSchema = typeof togglePostLikeSchema;
+export type ToggleThreadLikeSchema = typeof toggleThreadLikeSchema;

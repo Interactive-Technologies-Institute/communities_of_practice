@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Button } from '@/components/ui/button';
-	import { togglePostLikeSchema, type TogglePostLikeSchema } from '@/schemas/post';
+	import { toggleThreadLikeSchema, type ToggleThreadLikeSchema } from '@/schemas/thread';
 	import { cn } from '@/utils';
 	import { ThumbsUp } from 'lucide-svelte';
 	import { tick } from 'svelte';
@@ -8,10 +8,10 @@
 	import { zodClient } from 'sveltekit-superforms/adapters';
 
 	export let count: number;
-	export let data: SuperValidated<Infer<TogglePostLikeSchema>>;
+	export let data: SuperValidated<Infer<ToggleThreadLikeSchema>>;
 
 	const form = superForm(data, {
-		validators: zodClient(togglePostLikeSchema),
+		validators: zodClient(toggleThreadLikeSchema),
 		invalidateAll: 'force',
 		onUpdate: ({ result }) => {
 			if (result.type === 'failure') {
@@ -36,9 +36,9 @@
 	<Button type="button" on:click={toggleLike} variant="outline" size="sm">
 		<ThumbsUp class={cn('mr-2 h-4 w-4', { 'fill-foreground': $formData.value })} />
 		{#if $formData.value}
-			Liked this post
+			Liked this thread
 		{:else}
-			Like this post
+			Like this thread
 		{/if}
 		<span class="ml-4 font-mono text-xs">{count}</span>
 	</Button>

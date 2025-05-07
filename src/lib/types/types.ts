@@ -1,6 +1,6 @@
 import type { User } from '@supabase/supabase-js';
 
-export type Feature = 'map' | 'guides' | 'events' | 'docs' | 'forum_posts';
+export type Feature = 'map' | 'guides' | 'events' | 'docs' | 'forum_threads';
 
 export type UserRole = 'user' | 'moderator' | 'admin';
 
@@ -112,7 +112,7 @@ export type EventWithAuthor = Event & { author: UserProfile };
 
 export type EventWithModeration = Event & { moderation: ModerationInfo[] };
 
-export type Post = {
+export type Thread = {
 	id: number;
 	inserted_at: string;
 	updated_at: string;
@@ -123,11 +123,11 @@ export type Post = {
 	moderation_status: ModerationStatus;
 };
 
-export type PostWithLikes = Post & { likes_count: number };
+export type ThreadWithLikes = Thread & { likes_count: number };
 
-export type PostWithAuthor = Post & { author: UserProfile };
+export type ThreadWithAuthor = Thread & { author: UserProfile };
 
-export type PostWithModeration = Post & { moderation: ModerationInfo[] };
+export type ThreadWithModeration = Thread & { moderation: ModerationInfo[] };
 
 export type NotificationType =
 	| 'guide_pending'

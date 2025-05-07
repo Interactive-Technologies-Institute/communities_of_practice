@@ -75,7 +75,7 @@
 						Map
 					</a>
 				</FeatureWrapper>
-				<FeatureWrapper feature="forum_posts">
+				<FeatureWrapper feature="forum_threads">
 					<a
 						href="/forum"
 						on:click={() => (open = false)}

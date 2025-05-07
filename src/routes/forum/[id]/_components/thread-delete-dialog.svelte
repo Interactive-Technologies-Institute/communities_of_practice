@@ -1,15 +1,15 @@
 <script lang="ts">
 	import * as AlertDialog from '@/components/ui/alert-dialog';
-	import { deletePostSchema, type DeletePostSchema } from '@/schemas/post';
+	import { deleteThreadSchema, type DeleteThreadSchema } from '@/schemas/thread';
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 
 	export let open = false;
-	export let postId: number;
-	export let data: SuperValidated<Infer<DeletePostSchema>>;
+	export let threadId: number;
+	export let data: SuperValidated<Infer<DeleteThreadSchema>>;
 
 	const form = superForm(data, {
-		validators: zodClient(deletePostSchema),
+		validators: zodClient(deleteThreadSchema),
 	});
 
 	const { enhance } = form;
@@ -17,13 +17,13 @@
 
 <AlertDialog.Root bind:open>
 	<form method="POST" action="?/delete" use:enhance class="hidden">
-		<input type="hidden" name="id" value={postId} />
+		<input type="hidden" name="id" value={threadId} />
 	</form>
 	<AlertDialog.Content>
 		<AlertDialog.Header>
 			<AlertDialog.Title>Are you absolutely sure?</AlertDialog.Title>
 			<AlertDialog.Description>
-				This action cannot be undone. This will permanently delete this post and remove its data
+				This action cannot be undone. This will permanently delete this thread and remove its data
 				from our servers.
 			</AlertDialog.Description>
 		</AlertDialog.Header>
