@@ -20,7 +20,11 @@ create type public.user_permission as enum (
 	'forum_threads.create',
 	'forum_threads.update',
 	'forum_threads.delete',
-	'forum_threads.moderate'
+	'forum_threads.moderate',
+	'thread_comments.create',
+	'thread_comments.update',
+	'thread_comments.delete',
+	'thread_comments.moderate'
 );
 create type public.user_role as enum ('user', 'moderator', 'admin');
 create table public.user_roles (
@@ -164,6 +168,9 @@ values ('user', 'guides.create'),
 	('user', 'forum_threads.create'),
 	('user', 'forum_threads.update'),
 	('user', 'forum_threads.delete'),
+	('user', 'thread_comments.create'),
+	('user', 'thread_comments.update'),
+	('user', 'thread_comments.delete'),
 	('moderator', 'guides.create'),
 	('moderator', 'guides.update'),
 	('moderator', 'guides.delete'),
@@ -180,6 +187,10 @@ values ('user', 'guides.create'),
 	('moderator', 'forum_threads.update'),
 	('moderator', 'forum_threads.delete'),
 	('moderator', 'forum_threads.moderate'),
+	('moderator', 'thread_comments.create'),
+	('moderator', 'thread_comments.update'),
+	('moderator', 'thread_comments.delete'),
+	('moderator', 'thread_comments.moderate'),
 	('admin', 'user_roles.update'),
 	('admin', 'user_types.update'),
 	('admin', 'features.update'),
@@ -199,4 +210,8 @@ values ('user', 'guides.create'),
 	('admin', 'forum_threads.create'),
 	('admin', 'forum_threads.update'),
 	('admin', 'forum_threads.delete'),
-	('admin', 'forum_threads.moderate');
+	('admin', 'forum_threads.moderate'),
+	('admin', 'thread_comments.create'),
+	('admin', 'thread_comments.update'),
+	('admin', 'thread_comments.delete'),
+	('admin', 'thread_comments.moderate');

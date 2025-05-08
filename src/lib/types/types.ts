@@ -129,6 +129,18 @@ export type ThreadWithAuthor = Thread & { author: UserProfile };
 
 export type ThreadWithModeration = Thread & { moderation: ModerationInfo[] };
 
+export type ThreadComment = {
+	id: number;
+	thread_id: number;
+	user_id: string;
+	content: string;
+	inserted_at: string;
+	updated_at: string;
+	parent_id: number | null;
+  };  
+
+  export type ThreadCommentWithLikes = ThreadComment & { likes_count: number };
+
 export type NotificationType =
 	| 'guide_pending'
 	| 'guide_changes_requested'

@@ -1,5 +1,6 @@
 import { deleteThreadSchema, toggleThreadLikeSchema } from '@/schemas/thread';
-import type { ThreadWithAuthor, ModerationInfo } from '@/types/types';
+import { createThreadCommentSchema } from '@/schemas/thread-comment';
+import type { ThreadWithAuthor, ModerationInfo, ThreadCommentWithLikes } from '@/types/types';
 import { handleFormAction } from '@/utils';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { setFlash } from 'sveltekit-flash-message/server';
@@ -61,6 +62,39 @@ export const load = async (event) => {
 
     const likesCount = await getLikesCount(event.params.id);
 
+    async function getThreadComments(threadId: string): Promise<ThreadCommentWithLikes[]> {
+        const { data: comments, error: commentsError } = await event.locals.supabase
+            .from('thread_comments')
+            .select('*')
+            .eq('thread_id', threadId)
+            .order('inserted_at', { ascending: true });
+    
+        if (commentsError) {
+            const errorMessage = 'Error fetching comments, please try again later.';
+            setFlash({ type: 'error', message: errorMessage }, event.cookies);
+            return error(500, errorMessage);
+        }
+    
+        const commentsWithLikes = await Promise.all(
+            comments.map(async (comment) => {
+                const { data: data, error: likeError } = await event.locals.supabase
+                    .rpc('get_thread_comment_likes_count', {
+                        comment_id: comment.id,
+                        user_id: user?.id,
+                    })
+                    .single();
+    
+                return {
+                    ...comment,
+                    likes_count: likeError ? 0 : data.count ?? 0,
+                };
+            })
+        );
+    
+        return commentsWithLikes;
+    }
+    
+
 
     return {
         thread: await getThread(event.params.id),
@@ -70,14 +104,35 @@ export const load = async (event) => {
             id: 'delete-thread',
         }),
         toggleLikeForm: await superValidate(
-            { value: user ? likesCount.userLikes : false }, // Ensures only current user sees their state
+            { value: user ? likesCount.userLikes : false },
             zod(toggleThreadLikeSchema),
             { id: 'toggle-thread-like' }
         ),
+        createThreadCommentForm: await superValidate(zod(createThreadCommentSchema), {
+            id: 'create-thread-comment',
+        }),
+        thread_comments_with_likes: await getThreadComments(event.params.id),
     };
 };
 
 export const actions = {
+    createThreadComment: async (event) =>
+            handleFormAction(event, createThreadCommentSchema, 'create-thread-comment', async (event, userId, form) => {
+                const { error } = await event.locals.supabase
+                    .from('thread_comments')
+                    .insert({
+                        content: form.data.content,
+                        user_id: userId,
+                        thread_id: parseInt(event.params.id),
+                    });
+    
+                if (error) {
+                    setFlash({ type: 'error', message: error.message }, event.cookies);
+                    return fail(500, { message: error.message, form });
+                }
+    
+                return redirect(303, '/forum/' + event.params.id);
+            }),
     delete: async (event) =>
         handleFormAction(event, deleteThreadSchema, 'delete-thread', async (event, userId, form) => {
             const { error: supabaseError } = await event.locals.supabase
