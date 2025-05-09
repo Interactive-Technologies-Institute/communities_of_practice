@@ -123,7 +123,7 @@ export type Thread = {
 	moderation_status: ModerationStatus;
 };
 
-export type ThreadWithLikes = Thread & { likes_count: number };
+export type ThreadWithAuthorAndLikes = Thread & { author: UserProfile, likes_count: number };
 
 export type ThreadWithAuthor = Thread & { author: UserProfile };
 
@@ -139,7 +139,7 @@ export type ThreadComment = {
 	parent_id: number | null;
   };  
 
-  export type ThreadCommentWithLikes = ThreadComment & { likes_count: number };
+  export type ThreadCommentWithAuthorAndLikes = ThreadComment & { author: UserProfile, likes_count: number };
 
 export type NotificationType =
 	| 'guide_pending'

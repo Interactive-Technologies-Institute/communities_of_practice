@@ -11,6 +11,8 @@
 	import LikeButton from './_components/like-button.svelte';
 	import ThreadCommentForm from './_components/comment-form.svelte';
 	import ThreadCommentItem from './_components/comment-item.svelte';
+	import * as Avatar from '@/components/ui/avatar';
+	import { firstAndLastInitials } from '@/utils';
 
 	export let data;
 
@@ -47,6 +49,19 @@
 			{/each}
 		</div>
 	</div>
+	<div class="mx-auto flex max-w-2xl flex-col gap-y-4">
+		<div class="flex items-center gap-2 self-start">
+			<Avatar.Root class="h-8 w-8">
+				<Avatar.Image src={data.thread.author.avatar} alt={data.thread.author.display_name} />
+				<Avatar.Fallback>
+					{firstAndLastInitials(data.thread.author.display_name)}
+				</Avatar.Fallback>
+			</Avatar.Root>
+			<Button variant="link" size="sm" href={`/users/${data.thread.author.id}`} class="p-0 h-auto">
+				{data.thread.author.display_name}
+			</Button>
+		</div>
+	</div>
 	<div class="flex flex-col items-center gap-y-4">
 		<div class="flex flex-row items-center justify-center gap-x-4">
 			<LikeButton count={data.likesCount} data={data.toggleLikeForm} />
@@ -67,10 +82,6 @@
 			• Updated {dayjs(data.thread.updated_at).fromNow()}
 			{/if}
 		</p>
-		<Button variant="link" size="sm" href="/users/{data.thread.author.id}">
-			by
-			{data.thread.author.display_name}
-		</Button>
 	</div>
 	{#if data.thread.user_id === data.user?.id}
 		<div

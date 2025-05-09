@@ -1,4 +1,4 @@
-import type { ThreadWithLikes } from '@/types/types';
+import type { ThreadWithAuthorAndLikes } from '@/types/types';
 import { arrayQueryParam, stringQueryParam } from '@/utils';
 import { error } from '@sveltejs/kit';
 import { setFlash } from 'sveltekit-flash-message/server';
@@ -8,10 +8,10 @@ export const load = async (event) => {
     const search = stringQueryParam().decode(event.url.searchParams.get('s'));
     const tags = arrayQueryParam().decode(event.url.searchParams.get('tags'));
 
-    async function getThreads(): Promise<ThreadWithLikes[]> {
+    async function getThreads(): Promise<ThreadWithAuthorAndLikes[]> {
         let query = event.locals.supabase
             .from('forum_threads_view')
-            .select('*')
+            .select('*, author:profiles_view!inner(*)')
             .order('moderation_status', { ascending: true })
             .order('inserted_at', { ascending: false });
 
@@ -31,7 +31,7 @@ export const load = async (event) => {
             return error(500, errorMessage);
         }
 
-        const threadsWithLikes = await Promise.all(
+        const threadsWithAuthorAndLikes = await Promise.all(
 			forumThreads.map(async (thread) => {
 				const { data, error: likesError } = await event.locals.supabase
 					.rpc('get_forum_thread_likes_count', {
@@ -47,7 +47,7 @@ export const load = async (event) => {
 			})
 		);
 
-		return threadsWithLikes;
+		return threadsWithAuthorAndLikes;
     }
 
     async function getTags(): Promise<Map<string, number>> {

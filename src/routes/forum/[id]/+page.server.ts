@@ -1,6 +1,6 @@
 import { deleteThreadSchema, toggleThreadLikeSchema } from '@/schemas/thread';
 import { createThreadCommentSchema } from '@/schemas/thread-comment';
-import type { ThreadWithAuthor, ModerationInfo, ThreadCommentWithLikes } from '@/types/types';
+import type { ThreadWithAuthor, ModerationInfo, ThreadCommentWithAuthorAndLikes } from '@/types/types';
 import { handleFormAction } from '@/utils';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { setFlash } from 'sveltekit-flash-message/server';
@@ -62,10 +62,10 @@ export const load = async (event) => {
 
     const likesCount = await getLikesCount(event.params.id);
 
-    async function getThreadComments(threadId: string): Promise<ThreadCommentWithLikes[]> {
+    async function getThreadComments(threadId: string): Promise<ThreadCommentWithAuthorAndLikes[]> {
         const { data: comments, error: commentsError } = await event.locals.supabase
             .from('thread_comments')
-            .select('*')
+            .select('*, author:profiles_view!inner(*)')
             .eq('thread_id', threadId)
             .order('inserted_at', { ascending: true });
     
@@ -75,7 +75,7 @@ export const load = async (event) => {
             return error(500, errorMessage);
         }
     
-        const commentsWithLikes = await Promise.all(
+        const commentsWithAuthorAndLikes = await Promise.all(
             comments.map(async (comment) => {
                 const { data: data, error: likeError } = await event.locals.supabase
                     .rpc('get_thread_comment_likes_count', {
@@ -91,7 +91,7 @@ export const load = async (event) => {
             })
         );
     
-        return commentsWithLikes;
+        return commentsWithAuthorAndLikes;
     }
     
 

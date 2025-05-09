@@ -4,10 +4,12 @@
 	import { Badge } from '@/components/ui/badge';
 	import { Button } from '@/components/ui/button';
 	import { Card } from '@/components/ui/card';
-	import type { ThreadWithLikes } from '@/types/types';
+	import type { ThreadWithAuthorAndLikes } from '@/types/types';
 	import { Tag } from 'lucide-svelte';
+	import * as Avatar from '@/components/ui/avatar';
+	import { firstAndLastInitials } from '@/utils';
 
-	export let thread: ThreadWithLikes;
+	export let thread: ThreadWithAuthorAndLikes;
 
 	const moderationStatusLabels = {
 		pending: 'Pending',
@@ -29,6 +31,13 @@
 				<h2 class="line-clamp-2 text-lg font-medium whitespace-pre-wrap break-words">{thread.title}</h2>
 				<p class="line-clamp-2 text-muted-foreground whitespace-pre-wrap break-words">{thread.content}</p>
 				<p class="mt-2 text-sm text-muted-foreground">Updated at: {updatedAt}</p>
+				<div class="flex items-center gap-2">
+					<Avatar.Root class="h-8 w-8">
+						<Avatar.Image src={thread.author.avatar} alt={thread.author.display_name} />
+						<Avatar.Fallback>{firstAndLastInitials(thread.author.display_name)}</Avatar.Fallback>
+					</Avatar.Root>
+					<p class="text-sm font-medium">{thread.author.display_name}</p>
+					</div>
 
 				<div class="flex flex-wrap gap-2">
 					<Button variant="secondary" size="sm">{thread.likes_count}</Button>

@@ -4,9 +4,11 @@
 	import { Badge } from '@/components/ui/badge';
 	import { Button } from '@/components/ui/button';
 	import { Card } from '@/components/ui/card';
-	import type { ThreadCommentWithLikes } from '@/types/types';
+	import type { ThreadCommentWithAuthorAndLikes } from '@/types/types';
+	import * as Avatar from '@/components/ui/avatar';
+	import { firstAndLastInitials } from '@/utils';
 
-	export let comment: ThreadCommentWithLikes;
+	export let comment: ThreadCommentWithAuthorAndLikes;
 
 	const moderationStatusLabels = {
 		pending: 'Pending',
@@ -25,6 +27,14 @@
 		<div class="mb-5">
 			<p class="line-clamp-2 text-muted-foreground whitespace-pre-wrap break-words">{comment.content}</p>
 			<!--<p class="mt-2 text-sm text-muted-foreground">Updated at: {updatedAt}</p>-->
+			<div class="flex items-center gap-2">
+				<Avatar.Root class="h-8 w-8">
+					<Avatar.Image src={comment.author.avatar} alt={comment.author.display_name} />
+					<Avatar.Fallback>{firstAndLastInitials(comment.author.display_name)}</Avatar.Fallback>
+				</Avatar.Root>
+				<p class="text-sm font-medium">{comment.author.display_name}</p>
+				</div>
+
 			<div class="flex flex-wrap gap-2">
 				<Button variant="secondary" size="sm">{comment.likes_count}</Button>
 			</div> 
