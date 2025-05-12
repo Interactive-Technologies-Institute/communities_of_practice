@@ -22,6 +22,8 @@
 	import { zodClient, type Infer } from 'sveltekit-superforms/adapters';
 
 	export let data: SuperValidated<Infer<CreateThreadCommentSchema>>;
+	export let parentId: number | null = null;
+    export let open: boolean;
 
 	const form = superForm(data, {
 		validators: zodClient(createThreadCommentSchema),
@@ -32,6 +34,7 @@
 </script>
 
 <form method="POST" enctype="multipart/form-data" action="?/createThreadComment" use:enhance class="flex flex-col gap-y-10">
+	<input type="hidden" name="parent_id" value={parentId ?? ''} />
 	<Card.Root>
 		<Card.Content class="space-y-4">
 			<Form.Field {form} name="content">
@@ -41,6 +44,7 @@
 					<Form.FieldErrors />
 				</Form.Control>
 			</Form.Field>
+			<Button type="button" variant="outline" on:click={() => (open = false)}>Cancel</Button>
 			<Button type="submit" disabled={$submitting}>
 				{#if $submitting}
 					<Loader2 class="mr-2 h-4 w-4 animate-spin" />

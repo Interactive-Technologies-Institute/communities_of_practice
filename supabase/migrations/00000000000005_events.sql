@@ -56,13 +56,13 @@ select count(*) as interest_count,
 		when exists (
 			select 1
 			from public.events_interested
-			where user_id = user_id
-				and event_id = event_id
+			where user_id = $2
+				and event_id = $1
 		) then true
 		else false
 	end as has_interest
 from public.events_interested
-where event_id = event_id;
+where event_id = $1;
 $$;
 create view public.latest_events_moderation with (security_invoker = on) as
 select distinct on (event_id) *
@@ -80,8 +80,8 @@ select unnest(tags) as tag,
 from public.events
 group by tag;
 -- Storage Buckets
--- insert into storage.buckets (id, name, public, allowed_mime_types)
--- values ('events', 'Events', true, '{"image/*"}');
+insert into storage.buckets (id, name, public, allowed_mime_types)
+values ('events', 'Events', true, '{"image/*"}');
 -- RLS policies
 alter table public.events enable row level security;
 alter table public.events_moderation enable row level security;

@@ -6,6 +6,7 @@ import { error, fail, redirect } from '@sveltejs/kit';
 import { setFlash } from 'sveltekit-flash-message/server';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
+import type { NestedComment } from '@/types/types';
 
 export const load = async (event) => {
     const { user } = await event.locals.safeGetSession();
@@ -62,39 +63,61 @@ export const load = async (event) => {
 
     const likesCount = await getLikesCount(event.params.id);
 
+    function buildCommentTree(comments: ThreadCommentWithAuthorAndLikes[]): NestedComment[] {
+        const map = new Map<number, NestedComment>();
+        const roots: NestedComment[] = [];
+
+        for (const comment of comments) {
+            map.set(comment.id, { ...comment, replies: [] });
+        }
+
+        for (const comment of map.values()) {
+            if (comment.parent_id) {
+                const parent = map.get(comment.parent_id);
+                if (parent) {
+                    comment.parent_author = parent.author.display_name; 
+                    parent.replies.push(comment);
+                }
+            } else {
+                roots.push(comment);
+            }
+        }
+
+        return roots;
+    }
+
     async function getThreadComments(threadId: string): Promise<ThreadCommentWithAuthorAndLikes[]> {
+
         const { data: comments, error: commentsError } = await event.locals.supabase
             .from('thread_comments')
             .select('*, author:profiles_view!inner(*)')
             .eq('thread_id', threadId)
             .order('inserted_at', { ascending: true });
-    
+
         if (commentsError) {
             const errorMessage = 'Error fetching comments, please try again later.';
             setFlash({ type: 'error', message: errorMessage }, event.cookies);
             return error(500, errorMessage);
         }
-    
-        const commentsWithAuthorAndLikes = await Promise.all(
+
+        const commentsWithExtra = await Promise.all(
             comments.map(async (comment) => {
                 const { data: data, error: likeError } = await event.locals.supabase
                     .rpc('get_thread_comment_likes_count', {
                         comment_id: comment.id,
-                        user_id: user?.id,
+                        user_id: user?.id
                     })
                     .single();
-    
+
                 return {
                     ...comment,
-                    likes_count: likeError ? 0 : data.count ?? 0,
+                    likes_count: likeError ? 0 : data.count ?? 0
                 };
             })
         );
-    
-        return commentsWithAuthorAndLikes;
-    }
-    
 
+        return commentsWithExtra;
+    }
 
     return {
         thread: await getThread(event.params.id),
@@ -111,7 +134,7 @@ export const load = async (event) => {
         createThreadCommentForm: await superValidate(zod(createThreadCommentSchema), {
             id: 'create-thread-comment',
         }),
-        thread_comments_with_likes: await getThreadComments(event.params.id),
+        nestedComments: buildCommentTree(await getThreadComments(event.params.id)),
     };
 };
 
@@ -124,6 +147,8 @@ export const actions = {
                         content: form.data.content,
                         user_id: userId,
                         thread_id: parseInt(event.params.id),
+                        parent_id: form.data.parent_id ?? null,
+
                     });
     
                 if (error) {

@@ -141,6 +141,8 @@ export type ThreadComment = {
 
   export type ThreadCommentWithAuthorAndLikes = ThreadComment & { author: UserProfile, likes_count: number };
 
+  export type NestedComment = ThreadCommentWithAuthorAndLikes & { replies: NestedComment[], parent_author?: string;};
+
 export type NotificationType =
 	| 'guide_pending'
 	| 'guide_changes_requested'

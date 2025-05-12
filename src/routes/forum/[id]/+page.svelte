@@ -8,7 +8,7 @@
 	import { ChartNoAxesColumn, Clock, Footprints, Pen, Tag, Trash } from 'lucide-svelte';
 	import { MetaTags } from 'svelte-meta-tags';
 	import ThreadDeleteDialog from './_components/thread-delete-dialog.svelte';
-	import LikeButton from './_components/like-button.svelte';
+	import ThreadLikeButton from '../_components/thread-like-button.svelte';
 	import ThreadCommentForm from './_components/comment-form.svelte';
 	import ThreadCommentItem from './_components/comment-item.svelte';
 	import * as Avatar from '@/components/ui/avatar';
@@ -64,15 +64,13 @@
 	</div>
 	<div class="flex flex-col items-center gap-y-4">
 		<div class="flex flex-row items-center justify-center gap-x-4">
-			<LikeButton count={data.likesCount} data={data.toggleLikeForm} />
+			<ThreadLikeButton count={data.likesCount} data={data.toggleLikeForm} />
 		</div>
 	</div>
-	<div class="mx-auto flex max-w-2xl flex-col gap-y-4">
+	<div class="mx-auto flex max-w-2xl flex-col gap-y-6 pb-6">
 		<ThreadCommentForm data={data.createThreadCommentForm} />
-	</div>
-	<div class="container mx-auto grid grid-cols-1 gap-6 py-10 max-w-2xl flex-col gap-y-4">
-		{#each data.thread_comments_with_likes as comment}
-			<ThreadCommentItem {comment} />
+		{#each data.nestedComments as comment}
+			<ThreadCommentItem comment={comment} data={data.createThreadCommentForm}/>
 		{/each}
 	</div>
 	<div class="flex flex-col items-center">

@@ -146,8 +146,8 @@ order by
     case when sort_order = 'desc' then coalesce(usefuls.usefuls_count, 0) end desc;
 $$;
 -- Storage Buckets
--- insert into storage.buckets (id, name, public, allowed_mime_types)
--- values ('guides', 'Guides', true, '{"image/*"}');
+insert into storage.buckets (id, name, public, allowed_mime_types)
+values ('guides', 'Guides', true, '{"image/*"}');
 -- RLS policies
 alter table public.guides enable row level security;
 alter table public.guides_moderation enable row level security;

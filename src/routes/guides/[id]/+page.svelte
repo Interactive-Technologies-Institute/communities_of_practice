@@ -85,7 +85,7 @@
 							<span class="md:hidden">{i + 1}. </span>
 							{step.title}
 						</h2>
-						<p>{step.description}</p>
+						<p class="whitespace-pre-wrap break-words">{step.description}</p>
 					</div>
 					<InteractableImage
 						src={step.image}
