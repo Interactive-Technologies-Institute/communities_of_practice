@@ -136,6 +136,7 @@ export type ThreadComment = {
 	content: string;
 	inserted_at: string;
 	updated_at: string;
+	is_reply: boolean;
 	parent_id: number | null;
   };  
 

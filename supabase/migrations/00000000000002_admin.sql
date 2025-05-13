@@ -39,8 +39,8 @@ end loop;
 end;
 $$;
 -- Storage Buckets
-insert into storage.buckets (id, name, public, allowed_mime_types)
-values ('branding', 'Branding', true, '{"image/*"}');
+-- insert into storage.buckets (id, name, public, allowed_mime_types)
+-- values ('branding', 'Branding', true, '{"image/*"}');
 -- RLS policies
 alter table public.feature_flags enable row level security;
 alter table public.user_types enable row level security;

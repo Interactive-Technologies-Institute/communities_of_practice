@@ -1,5 +1,5 @@
 import { deleteThreadSchema, toggleThreadLikeSchema } from '@/schemas/thread';
-import { createThreadCommentSchema } from '@/schemas/thread-comment';
+import { createThreadCommentSchema, deleteThreadCommentSchema } from '@/schemas/thread-comment';
 import type { ThreadWithAuthor, ModerationInfo, ThreadCommentWithAuthorAndLikes } from '@/types/types';
 import { handleFormAction } from '@/utils';
 import { error, fail, redirect } from '@sveltejs/kit';
@@ -72,16 +72,19 @@ export const load = async (event) => {
         }
 
         for (const comment of map.values()) {
-            if (comment.parent_id) {
-                const parent = map.get(comment.parent_id);
-                if (parent) {
-                    comment.parent_author = parent.author.display_name; 
-                    parent.replies.push(comment);
-                }
-            } else {
-                roots.push(comment);
-            }
-        }
+		if (comment.is_reply) {
+			const parent = comment.parent_id ? map.get(comment.parent_id) : undefined;
+			if (parent) {
+				comment.parent_author = parent.author.display_name;
+				parent.replies.push(comment);
+			} else {
+				comment.parent_author = '(deleted comment)';
+				roots.push(comment);
+			}
+		} else {
+			roots.push(comment);
+		}
+	}
 
         return roots;
     }
@@ -134,6 +137,9 @@ export const load = async (event) => {
         createThreadCommentForm: await superValidate(zod(createThreadCommentSchema), {
             id: 'create-thread-comment',
         }),
+        deleteThreadCommentForm: await superValidate(zod(deleteThreadCommentSchema), {
+            id: 'delete-thread-comment',
+        }),
         nestedComments: buildCommentTree(await getThreadComments(event.params.id)),
     };
 };
@@ -147,8 +153,8 @@ export const actions = {
                         content: form.data.content,
                         user_id: userId,
                         thread_id: parseInt(event.params.id),
-                        parent_id: form.data.parent_id ?? null,
-
+                        is_reply: form.data.parent_id !== null,
+                        parent_id: form.data.parent_id ?? null
                     });
     
                 if (error) {
@@ -156,8 +162,23 @@ export const actions = {
                     return fail(500, { message: error.message, form });
                 }
     
-                return redirect(303, '/forum/' + event.params.id);
+                return { form };
             }),
+    deleteThreadComment: async (event) =>
+        handleFormAction(event, deleteThreadCommentSchema, 'delete-thread-comment', async (event, userId, form) => {
+            const { error: supabaseError } = await event.locals.supabase
+                .from('thread_comments')
+                .delete()
+                .eq('id', form.data.id)
+                .eq('user_id', userId);
+
+            if (supabaseError) {
+                setFlash({ type: 'error', message: supabaseError.message }, event.cookies);
+                return fail(500, { message: supabaseError.message, form });
+            }
+
+            return { form };
+        }),
     delete: async (event) =>
         handleFormAction(event, deleteThreadSchema, 'delete-thread', async (event, userId, form) => {
             const { error: supabaseError } = await event.locals.supabase

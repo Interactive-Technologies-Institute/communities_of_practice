@@ -129,8 +129,8 @@ insert on auth.users for each row execute procedure public.handle_new_user();
 create trigger handle_updated_at before
 update on public.profiles for each row execute procedure moddatetime (updated_at);
 -- Storage Buckets
-insert into storage.buckets (id, name, public, allowed_mime_types)
-values ('users', 'Users', true, '{"image/*"}');
+-- insert into storage.buckets (id, name, public, allowed_mime_types)
+-- values ('users', 'Users', true, '{"image/*"}');
 -- RLS policies
 alter table public.user_roles enable row level security;
 alter table public.role_permissions enable row level security;

@@ -28,6 +28,11 @@
 	const form = superForm(data, {
 		validators: zodClient(createThreadCommentSchema),
 		taintedMessage: true,
+		onResult({ result }) {
+			if (result.type === 'success') {
+				open = false;
+			}
+		}
 	});
 
 	const { form: formData, enhance, submitting } = form;

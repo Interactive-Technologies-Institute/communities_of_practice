@@ -70,7 +70,7 @@
 	<div class="mx-auto flex max-w-2xl flex-col gap-y-6 pb-6">
 		<ThreadCommentForm data={data.createThreadCommentForm} />
 		{#each data.nestedComments as comment}
-			<ThreadCommentItem comment={comment} data={data.createThreadCommentForm}/>
+			<ThreadCommentItem comment={comment} createForm={data.createThreadCommentForm} deleteForm={data.deleteThreadCommentForm} currentUserId={data.user?.id} currentUserRole={data.user?.role}/>
 		{/each}
 	</div>
 	<div class="flex flex-col items-center">
