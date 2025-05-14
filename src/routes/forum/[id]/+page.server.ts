@@ -12,7 +12,7 @@ export const load = async (event) => {
     const { user } = await event.locals.safeGetSession();
 
     async function getThread(id: string): Promise<ThreadWithAuthor> {
-        const { data: thread, error: threadError } = await event.locals.supabase
+        const { data: threadData, error: threadError } = await event.locals.supabase
             .from('forum_threads_view')
             .select('*, author:profiles_view!inner(*)')
             .eq('id', id)
@@ -24,10 +24,12 @@ export const load = async (event) => {
             return error(500, errorMessage);
         }
 
-        
-        return thread;
-    }
+        const imageUrl = threadData.image
+            ? event.locals.supabase.storage.from('forum_threads').getPublicUrl(threadData.image).data.publicUrl
+            : undefined;
 
+        return { ...threadData, image: imageUrl };
+    }
     async function getThreadModeration(id: string): Promise<ModerationInfo[]> {
         const { data: moderation, error: moderationError } = await event.locals.supabase
             .from('forum_threads_moderation')

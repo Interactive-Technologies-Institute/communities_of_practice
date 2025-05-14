@@ -25,11 +25,13 @@
 	openGraph={{
 		title: data.thread.title,
 		description: data.thread.content,
+		images: [{ url: data.thread.image ?? ''}],
 	}}
 	twitter={{
 		cardType: 'summary_large_image',
 		title: data.thread.title,
 		description: data.thread.content,
+		image: data.thread.image,
 	}}
 />
 
@@ -40,6 +42,12 @@
 	{/if}
 	<div class="mx-auto flex max-w-2xl flex-col gap-y-4">
 		<p class="whitespace-pre-wrap break-words">{data.thread.content}</p>
+		{#if data.thread.image !== ''}
+			<InteractableImage
+				src={data.thread.image}
+				class="aspect-[3/2] h-auto w-full rounded-md object-cover"
+			/>
+		{/if}
 		<div class=" flex flex-wrap gap-2">
 			{#each data.thread.tags as tag}
 			<Button variant="secondary" size="sm" href="/forum?tags={tag}">

@@ -225,6 +225,7 @@ export type Database = {
           content: string
           fts: unknown | null
           id: number
+          image: string
           inserted_at: string
           tags: string[]
           title: string
@@ -235,6 +236,7 @@ export type Database = {
           content: string
           fts?: unknown | null
           id?: number
+          image: string
           inserted_at?: string
           tags: string[]
           title: string
@@ -245,6 +247,7 @@ export type Database = {
           content?: string
           fts?: unknown | null
           id?: number
+          image?: string
           inserted_at?: string
           tags?: string[]
           title?: string
@@ -1054,6 +1057,7 @@ export type Database = {
           content: string | null
           fts: unknown | null
           id: number | null
+          image: string | null
           inserted_at: string | null
           moderation_status:
             | Database["public"]["Enums"]["moderation_status"]

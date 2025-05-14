@@ -29,6 +29,21 @@
 	});
 
 	const { form: formData, enhance, submitting } = form;
+
+	const image = fileProxy(form, 'image');
+	let imageUrl: string | null | undefined = $formData.imageUrl;
+	$: {
+		if ($image.length > 0) {
+			const img = $image.item(0);
+			const reader = new FileReader();
+			reader.onload = (e) => {
+				imageUrl = e.target?.result as string | null | undefined;
+			};
+			reader.readAsDataURL(img!);
+		} else {
+			imageUrl = $formData.imageUrl;
+		}
+	}
 </script>
 
 <form method="POST" enctype="multipart/form-data" use:enhance class="flex flex-col gap-y-10">
@@ -59,6 +74,25 @@
 					<Form.FieldErrors />
 				</Form.Control>
 			</Form.Field>
+			<div class="grid grid-cols-1 gap-x-4 md:grid-cols-2">
+				<Form.Field {form} name="image">
+					<Form.Control let:attrs>
+						<Form.Label>Image</Form.Label>
+						<Card.Root class="aspect-[3/2] overflow-hidden">
+							{#if imageUrl}
+								<InteractableImage
+									src={imageUrl}
+									alt="Thread Image"
+									class="h-full w-full object-cover"
+								/>
+							{/if}
+						</Card.Root>
+						<FileInput {...attrs} bind:files={$image} accept="image/*" />
+						<input hidden value={$formData.imageUrl} name="imageUrl" />
+						<Form.FieldErrors />
+					</Form.Control>
+				</Form.Field>
+			</div>
 		</Card.Content>
 	</Card.Root>
 	<div

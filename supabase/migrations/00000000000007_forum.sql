@@ -6,6 +6,7 @@ create table public.forum_threads (
   user_id uuid not null references public.profiles(id),
   title text not null,
   content text not null,
+  image text not null,
   tags text [] not null
 );
 alter table public.forum_threads
@@ -76,6 +77,9 @@ select unnest(tags) as tag,
 	count(*) as count
 from public.forum_threads
 group by tag;
+-- Storage Buckets
+ insert into storage.buckets (id, name, public, allowed_mime_types)
+ values ('forum_threads', 'Threads', true, '{"image/*"}');
 -- RLS policies
 alter table public.forum_threads enable row level security;
 alter table public.forum_threads_moderation enable row level security;

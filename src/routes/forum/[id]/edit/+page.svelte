@@ -2,6 +2,7 @@
 	import PageHeader from '@/components/page-header.svelte';
 	import { MetaTags } from 'svelte-meta-tags';
 	import ThreadForm from '../../_components/thread-form.svelte';
+	
 	export let data;
 </script>
 

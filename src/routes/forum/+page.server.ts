@@ -42,6 +42,7 @@ export const load = async (event) => {
 
 				return {
 					...thread,
+                    image: thread.image ?? '',
 					likes_count: likesError ? 0 : data.count ?? 0,
 				};
 			})

@@ -120,6 +120,7 @@ export type Thread = {
 	title: string;
 	content: string;
 	tags: string[];
+	image?: string;
 	moderation_status: ModerationStatus;
 };
 

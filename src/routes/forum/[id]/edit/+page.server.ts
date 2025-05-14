@@ -14,7 +14,7 @@ export const load = async (event) => {
     }
 
     async function getThread(id: string) {
-        const { data: thread, error: threadError } = await event.locals.supabase
+        const { data: threadData, error: threadError } = await event.locals.supabase
             .from('forum_threads')
             .select('*')
             .eq('id', id)
@@ -25,7 +25,8 @@ export const load = async (event) => {
             setFlash({ type: 'error', message: errorMessage }, event.cookies);
             return error(500, errorMessage);
         }
-        return thread;
+		const imageUrl = event.locals.supabase.storage.from('forum_threads').getPublicUrl(threadData.image);
+        return { ...threadData, image: undefined, imageUrl: imageUrl.data.publicUrl };
     }
 
     const thread = await getThread(event.params.id);
@@ -40,12 +41,40 @@ export const load = async (event) => {
 export const actions = {
     default: async (event) =>
         handleFormAction(event, createThreadSchema, 'update-thread', async (event, userId, form) => {
+            async function uploadImage(
+                image: File
+            ): Promise<{ path: string; error: StorageError | null }> {
+                const fileExt = image.name.split('.').pop();
+                const filePath = `${uuidv4()}.${fileExt}`;
+
+                const { data: imageFileData, error: imageFileError } = await event.locals.supabase.storage
+                    .from('forum_threads')
+                    .upload(filePath, image);
+
+                if (imageFileError) {
+                    setFlash({ type: 'error', message: imageFileError.message }, event.cookies);
+                    return { path: '', error: imageFileError };
+                }
+
+                return { path: imageFileData.path, error: null };
+            }
+
+            let imagePath = '';
+            if (form.data.image) {
+                const { path, error } = await uploadImage(form.data.image);
+                if (error) {
+                    return fail(500, withFiles({ message: error.message, form }));
+                }
+                imagePath = path;
+            } else if (form.data.imageUrl) {
+                imagePath = form.data.imageUrl.split('/').pop() ?? '';
+            }
 
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const data = form.data;
+            const { imageUrl, ...data } = form.data;
             const { error: supabaseError } = await event.locals.supabase
                 .from('forum_threads')
-                .update({ ...data, user_id: userId })
+                .update({ ...data, user_id: userId, image: imagePath })
                 .eq('id', event.params.id);
 
             if (supabaseError) {

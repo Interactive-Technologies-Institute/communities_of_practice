@@ -80,8 +80,8 @@ select unnest(tags) as tag,
 from public.events
 group by tag;
 -- Storage Buckets
--- insert into storage.buckets (id, name, public, allowed_mime_types)
--- values ('events', 'Events', true, '{"image/*"}');
+insert into storage.buckets (id, name, public, allowed_mime_types)
+values ('events', 'Events', true, '{"image/*"}');
 -- RLS policies
 alter table public.events enable row level security;
 alter table public.events_moderation enable row level security;
