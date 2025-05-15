@@ -74,6 +74,13 @@
 					<Form.FieldErrors />
 				</Form.Control>
 			</Form.Field>
+			<Form.Field {form} name="summary">
+				<Form.Control let:attrs>
+					<Form.Label>Summary</Form.Label>
+					<Textarea {...attrs} bind:value={$formData.summary} />
+					<Form.FieldErrors />
+				</Form.Control>
+			</Form.Field>
 			<div class="grid grid-cols-1 gap-x-4 md:grid-cols-2">
 				<Form.Field {form} name="image">
 					<Form.Control let:attrs>

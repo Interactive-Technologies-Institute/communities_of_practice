@@ -119,6 +119,7 @@ export type Thread = {
 	user_id: string;
 	title: string;
 	content: string;
+	summary?:string | null;
 	tags: string[];
 	image?: string;
 	moderation_status: ModerationStatus;

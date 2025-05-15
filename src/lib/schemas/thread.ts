@@ -13,6 +13,7 @@ export const createThreadSchema = z
             .max(5000, { message: 'Content must be less than 5000 characters' }),
         imageUrl: z.string().nullish(),
         image: z.instanceof(File).nullish(),
+        summary: z.string().nullish(),
         tags: z
             .array(z.string())
             .refine((tags) => tags.length <= 5, {

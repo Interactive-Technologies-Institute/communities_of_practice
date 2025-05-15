@@ -61,6 +61,7 @@ export const actions = {
 					content: form.data.content,
 					user_id: userId,
 					image: imagePath,
+					summary: form.data.summary,
 					tags: form.data.tags
 				});
 

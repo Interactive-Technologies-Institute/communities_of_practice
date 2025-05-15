@@ -42,11 +42,14 @@
 	{/if}
 	<div class="mx-auto flex max-w-2xl flex-col gap-y-4">
 		<p class="whitespace-pre-wrap break-words">{data.thread.content}</p>
-		{#if data.thread.image !== ''}
+		{#if data.thread.image !== null && data.thread.image !== undefined}
 			<InteractableImage
 				src={data.thread.image}
 				class="aspect-[3/2] h-auto w-full rounded-md object-cover"
 			/>
+		{/if}
+		{#if data.thread.summary !== null && data.thread.summary !== undefined}
+			<p class="whitespace-pre-wrap break-words">{"Summary:" + data.thread.summary}</p>
 		{/if}
 		<div class=" flex flex-wrap gap-2">
 			{#each data.thread.tags as tag}

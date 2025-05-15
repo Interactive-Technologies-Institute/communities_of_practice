@@ -7,6 +7,7 @@ create table public.forum_threads (
   title text not null,
   content text not null,
   image text not null,
+  summary text,
   tags text [] not null
 );
 alter table public.forum_threads
