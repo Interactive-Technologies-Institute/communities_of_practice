@@ -20,6 +20,8 @@
 	import { CalendarIcon, Loader2 } from 'lucide-svelte';
 	import { fileProxy, superForm, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient, type Infer } from 'sveltekit-superforms/adapters';
+	import { PUBLIC_OPENAI_API_KEY } from '$env/static/public';
+	import { OpenAI } from 'openai';
 
 	export let data: SuperValidated<Infer<CreateThreadSchema>>;
 
@@ -44,6 +46,52 @@
 			imageUrl = $formData.imageUrl;
 		}
 	}
+
+	const openai = new OpenAI({ apiKey: PUBLIC_OPENAI_API_KEY, dangerouslyAllowBrowser: true});
+	const prompt = 'This is the content of a forum thread on a platform for communities of practice. Summarize it: ';
+
+	let loading = false;
+
+	async function generateSummary(content: string): Promise<string | null> {
+		try {
+			/*const response = await openai.chat.completions.create({
+				model: 'gpt-3.5-turbo',
+				messages: [
+					{
+						role: 'system',
+						content: 'You are an assistant that summarizes forum threads clearly and concisely.'
+					},
+					{
+						role: 'user',
+						content: `Summarize the following thread content:\n\n${content}`
+					}
+				],
+				temperature: 0.7,
+				max_tokens: 300
+			});*/
+			// return response.choices[0]?.message?.content?.trim() ?? null;
+			return "OLAAAAA"
+		} catch (error) {
+			console.error('Error generating summary:', error);
+			return null;
+		}
+	}
+
+	async function handleGenerateSummary() {
+		loading = true;
+
+		const summary = await generateSummary($formData.content);
+
+		if (summary) {
+			$formData = {
+				...$formData,
+				summary
+			};
+		}
+
+		loading = false;
+	}
+
 </script>
 
 <form method="POST" enctype="multipart/form-data" use:enhance class="flex flex-col gap-y-10">
@@ -76,8 +124,22 @@
 			</Form.Field>
 			<Form.Field {form} name="summary">
 				<Form.Control let:attrs>
-					<Form.Label>Summary</Form.Label>
-					<Textarea {...attrs} bind:value={$formData.summary} />
+					<Form.Label class="flex justify-between items-center">
+						Summary
+						<Button
+							type="button"
+							size="sm"
+							on:click={handleGenerateSummary}
+							disabled={loading}
+						>
+							{#if loading}
+								<Loader2 class="mr-2 h-4 w-4 animate-spin" />
+							{:else}
+								Generate Summary
+							{/if}
+						</Button>
+					</Form.Label>
+					<Textarea {...attrs} bind:value={$formData.summary} disabled={loading} />
 					<Form.FieldErrors />
 				</Form.Control>
 			</Form.Field>
