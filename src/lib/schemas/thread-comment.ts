@@ -20,6 +20,7 @@ export const deleteThreadCommentSchema = z.object({
 export type DeleteThreadCommentSchema = typeof deleteThreadCommentSchema;
 
 export const toggleThreadCommentLikeSchema = z.object({
+    id: z.number(),
     value: z.boolean(),
 });
 

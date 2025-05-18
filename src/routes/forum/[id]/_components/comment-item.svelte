@@ -8,7 +8,7 @@
 	import * as Avatar from '@/components/ui/avatar';
 	import { firstAndLastInitials } from '@/utils';
 	import ThreadCommentLikeButton from './comment-like-button.svelte';
-	import { createThreadCommentSchema, deleteThreadCommentSchema } from '@/schemas/thread-comment';
+	import { createThreadCommentSchema, deleteThreadCommentSchema, toggleThreadCommentLikeSchema } from '@/schemas/thread-comment';
 	import { zodClient, type Infer } from 'sveltekit-superforms/adapters';
 	import { superForm, type SuperValidated } from 'sveltekit-superforms';
 	import ThreadCommentItem from './comment-item.svelte';
@@ -19,6 +19,7 @@
 	export let comment: NestedComment;
 	export let createForm: SuperValidated<Infer<typeof createThreadCommentSchema>>;
 	export let deleteForm: SuperValidated<Infer<typeof deleteThreadCommentSchema>>;
+	export let toggleCommentLikeForms: Record<string, SuperValidated<Infer<typeof toggleThreadCommentLikeSchema>>>;
 	export let currentUserId: string | undefined;
 	export let currentUserRole: string | undefined;
 	let replying = false;
@@ -57,9 +58,9 @@
 				</Avatar.Root>
 				<p class="text-sm font-medium">{comment.author.display_name}</p>
 			</div>
-			<!--<div class="flex flex-wrap gap-2">
-				<ThreadCommentLikeButton count={comment.likes_count} data />
-				</div>-->
+			<div class="flex flex-wrap gap-2">
+				<ThreadCommentLikeButton count={comment.likes_count} data={toggleCommentLikeForms[comment.id]} />
+			</div>
 			<div class="mt-3 flex gap-x-2">
 				<Button type="button" on:click={() => (replying = !replying)}>
 					{replying ? 'Cancel' : 'Reply'}
@@ -86,6 +87,6 @@
 
 {#if comment.replies && comment.replies.length > 0}
     {#each comment.replies as reply}
-      <ThreadCommentItem comment={reply} createForm={createForm} deleteForm={deleteForm} currentUserId={currentUserId} currentUserRole={currentUserRole}/>
+      <ThreadCommentItem comment={reply} createForm={createForm} deleteForm={deleteForm} toggleCommentLikeForms={toggleCommentLikeForms} currentUserId={currentUserId} currentUserRole={currentUserRole}/>
     {/each}
 {/if}

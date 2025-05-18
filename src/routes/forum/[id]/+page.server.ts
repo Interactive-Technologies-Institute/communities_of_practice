@@ -1,5 +1,5 @@
 import { deleteThreadSchema, toggleThreadLikeSchema } from '@/schemas/thread';
-import { createThreadCommentSchema, deleteThreadCommentSchema } from '@/schemas/thread-comment';
+import { createThreadCommentSchema, deleteThreadCommentSchema, toggleThreadCommentLikeSchema } from '@/schemas/thread-comment';
 import type { ThreadWithAuthor, ModerationInfo, ThreadCommentWithAuthorAndLikes } from '@/types/types';
 import { handleFormAction } from '@/utils';
 import { error, fail, redirect } from '@sveltejs/kit';
@@ -7,6 +7,8 @@ import { setFlash } from 'sveltekit-flash-message/server';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import type { NestedComment } from '@/types/types';
+import type { SuperValidated } from 'sveltekit-superforms';
+import type { Infer } from 'sveltekit-superforms';
 
 export const load = async (event) => {
     const { user } = await event.locals.safeGetSession();
@@ -91,8 +93,7 @@ export const load = async (event) => {
         return roots;
     }
 
-    async function getThreadComments(threadId: string): Promise<ThreadCommentWithAuthorAndLikes[]> {
-
+    async function getThreadComments(threadId: string): Promise<NestedComment[]> {
         const { data: comments, error: commentsError } = await event.locals.supabase
             .from('thread_comments')
             .select('*, author:profiles_view!inner(*)')
@@ -104,10 +105,10 @@ export const load = async (event) => {
             setFlash({ type: 'error', message: errorMessage }, event.cookies);
             return error(500, errorMessage);
         }
-
-        const commentsWithExtra = await Promise.all(
+        // For each comment, fetch like count and whether the user has liked it
+        const commentsWithExtra: NestedComment[] = await Promise.all(
             comments.map(async (comment) => {
-                const { data: data, error: likeError } = await event.locals.supabase
+                const { data, error: likeError } = await event.locals.supabase
                     .rpc('get_thread_comment_likes_count', {
                         comment_id: comment.id,
                         user_id: user?.id
@@ -116,12 +117,33 @@ export const load = async (event) => {
 
                 return {
                     ...comment,
-                    likes_count: likeError ? 0 : data.count ?? 0
+                    likes_count: likeError ? 0 : data.count ?? 0,
+                    replies: [],
                 };
             })
         );
+	    return commentsWithExtra;
+    }
+    // Fetch all comments and build the like forms for each
+    const comments = await getThreadComments(event.params.id);
+    const commentLikeForms: Record<string, SuperValidated<Infer<typeof toggleThreadCommentLikeSchema>>> = {};
+    
+    for (const comment of comments) {
+        const { data, error: likeError } = await event.locals.supabase
+            .rpc('get_thread_comment_likes_count', {
+                comment_id: comment.id,
+                user_id: user?.id
+            })
+            .single();
 
-        return commentsWithExtra;
+        const userHasLiked = likeError ? false : data.has_likes ?? false;
+        const form = await superValidate(
+            { id: comment.id, value: userHasLiked },
+            zod(toggleThreadCommentLikeSchema),
+            { id: `toggle-thread-comment-like-${comment.id}` }
+        );
+
+        commentLikeForms[comment.id] = form;
     }
 
     return {
@@ -142,6 +164,7 @@ export const load = async (event) => {
         deleteThreadCommentForm: await superValidate(zod(deleteThreadCommentSchema), {
             id: 'delete-thread-comment',
         }),
+        toggleCommentLikeForms: commentLikeForms,
         nestedComments: buildCommentTree(await getThreadComments(event.params.id)),
     };
 };
@@ -181,6 +204,33 @@ export const actions = {
 
             return { form };
         }),
+    toggleCommentLike: async (event) =>
+        handleFormAction(
+            event,
+            toggleThreadCommentLikeSchema,
+            'toggle-thread-comment-like',
+            async (event, userId, form) => {
+                const supabase = event.locals.supabase;
+
+                if (form.data.value) {
+                    const { error } = await supabase
+                        .from('thread_comments_liked')
+                        .insert({
+                            comment_id: form.data.id,
+                            user_id: userId
+                        });
+                    if (error) return fail(500, { message: error.message, form });
+                } else {
+                    const { error } = await supabase
+                        .from('thread_comments_liked')
+                        .delete()
+                        .eq('comment_id', form.data.id)
+                        .eq('user_id', userId);
+                    if (error) return fail(500, { message: error.message, form });
+                }
+                return { form };
+            }
+        ),
     delete: async (event) =>
         handleFormAction(event, deleteThreadSchema, 'delete-thread', async (event, userId, form) => {
             const { error: supabaseError } = await event.locals.supabase
