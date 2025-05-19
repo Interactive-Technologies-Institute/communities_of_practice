@@ -89,6 +89,21 @@
 				</Form.Field>
 				<Form.Field
 					{form}
+					name="users"
+					class="flex flex-row items-center justify-between rounded-lg border p-4"
+				>
+					<Form.Control let:attrs>
+						<div class="space-y-0.5">
+							<Form.Label>Members</Form.Label>
+							<Form.Description>
+								Enable this feature to view all the members of the community.
+							</Form.Description>
+						</div>
+						<Switch includeInput {...attrs} bind:checked={$formData.users} />
+					</Form.Control>
+				</Form.Field>
+				<Form.Field
+					{form}
 					name="docs"
 					class="flex flex-row items-center justify-between rounded-lg border p-4"
 				>

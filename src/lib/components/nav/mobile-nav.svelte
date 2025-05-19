@@ -87,6 +87,18 @@
 						Forum
 					</a>
 				</FeatureWrapper>
+				<FeatureWrapper feature="users">
+					<a
+						href="/users"
+						on:click={() => (open = false)}
+						class={cn(
+							'transition-colors hover:text-foreground/80',
+							$page.url.pathname.startsWith('/users') ? 'text-foreground' : 'text-foreground/60'
+						)}
+					>
+						Members
+					</a>
+				</FeatureWrapper>
 			</nav>
 		</ScrollArea>
 	</Sheet.Content>
