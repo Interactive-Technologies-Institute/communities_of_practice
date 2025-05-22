@@ -10,7 +10,8 @@
 	import { Loader2 } from 'lucide-svelte';
 	import { fileProxy, superForm, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient, type Infer } from 'sveltekit-superforms/adapters';
-
+	import { TagInput } from '@/components/ui/tag-input';
+	
 	export let data: SuperValidated<Infer<UpdateUserProfileSchema>>;
 
 	const form = superForm(data, {
@@ -56,6 +57,74 @@
 					<Form.Control let:attrs>
 						<Form.Label>Description</Form.Label>
 						<Input {...attrs} bind:value={$formData.description} />
+						<Form.FieldErrors />
+					</Form.Control>
+				</Form.Field>
+				<Form.Field {form} name="date">
+					<Form.Control let:attrs>
+						<Form.Label for="date">Date</Form.Label>
+						<Input
+							{...attrs}
+							type="text"
+							placeholder="DD/MM/YYYY"
+							bind:value={$formData.date}
+							/>
+						<Form.FieldErrors />
+					</Form.Control>
+				</Form.Field>
+				<Form.Field {form} name="profession">
+					<Form.Control let:attrs>
+						<Form.Label>Profession</Form.Label>
+						<Input {...attrs} bind:value={$formData.profession} />
+						<Form.FieldErrors />
+					</Form.Control>
+				</Form.Field>
+				<Form.Field {form} name="website">
+					<Form.Control let:attrs>
+						<Form.Label>Website</Form.Label>
+						<Input {...attrs} bind:value={$formData.website} />
+						<Form.FieldErrors />
+					</Form.Control>
+				</Form.Field>
+				<Form.Field {form} name="gender">
+					<Form.Control let:attrs>
+						<Form.Label>Gender</Form.Label>
+						<Input {...attrs} bind:value={$formData.gender} />
+						<Form.FieldErrors />
+					</Form.Control>
+				</Form.Field>
+				<Form.Field {form} name="nationality">
+					<Form.Control let:attrs>
+						<Form.Label>Nationality</Form.Label>
+						<Input {...attrs} bind:value={$formData.nationality} />
+						<Form.FieldErrors />
+					</Form.Control>
+				</Form.Field>
+				<Form.Field {form} name="interests">
+					<Form.Control let:attrs>
+						<Form.Label>Interests</Form.Label>
+						<TagInput {...attrs} bind:value={$formData.interests} />
+						<Form.FieldErrors />
+					</Form.Control>
+				</Form.Field>
+				<Form.Field {form} name="skills">
+					<Form.Control let:attrs>
+						<Form.Label>Skills</Form.Label>
+						<TagInput {...attrs} bind:value={$formData.skills} />
+						<Form.FieldErrors />
+					</Form.Control>
+				</Form.Field>
+				<Form.Field {form} name="education_exps">
+					<Form.Control let:attrs>
+						<Form.Label>Educational Experiences</Form.Label>
+						<TagInput {...attrs} bind:value={$formData.education_exps} />
+						<Form.FieldErrors />
+					</Form.Control>
+				</Form.Field>
+				<Form.Field {form} name="languages">
+					<Form.Control let:attrs>
+						<Form.Label>Languages</Form.Label>
+						<TagInput {...attrs} bind:value={$formData.languages} />
 						<Form.FieldErrors />
 					</Form.Control>
 				</Form.Field>

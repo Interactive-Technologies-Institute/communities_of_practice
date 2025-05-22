@@ -16,6 +16,15 @@ export type UserProfile = {
 	display_name: string;
 	description: string | null;
 	avatar: string | null;
+	date: string | null;
+	profession: string | null;
+	website: string | null;
+	gender: string | null;
+	nationality: string | null;
+	interests: string[]; // default: []
+	skills: string[];    // default: []
+	education: string[]; // default: []
+	languages: string[]; // default: []
 };
 
 export type UserType = {

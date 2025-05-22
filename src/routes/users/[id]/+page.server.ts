@@ -33,7 +33,13 @@ export const load = async (event) => {
 				.getPublicUrl(userProfile.avatar).data.publicUrl;
 		}
 
-		return userProfile;
+		return {
+			...userProfile,
+			interests: userProfile.interests ?? [],
+			skills: userProfile.skills ?? [],
+			education: userProfile.education ?? [],
+			languages: userProfile.languages ?? [],
+    };
 	}
 
 	async function getGuides(): Promise<{ id: number; label: string }[]> {
@@ -51,6 +57,23 @@ export const load = async (event) => {
 		}
 
 		return guides;
+	}
+
+	async function getThreads(): Promise<{ id: number; label: string }[]> {
+		const { data: threads, error: threadsError } = await event.locals.supabase
+			.from('forum_threads_view')
+			.select('id, label:title')
+			.order('moderation_status', { ascending: true })
+			.order('inserted_at', { ascending: false })
+			.eq('user_id', id);
+
+		if (threadsError) {
+			const errorMessage = 'Error fetching threads, please try again later.';
+			setFlash({ type: 'error', message: errorMessage }, event.cookies);
+			return error(500, errorMessage);
+		}
+
+		return threads;
 	}
 
 	async function getEvents(): Promise<{ id: number; label: string }[]> {
@@ -90,6 +113,7 @@ export const load = async (event) => {
 		userProfile: await getUserProfile(),
 		guides: await getGuides(),
 		events: await getEvents(),
+		forum_threads: await getThreads(),
 		mapPin: await getMapPin(),
 	};
 };

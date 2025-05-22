@@ -17,23 +17,19 @@
 <PageHeader title="User Details" subtitle="View user details and their contributions" />
 <div class="container mx-auto mb-20 flex max-w-3xl flex-col gap-y-8 md:gap-y-10">
 	<Card.Root>
-		<Card.Header>
-			<div class="flex flex-row items-center gap-x-4">
-				<Avatar.Root class="h-20 w-20">
-					<Avatar.Image src={data.userProfile.avatar} alt={data.userProfile.display_name} />
-					<Avatar.Fallback>{firstAndLastInitials(data.userProfile.display_name)}</Avatar.Fallback>
-				</Avatar.Root>
-				<div>
-					<Card.Title class="text-xl">{data.userProfile.display_name}</Card.Title>
-					<Card.Description class="text-lg">
-						{data.userProfile.type}
-					</Card.Description>
-				</div>
-			</div>
+		<Card.Header class="flex flex-col items-center text-center gap-y-2">
+			<Avatar.Root class="h-28 w-28">
+				<Avatar.Image src={data.userProfile.avatar} alt={data.userProfile.display_name} />
+				<Avatar.Fallback>{firstAndLastInitials(data.userProfile.display_name)}</Avatar.Fallback>
+			</Avatar.Root>
+			<Card.Title class="text-xl">{data.userProfile.display_name}</Card.Title>
+			<Card.Description class="text-lg">
+				{data.userProfile.type}
+			</Card.Description>
 		</Card.Header>
-		<Card.Content class="space-y-4">
+		<Card.Content class="space-y-4 text-center flex flex-col items-center">
 			<p>{data.userProfile.description ?? 'No description provided'}</p>
-			<div class="flex flex-row gap-x-4">
+			<div class="flex flex-row gap-x-4 justify-center">
 				<Button href="mailto:{data.userProfile.email}" variant="outline">
 					<Mail class="mr-2 h-4 w-4" />
 					Email
@@ -90,6 +86,28 @@
 					</div>
 				{:else}
 					<p class="text-sm text-muted-foreground">User has not created any Events</p>
+				{/if}
+			</Card.Content>
+		</Card.Root>
+	</FeatureWrapper>
+	<FeatureWrapper feature="forum_threads">
+		<Card.Root>
+			<Card.Header>
+				<Card.Title>Threads ({data.forum_threads.length})</Card.Title>
+				<Card.Description>List of Events created</Card.Description>
+			</Card.Header>
+			<Card.Content>
+				{#if data.forum_threads && data.forum_threads.length > 0}
+					<div class="flex flex-wrap gap-4">
+						{#each data.forum_threads as forum_thread}
+							<Button href="/forum/{forum_thread.id}" variant="outline" class="max-w-full">
+								<span class="truncate">{forum_thread.label}</span>
+								<SquareArrowOutUpRight class="ml-2 h-4 w-4 shrink-0 text-muted-foreground" />
+							</Button>
+						{/each}
+					</div>
+				{:else}
+					<p class="text-sm text-muted-foreground">User has not created any Threads</p>
 				{/if}
 			</Card.Content>
 		</Card.Root>

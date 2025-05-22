@@ -40,7 +40,13 @@ export const load = async (event) => {
 				.data.publicUrl;
 		}
 
-		return { ...userProfile, avatar: undefined, avatarUrl };
+		return { 
+			...userProfile, 
+			interests: userProfile.interests ?? [],
+			skills:userProfile.skills ?? [],
+			education: userProfile.education ?? [],
+			languages: userProfile.languages ?? [],
+			avatar: undefined, avatarUrl };
 	}
 
 	const userProfileData = await getUserProfile(id);
@@ -98,6 +104,15 @@ export const actions = {
 						display_name: form.data.display_name,
 						description: form.data.description,
 						avatar: avatarPath,
+						profession: form.data.profession,
+						website: form.data.website,
+						gender: form.data.gender,
+						nationality: form.data.nationality,
+						interests: form.data.interests,
+						skills: form.data.skills,
+						education: form.data.education_exps,
+						languages: form.data.languages,
+						date: form.data.date,
 					})
 					.eq('id', userId);
 

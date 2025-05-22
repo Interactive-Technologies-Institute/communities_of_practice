@@ -739,33 +739,60 @@ export type Database = {
       profiles: {
         Row: {
           avatar: string | null
+          date: string | null
           description: string | null
           display_name: string
+          education: string[]
           email: string
+          gender: string | null
           id: string
           inserted_at: string
+          interests: string[]
+          languages: string[]
+          nationality: string | null
+          profession: string | null
+          skills: string[]
           type: string
           updated_at: string
+          website: string | null
         }
         Insert: {
           avatar?: string | null
+          date?: string | null
           description?: string | null
           display_name: string
+          education?: string[]
           email: string
+          gender?: string | null
           id: string
           inserted_at?: string
+          interests?: string[]
+          languages?: string[]
+          nationality?: string | null
+          profession?: string | null
+          skills?: string[]
           type: string
           updated_at?: string
+          website?: string | null
         }
         Update: {
           avatar?: string | null
+          date?: string | null
           description?: string | null
           display_name?: string
+          education?: string[]
           email?: string
+          gender?: string | null
           id?: string
           inserted_at?: string
+          interests?: string[]
+          languages?: string[]
+          nationality?: string | null
+          profession?: string | null
+          skills?: string[]
           type?: string
           updated_at?: string
+          website?: string | null
         }
         Relationships: []
       }
@@ -1362,14 +1389,23 @@ export type Database = {
       profiles_view: {
         Row: {
           avatar: string | null
+          date: string | null
           description: string | null
           display_name: string | null
+          education: string[] | null
           email: string | null
+          gender: string | null
           id: string | null
           inserted_at: string | null
+          interests: string[] | null
+          languages: string[] | null
+          nationality: string | null
+          profession: string | null
           role: Database["public"]["Enums"]["user_role"] | null
+          skills: string[] | null
           type: string | null
           updated_at: string | null
+          website: string | null
         }
         Relationships: []
       }
