@@ -77,6 +77,37 @@
 		}
 	}
 
+	async function generateTags(content: string): Promise<string[] | null> {
+	try {
+		/*const response = await openai.chat.completions.create({
+			model: 'gpt-3.5-turbo',
+			messages: [
+				{
+					role: 'system',
+					content: 'You are an assistant that suggests useful tags for discussion forum threads.'
+				},
+				{
+					role: 'user',
+					content: `Return a maximum of 5 unique tags (each between 3 and 20 characters) that represent the following thread content as a JSON array of strings. Example: ["tag1", "tag2"]\n\nContent:\n${content}`
+				}
+			],
+			temperature: 0.7,
+			max_tokens: 100
+		});
+
+		const generated = response.choices[0]?.message?.content?.trim();
+		if (!generated) return null;
+
+		const tags: string[] = JSON.parse(generated);
+		if (Array.isArray(tags)) return tags;*/
+
+		return ['tag1', 'tag2', 'tag3', 'tag4', 'tag5'];
+	} catch (error) {
+		console.error('Error generating tags:', error);
+		return null;
+	}
+}
+
 	async function handleGenerateSummary() {
 		loading = true;
 
@@ -86,6 +117,21 @@
 			$formData = {
 				...$formData,
 				summary
+			};
+		}
+
+		loading = false;
+	}
+
+	async function handleGenerateTags() {
+		loading = true;
+
+		const tags = await generateTags($formData.content);
+
+		if (tags) {
+			$formData = {
+				...$formData,
+				tags
 			};
 		}
 
@@ -117,7 +163,21 @@
 			</Form.Field>
 			<Form.Field {form} name="tags">
 				<Form.Control let:attrs>
-					<Form.Label>Tags*</Form.Label>
+					<Form.Label class="flex justify-between items-center">
+						Tags*
+						<Button
+							type="button"
+							size="sm"
+							on:click={handleGenerateTags}
+							disabled={loading}
+						>
+							{#if loading}
+								<Loader2 class="mr-2 h-4 w-4 animate-spin" />
+							{:else}
+								Generate Tags
+							{/if}
+						</Button>
+					</Form.Label>
 					<TagInput {...attrs} bind:value={$formData.tags} />
 					<Form.FieldErrors />
 				</Form.Control>
