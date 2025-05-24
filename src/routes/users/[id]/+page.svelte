@@ -10,12 +10,43 @@
 	import { MetaTags } from 'svelte-meta-tags';
 
 	export let data;
+
+	function parseDateFromDDMMYYYY(input: string): Date | null {
+		const [day, month, year] = input.split('/');
+		if (!day || !month || !year) return null;
+		return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+	}
+
+	function calculateAge(birthdate: string | null): number | null {
+		if (!birthdate) return null;
+
+		const birth = birthdate.includes('/')
+			? parseDateFromDDMMYYYY(birthdate)
+			: new Date(birthdate);
+
+		if (!birth || isNaN(birth.getTime())) return null;
+
+		const today = new Date();
+		let age = today.getFullYear() - birth.getFullYear();
+		const m = today.getMonth() - birth.getMonth();
+
+		if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+			age--;
+		}
+
+		return age;
+	}
+
+	const age = calculateAge(data.userProfile.date);
+
+	let activeSection: 'interests' | 'skills' | 'education' | 'languages' = 'interests';
+
 </script>
 
 <MetaTags title="User Details" description="" />
 
-<PageHeader title="User Details" subtitle="View user details and their contributions" />
-<div class="container mx-auto mb-20 flex max-w-3xl flex-col gap-y-8 md:gap-y-10">
+<!--<PageHeader title="User Details" subtitle="View user details and their contributions" />-->
+<div class="container mx-auto mb-20 mt-10 flex max-w-3xl flex-col gap-y-8 md:gap-y-10">
 	<Card.Root>
 		<Card.Header class="flex flex-col items-center text-center gap-y-2">
 			<Avatar.Root class="h-28 w-28">
@@ -46,7 +77,89 @@
 			{/if}
 		</Card.Content>
 	</Card.Root>
-	<FeatureWrapper feature="guides">
+	<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+		<Card.Root class="h-28 flex flex-col items-center justify-center text-sm text-center leading-tight px-4 overflow-hidden break-words">
+			<div><strong>Gender:</strong></div>
+			<div>{data.userProfile.gender ?? '-'}</div>
+		</Card.Root>
+		<Card.Root class="h-28 flex flex-col items-center justify-center text-sm text-center leading-tight px-4 overflow-hidden break-words">
+			<div><strong>Age:</strong></div>
+			<div>{age ?? '-'} years old</div>
+		</Card.Root>
+		<Card.Root class="h-28 flex flex-col items-center justify-center text-sm text-center leading-tight px-4 overflow-hidden break-words">
+			<div><strong>Nationality:</strong></div>
+			<div>{data.userProfile.nationality ?? '-'}</div>
+		</Card.Root>
+		<Card.Root class="h-28 flex flex-col items-center justify-center text-sm text-center leading-tight px-4 overflow-hidden break-words">
+			<div><strong>Profession:</strong></div>
+			<div>{data.userProfile.profession ?? '-'}</div>
+		</Card.Root>
+	</div>
+	<Card.Root>
+		<!--<Card.Header><Card.Title>Capabilities</Card.Title></Card.Header>-->
+		<Card.Content>
+			<div class="flex flex-wrap justify-center gap-4 mb-4 mt-4">
+				<Button class="w-32"
+					variant={activeSection === 'interests' ? 'default' : 'outline'}
+					on:click={() => activeSection = 'interests'}
+				>
+					Interests
+				</Button>
+				<Button class="w-32"
+					variant={activeSection === 'skills' ? 'default' : 'outline'}
+					on:click={() => activeSection = 'skills'}
+				>
+					Skills
+				</Button>
+				<Button class="w-32"
+					variant={activeSection === 'education' ? 'default' : 'outline'}
+					on:click={() => activeSection = 'education'}
+				>
+					Education
+				</Button>
+				<Button class="w-32"
+					variant={activeSection === 'languages' ? 'default' : 'outline'}
+					on:click={() => activeSection = 'languages'}
+				>
+					Languages
+				</Button>
+			</div>
+			{#if activeSection === 'interests'}
+				<div class="flex flex-col gap-2">
+					{#each data.userProfile.interests as item}
+						<div class="bg-gray-200 rounded px-4 py-2 text-sm text-center">
+							{item}
+						</div>
+					{/each}
+				</div>
+			{:else if activeSection === 'skills'}
+				<div class="flex flex-col gap-2">
+					{#each data.userProfile.skills as item}
+						<div class="bg-gray-200 rounded px-4 py-2 text-sm text-center">
+							{item}
+						</div>
+					{/each}
+				</div>
+			{:else if activeSection === 'education'}
+				<div class="flex flex-col gap-2">
+					{#each data.userProfile.education as item}
+						<div class="bg-gray-200 rounded px-4 py-2 text-sm text-center">
+							{item}
+						</div>
+					{/each}
+				</div>
+			{:else if activeSection === 'languages'}
+				<div class="flex flex-col gap-2">
+					{#each data.userProfile.languages as item}
+						<div class="bg-gray-200 rounded px-4 py-2 text-sm text-center">
+							{item}
+						</div>
+					{/each}
+				</div>
+			{/if}
+		</Card.Content>
+	</Card.Root>
+	<!--<FeatureWrapper feature="guides">
 		<Card.Root>
 			<Card.Header>
 				<Card.Title>Guides ({data.guides.length})</Card.Title>
@@ -89,7 +202,7 @@
 				{/if}
 			</Card.Content>
 		</Card.Root>
-	</FeatureWrapper>
+	</FeatureWrapper>-->
 	<FeatureWrapper feature="forum_threads">
 		<Card.Root>
 			<Card.Header>
