@@ -11,6 +11,9 @@
 
 	export let user: UserProfile;
 
+	$: avatarUrl = user.avatar
+        ? $page.data.supabase.storage.from('users').getPublicUrl(user.avatar).data.publicUrl
+        : '';
 </script>
 
 <a href={`/users/${user.id}`} class="h-full">
@@ -19,7 +22,7 @@
 			<div class="flex items-center justify-between">
 				<div class="flex items-center gap-2">
 					<Avatar.Root class="h-8 w-8">
-						<Avatar.Image src={user.avatar} alt={user.display_name} />
+						<Avatar.Image src={avatarUrl} alt={user.display_name} />
 						<Avatar.Fallback>{firstAndLastInitials(user.display_name)}</Avatar.Fallback>
 					</Avatar.Root>
 					<p class="text-sm font-medium">{user.display_name}</p>

@@ -26,6 +26,10 @@
 	? $page.data.supabase.storage.from('forum_threads').getPublicUrl(thread.image).data.publicUrl
 	: '';
 
+	$: avatarUrl = thread.author.avatar
+        ? $page.data.supabase.storage.from('users').getPublicUrl(thread.author.avatar).data.publicUrl
+        : '';
+
 </script>
 
 
@@ -38,7 +42,7 @@
 				<p class="mt-2 text-sm text-muted-foreground">Updated at: {updatedAt}</p>
 				<div class="flex items-center gap-2">
 					<Avatar.Root class="h-8 w-8">
-						<Avatar.Image src={thread.author.avatar} alt={thread.author.display_name} />
+						<Avatar.Image src={avatarUrl} alt={thread.author.display_name} />
 						<Avatar.Fallback>{firstAndLastInitials(thread.author.display_name)}</Avatar.Fallback>
 					</Avatar.Root>
 					<p class="text-sm font-medium">{thread.author.display_name}</p>

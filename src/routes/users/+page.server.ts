@@ -21,7 +21,14 @@ export const load = async (event) => {
             return error(500, errorMessage);
         }
 
-        return userProfiles;
+        return userProfiles.map(profile => ({
+            ...profile,
+            avatar: profile.avatar ?? '',
+            interests: profile.interests ?? [],
+            skills: profile.skills ?? [],
+            education: profile.education ?? [],
+            languages: profile.languages ?? [],
+        }));
     }
         
     return {

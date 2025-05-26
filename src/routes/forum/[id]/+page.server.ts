@@ -30,7 +30,17 @@ export const load = async (event) => {
             ? event.locals.supabase.storage.from('forum_threads').getPublicUrl(threadData.image).data.publicUrl
             : undefined;
 
-        return { ...threadData, image: imageUrl };
+        return {
+        ...threadData,
+        image: imageUrl,
+        author: {
+            ...threadData.author,
+            interests: threadData.author.interests ?? [],
+            skills: threadData.author.skills ?? [],
+            education: threadData.author.education ?? [],
+            languages: threadData.author.languages ?? [],
+        },
+    };
     }
     async function getThreadModeration(id: string): Promise<ModerationInfo[]> {
         const { data: moderation, error: moderationError } = await event.locals.supabase
@@ -101,6 +111,7 @@ export const load = async (event) => {
             .order('inserted_at', { ascending: true });
 
         if (commentsError) {
+            console.error('Supabase commentsError:', commentsError);
             const errorMessage = 'Error fetching comments, please try again later.';
             setFlash({ type: 'error', message: errorMessage }, event.cookies);
             return error(500, errorMessage);
@@ -119,6 +130,13 @@ export const load = async (event) => {
                     ...comment,
                     likes_count: likeError ? 0 : data.count ?? 0,
                     replies: [],
+                    author: {
+                        ...comment.author,
+                        interests: comment.author.interests ?? [],
+                        skills: comment.author.skills ?? [],
+                        education: comment.author.education ?? [],
+                        languages: comment.author.languages ?? [],
+                    },
                 };
             })
         );

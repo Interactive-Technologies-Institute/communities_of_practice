@@ -5,6 +5,7 @@ export const updateUserProfileSchema = z.object({
 	description: z.string().max(250, { message: 'Description must be less than 250 characters' }).nullish(),
 	avatar: z.instanceof(File).nullish(),
 	avatarUrl: z.string().nullish(),
+    avatarPath: z.string().optional(), 
 
 	date: z.string().regex(/^\d{2}\/\d{2}\/\d{4}$/, { message: 'Date must be in DD/MM/YYYY format' }).nullish(),
 	profession: z.string().max(100, { message: 'Profession must be less than 100 characters' }).nullish(),

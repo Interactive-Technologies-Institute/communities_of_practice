@@ -44,6 +44,13 @@ export const load = async (event) => {
 					...thread,
                     image: thread.image ?? '',
 					likes_count: likesError ? 0 : data.count ?? 0,
+                    author: {
+                        ...thread.author,
+                        interests: thread.author.interests ?? [],
+                        skills: thread.author.skills ?? [],
+                        education: thread.author.education ?? [],
+                        languages: thread.author.languages ?? [],
+                    },
 				};
 			})
 		);

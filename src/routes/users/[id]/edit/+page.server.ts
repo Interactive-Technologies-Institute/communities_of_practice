@@ -34,19 +34,21 @@ export const load = async (event) => {
 			return error(500, errorMessage);
 		}
 
-		let avatarUrl: string | undefined;
+		let avatarUrl = '';
 		if (userProfile.avatar) {
-			avatarUrl = event.locals.supabase.storage.from('users').getPublicUrl(userProfile.avatar)
-				.data.publicUrl;
+			avatarUrl = event.locals.supabase.storage.from('users').getPublicUrl(userProfile.avatar).data.publicUrl ?? '';
 		}
 
 		return { 
 			...userProfile, 
 			interests: userProfile.interests ?? [],
-			skills:userProfile.skills ?? [],
+			skills: userProfile.skills ?? [],
 			education: userProfile.education ?? [],
 			languages: userProfile.languages ?? [],
-			avatar: undefined, avatarUrl };
+			avatar: null,
+			avatarUrl ,
+			avatarPath: userProfile.avatar ?? '',
+		};
 	}
 
 	const userProfileData = await getUserProfile(id);
@@ -87,33 +89,42 @@ export const actions = {
 					return { path: avatarFileData.path, error: null };
 				}
 
-				let avatarPath = '';
+				let avatarPath: string | undefined = undefined;
+				// Check if a new avatar is provided
 				if (form.data.avatar) {
 					const { path, error } = await uploadAvatar(form.data.avatar);
 					if (error) {
 						return fail(500, withFiles({ message: error.message, form }));
 					}
 					avatarPath = path;
-				} else if (form.data.avatarUrl) {
-					avatarPath = form.data.avatarUrl.split('/').pop() ?? '';
+				} 
+				// If no new avatar is provided, check if an existing avatarPath is present
+				else if (form.data.avatarPath) {
+						avatarPath = form.data.avatarPath;
+				}
+
+				const updateUserProfile: Record<string, any> = {
+					display_name: form.data.display_name,
+					description: form.data.description,
+					profession: form.data.profession,
+					website: form.data.website,
+					gender: form.data.gender,
+					nationality: form.data.nationality,
+					interests: form.data.interests,
+					skills: form.data.skills,
+					education: form.data.education_exps,
+					languages: form.data.languages,
+					date: form.data.date,
+				};
+
+				// Only set avatar if a new file was uploaded or an existing avatarPath is present
+				if (avatarPath !== undefined) {
+					updateUserProfile.avatar = avatarPath;
 				}
 
 				const { error: profileError } = await event.locals.supabase
 					.from('profiles')
-					.update({
-						display_name: form.data.display_name,
-						description: form.data.description,
-						avatar: avatarPath,
-						profession: form.data.profession,
-						website: form.data.website,
-						gender: form.data.gender,
-						nationality: form.data.nationality,
-						interests: form.data.interests,
-						skills: form.data.skills,
-						education: form.data.education_exps,
-						languages: form.data.languages,
-						date: form.data.date,
-					})
+					.update(updateUserProfile)
 					.eq('id', userId);
 
 				if (profileError) {
