@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import InteractableImage from '@/components/interactable-image.svelte';
 	import ModerationBanner from '@/components/moderation-banner.svelte';
 	import PageHeader from '@/components/page-header.svelte';
@@ -17,6 +18,10 @@
 	export let data;
 
 	let openDeleteDialog = false;
+
+	$: avatarUrl = data.thread.author.avatar
+        ? $page.data.supabase.storage.from('users').getPublicUrl(data.thread.author.avatar).data.publicUrl
+        : '';
 </script>
 
 <MetaTags
@@ -63,7 +68,7 @@
 	<div class="mx-auto flex max-w-2xl flex-col gap-y-4">
 		<div class="flex items-center gap-2 self-start">
 			<Avatar.Root class="h-8 w-8">
-				<Avatar.Image src={data.thread.author.avatar} alt={data.thread.author.display_name} />
+				<Avatar.Image src={avatarUrl} alt={data.thread.author.display_name} />
 				<Avatar.Fallback>
 					{firstAndLastInitials(data.thread.author.display_name)}
 				</Avatar.Fallback>

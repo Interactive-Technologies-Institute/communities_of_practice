@@ -8,7 +8,13 @@ export const load = loadFlash(async ({ locals: { supabase, safeGetSession }, coo
 	if (user) {
 		const { data } = await supabase.from('profiles_view').select().eq('id', user.id).single();
 		if (data) {
-			profile = data;
+			profile = {
+				...data,
+				interests: data.interests ?? [],
+				education: data.education ?? [],
+				languages: data.languages ?? [],
+				skills: data.skills ?? [],
+			};
 			if (profile.avatar) {
 				profile.avatar = supabase.storage.from('users').getPublicUrl(profile.avatar).data.publicUrl;
 			}
@@ -33,7 +39,7 @@ export const load = loadFlash(async ({ locals: { supabase, safeGetSession }, coo
 	if (featuresData) features = featuresData.map((f: { id: Feature }) => f.id);
 
 	let branding: Branding = {
-		name: 'Community',
+		name: 'KCIDADE',
 		slogan: 'A community for everyone',
 		color_theme: 'neutral',
 		radius: 0.5,

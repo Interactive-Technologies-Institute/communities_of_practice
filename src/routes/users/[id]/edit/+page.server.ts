@@ -90,8 +90,23 @@ export const actions = {
 				}
 
 				let avatarPath: string | undefined = undefined;
+				// Check avatar reset condition
+				if (form.data.avatarReset === true && form.data.avatarPath) {
+					const avatarFileName = form.data.avatarPath;
+					const { error: deleteError } = await event.locals.supabase.storage
+						.from('users')
+						.remove([avatarFileName]);
+
+					if (deleteError) {
+						setFlash({ type: 'error', message: deleteError.message }, event.cookies);
+						return fail(500, withFiles({ message: deleteError.message, form }));
+					}
+
+					avatarPath = undefined;
+					form.data.avatarReset = false;
+				}
 				// Check if a new avatar is provided
-				if (form.data.avatar) {
+				else if (form.data.avatar) {
 					const { path, error } = await uploadAvatar(form.data.avatar);
 					if (error) {
 						return fail(500, withFiles({ message: error.message, form }));
@@ -118,9 +133,7 @@ export const actions = {
 				};
 
 				// Only set avatar if a new file was uploaded or an existing avatarPath is present
-				if (avatarPath !== undefined) {
-					updateUserProfile.avatar = avatarPath;
-				}
+				updateUserProfile.avatar = avatarPath ?? null;
 
 				const { error: profileError } = await event.locals.supabase
 					.from('profiles')
