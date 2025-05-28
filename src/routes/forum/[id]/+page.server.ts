@@ -74,8 +74,16 @@ export const load = async (event) => {
         return { count: likes.count, userLikes: likes.has_likes };
     }
 
-
-    const likesCount = await getLikesCount(event.params.id);
+    function getCommentsCount(comments: NestedComment[]): number {
+        let count = 0;
+        for (const c of comments) {
+            count += 1;
+            if (c.replies?.length) {
+                count += getCommentsCount(c.replies);
+            }
+        }
+        return count;
+    }
 
     function buildCommentTree(comments: ThreadCommentWithAuthorAndLikes[]): NestedComment[] {
         const map = new Map<number, NestedComment>();
@@ -142,6 +150,9 @@ export const load = async (event) => {
         );
 	    return commentsWithExtra;
     }
+
+    const likesCount = await getLikesCount(event.params.id);
+    const commentsCount = await getCommentsCount(await getThreadComments(event.params.id));
     // Fetch all comments and build the like forms for each
     const comments = await getThreadComments(event.params.id);
     const commentLikeForms: Record<string, SuperValidated<Infer<typeof toggleThreadCommentLikeSchema>>> = {};
@@ -168,6 +179,7 @@ export const load = async (event) => {
         thread: await getThread(event.params.id),
         moderation: await getThreadModeration(event.params.id),
         likesCount: likesCount.count,
+        commentsCount,
         deleteForm: await superValidate(zod(deleteThreadSchema), {
             id: 'delete-thread',
         }),

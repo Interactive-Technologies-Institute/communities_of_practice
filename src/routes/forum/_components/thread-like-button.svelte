@@ -7,7 +7,6 @@
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 
-	export let count: number;
 	export let data: SuperValidated<Infer<ToggleThreadLikeSchema>>;
 
 	const form = superForm(data, {
@@ -16,7 +15,6 @@
 		onUpdate: ({ result }) => {
 			if (result.type === 'failure') {
 				$formData.value = !$formData.value;
-				count += $formData.value ? 1 : -1;
 			}
 		},
 	});
@@ -25,7 +23,6 @@
 
 	async function toggleLike() {
 		$formData.value = !$formData.value;
-		count += $formData.value ? 1 : -1;
 		await tick();
 		submit();
 	}
@@ -33,13 +30,19 @@
 
 <form method="POST" action="?/toggleLike" use:enhance>
 	<input type="hidden" name="value" value={$formData.value} />
-	<Button type="button" on:click={toggleLike} variant="outline" size="sm">
-		<ThumbsUp class={cn('mr-2 h-4 w-4', { 'fill-foreground': $formData.value })} />
+	<Button
+		type="button"
+		on:click={toggleLike}
+		variant="ghost"
+		size="sm"
+		class={cn('flex items-center gap-2', $formData.value ? 'text-orange-500' : 'text-muted-foreground hover:text-foreground')}
+	>
+		<ThumbsUp class="h-4 w-4" />
 		{#if $formData.value}
-			Liked this thread
+			Liked
 		{:else}
-			Like this thread
+			Like
 		{/if}
-		<span class="ml-4 font-mono text-xs">{count}</span>
 	</Button>
+
 </form>

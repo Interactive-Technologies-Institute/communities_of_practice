@@ -22,6 +22,8 @@
 	export let toggleCommentLikeForms: Record<string, SuperValidated<Infer<typeof toggleThreadCommentLikeSchema>>>;
 	export let currentUserId: string | undefined;
 	export let currentUserRole: string | undefined;
+	export let level: number = 0;
+
 	let replying = false;
 	let openDeleteDialog = false;
 
@@ -39,54 +41,65 @@
 
 </script>
 {#if !comment.is_reply}
-	<hr class="my-1 border-t border-muted" />
+    <hr class="my-1 border-t border-muted" />
 {/if}
-<Card class="relative flex h-full flex-col overflow-hidden">
-	<div class="flex flex-1 flex-col px-4 py-3">
-		<div class="mb-5">
-			{#if comment.is_reply}
-				<p class="text-xs text-muted-foreground mb-2">
-					Replying to <span class="font-medium">{comment.parent_author}</span>
-				</p>
-			{/if}
-			<p class="line-clamp-2 text-muted-foreground whitespace-pre-wrap break-words">{comment.content}</p>
-			<!--<p class="mt-2 text-sm text-muted-foreground">Updated at: {updatedAt}</p>-->
-			<div class="flex items-center gap-2">
-				<Avatar.Root class="h-8 w-8">
-					<Avatar.Image src={comment.author.avatar} alt={comment.author.display_name} />
-					<Avatar.Fallback>{firstAndLastInitials(comment.author.display_name)}</Avatar.Fallback>
-				</Avatar.Root>
-				<p class="text-sm font-medium">{comment.author.display_name}</p>
-			</div>
-			<div class="flex flex-wrap gap-2">
-				<ThreadCommentLikeButton count={comment.likes_count} data={toggleCommentLikeForms[comment.id]} />
-			</div>
-			<div class="mt-3 flex gap-x-2">
-				<Button type="button" on:click={() => (replying = !replying)}>
-					{replying ? 'Cancel' : 'Reply'}
-				</Button>
-
-				{#if comment.author.id === currentUserId || currentUserRole === 'admin' || currentUserRole === 'moderator'}
-					<Button variant="destructive" on:click={() => (openDeleteDialog = true)}>
-						<Trash class="mr-2 h-4 w-4" />
-						Delete
+<div class="relative mt-4" style="min-height: 100%;">
+    {#if level > 0}
+        {#each Array(level) as _, i}
+            <div
+                class="absolute top-0 h-full w-px bg-gray-300"
+                style="left: {i * 1.5}rem;"
+            ></div>
+        {/each}
+    {/if}
+    <Card class="relative flex h-full flex-col overflow-hidden" style="margin-left: {level * 1.5}rem;">
+        <div class="flex flex-1 flex-col px-4 py-3">
+            <div class="mb-5">
+                {#if comment.is_reply}
+                    <p class="text-xs text-muted-foreground mb-2">
+                        Replying to <span class="font-medium">{comment.parent_author}</span>
+                    </p>
+                {/if}
+                <p class="line-clamp-2 text-muted-foreground whitespace-pre-wrap break-words">{comment.content}</p>
+				<!--<p class="mt-2 text-sm text-muted-foreground">Updated at: {updatedAt}</p>-->
+				<div class="flex items-center gap-2">
+					<Avatar.Root class="h-8 w-8">
+						<Avatar.Image src={comment.author.avatar} alt={comment.author.display_name} />
+						<Avatar.Fallback>{firstAndLastInitials(comment.author.display_name)}</Avatar.Fallback>
+					</Avatar.Root>
+					<p class="text-sm font-medium">{comment.author.display_name}</p>
+				</div>
+				<div class="flex flex-wrap gap-2">
+					<ThreadCommentLikeButton count={comment.likes_count} data={toggleCommentLikeForms[comment.id]} />
+				</div>
+				<div class="mt-3 flex gap-x-2">
+					<Button type="button" on:click={() => (replying = !replying)}>
+						{replying ? 'Cancel' : 'Reply'}
 					</Button>
+
+					{#if comment.author.id === currentUserId || currentUserRole === 'admin' || currentUserRole === 'moderator'}
+						<Button variant="destructive" on:click={() => (openDeleteDialog = true)}>
+							<Trash class="mr-2 h-4 w-4" />
+							Delete
+						</Button>
+					{/if}
+				</div>
+				{#if replying}
+					<div class="mt-4">
+						<ThreadCommentReplyForm parentId={comment.id} data={createForm} bind:open={replying} />
+					</div>
 				{/if}
 			</div>
-			{#if replying}
-				<div class="mt-4">
-					<ThreadCommentReplyForm parentId={comment.id} data={createForm} bind:open={replying} />
-				</div>
-			{/if}
 		</div>
-	</div>
-</Card>
-
+	</Card>
+</div>
 <ThreadDeleteCommentDialog commentId={comment.id} data={deleteForm} bind:open={openDeleteDialog} />
 
 
 {#if comment.replies && comment.replies.length > 0}
     {#each comment.replies as reply}
-      <ThreadCommentItem comment={reply} createForm={createForm} deleteForm={deleteForm} toggleCommentLikeForms={toggleCommentLikeForms} currentUserId={currentUserId} currentUserRole={currentUserRole}/>
+      <ThreadCommentItem comment={reply} createForm={createForm} deleteForm={deleteForm}
+	   toggleCommentLikeForms={toggleCommentLikeForms} currentUserId={currentUserId} currentUserRole={currentUserRole}
+	   level={Math.min(level + 1, 2)}/>
     {/each}
 {/if}
