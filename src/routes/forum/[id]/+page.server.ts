@@ -1,5 +1,5 @@
 import { deleteThreadSchema, toggleThreadLikeSchema } from '@/schemas/thread';
-import { createThreadCommentSchema, deleteThreadCommentSchema, toggleThreadCommentLikeSchema } from '@/schemas/thread-comment';
+import { createThreadCommentSchema, deleteThreadCommentSchema, toggleThreadCommentLikeSchema, updateThreadCommentSchema } from '@/schemas/thread-comment';
 import type { ThreadWithAuthor, ModerationInfo, ThreadCommentWithAuthorAndLikes } from '@/types/types';
 import { handleFormAction } from '@/utils';
 import { error, fail, redirect } from '@sveltejs/kit';
@@ -156,6 +156,7 @@ export const load = async (event) => {
     // Fetch all comments and build the like forms for each
     const comments = await getThreadComments(event.params.id);
     const commentLikeForms: Record<string, SuperValidated<Infer<typeof toggleThreadCommentLikeSchema>>> = {};
+    const editThreadCommentForms: Record<string, SuperValidated<Infer<typeof updateThreadCommentSchema>>> = {};
     
     for (const comment of comments) {
         const { data, error: likeError } = await event.locals.supabase
@@ -166,13 +167,19 @@ export const load = async (event) => {
             .single();
 
         const userHasLiked = likeError ? false : data.has_likes ?? false;
-        const form = await superValidate(
+        const commentLikeForm = await superValidate(
             { id: comment.id, value: userHasLiked },
             zod(toggleThreadCommentLikeSchema),
             { id: `toggle-thread-comment-like-${comment.id}` }
         );
+        const commentEditForm = await superValidate(
+            { id: comment.id, content: comment.content },
+            zod(updateThreadCommentSchema),
+            { id: `update-thread-comment-${comment.id}` }
+        );
 
-        commentLikeForms[comment.id] = form;
+        commentLikeForms[comment.id] = commentLikeForm;
+        editThreadCommentForms[comment.id] = commentEditForm;
     }
 
     return {
@@ -195,6 +202,7 @@ export const load = async (event) => {
             id: 'delete-thread-comment',
         }),
         toggleCommentLikeForms: commentLikeForms,
+        editThreadCommentForms,
         nestedComments: buildCommentTree(await getThreadComments(event.params.id)),
     };
 };
@@ -234,6 +242,21 @@ export const actions = {
 
             return { form };
         }),
+    editThreadComment: async (event) =>
+		handleFormAction(event, updateThreadCommentSchema, 'edit-thread-comment', async (event, userId, form) => {
+			const { error } = await event.locals.supabase
+				.from('thread_comments')
+				.update({ content: form.data.content })
+				.eq('id', form.data.id)
+				.eq('user_id', userId);
+
+			if (error) {
+				setFlash({ type: 'error', message: error.message }, event.cookies);
+				return fail(500, { message: error.message, form });
+			}
+
+			return { form };
+		}),
     toggleCommentLike: async (event) =>
         handleFormAction(
             event,

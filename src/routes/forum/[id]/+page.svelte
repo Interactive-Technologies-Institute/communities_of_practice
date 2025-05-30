@@ -95,13 +95,13 @@
 				<Button variant="ghost" size="sm" on:click={() => (showCommentForm = !showCommentForm)}
 					class={cn('flex items-center gap-2', { 'text-orange-500': showCommentForm })}>
 					<MessageSquare class="h-4 w-4" />
-					{showCommentForm ? 'Commenting' : 'Comment'}
+					Comment
 				</Button>
 				{#if data.thread.summary}
 					<Button variant="ghost" size="sm" on:click={() => (showSummary = !showSummary)}
 						class={cn('flex items-center gap-2', { 'text-orange-500': showSummary })}>
 						<Text class="h-4 w-4" />
-						{showSummary ? 'Summary Open' : 'Summary'}
+						Summary
 					</Button>
 				{/if}
 			</div>
@@ -136,7 +136,7 @@
 		{#each data.nestedComments as comment}
 			<ThreadCommentItem comment={comment} createForm={data.createThreadCommentForm} deleteForm={data.deleteThreadCommentForm} 
 			toggleCommentLikeForms={data.toggleCommentLikeForms} currentUserId={data.user?.id} currentUserRole={data.user?.role}
-			level={0}/>
+			level={0} editThreadCommentForms={data.editThreadCommentForms}/>
 		{/each}
 	</div>
 </div>

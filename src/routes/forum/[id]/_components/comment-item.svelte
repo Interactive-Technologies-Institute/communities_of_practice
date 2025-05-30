@@ -8,13 +8,13 @@
 	import * as Avatar from '@/components/ui/avatar';
 	import { firstAndLastInitials } from '@/utils';
 	import ThreadCommentLikeButton from './comment-like-button.svelte';
-	import { createThreadCommentSchema, deleteThreadCommentSchema, toggleThreadCommentLikeSchema } from '@/schemas/thread-comment';
+	import { createThreadCommentSchema, deleteThreadCommentSchema, toggleThreadCommentLikeSchema, updateThreadCommentSchema } from '@/schemas/thread-comment';
 	import { zodClient, type Infer } from 'sveltekit-superforms/adapters';
 	import { superForm, type SuperValidated } from 'sveltekit-superforms';
 	import ThreadCommentItem from './comment-item.svelte';
 	import ThreadCommentReplyForm from './comment-reply-form.svelte';
 	import ThreadDeleteCommentDialog from './comment-delete-dialog.svelte';
-	import { Trash, MessageSquare, Pen } from 'lucide-svelte';
+	import { Trash, MessageSquare, Pen, Check, X } from 'lucide-svelte';
 	import { cn } from '@/utils';
 
 	export let comment: NestedComment;
@@ -24,10 +24,14 @@
 	export let currentUserId: string | undefined;
 	export let currentUserRole: string | undefined;
 	export let level: number = 0;
+	export let editThreadCommentForms: Record<string, SuperValidated<Infer<typeof updateThreadCommentSchema>>>;
 
 	let replying = false;
+	let editing = false;
+	let editedContent = comment.content;
 	let openDeleteDialog = false;
 
+	const isCommentValid = () => editedContent.length >= 1 && editedContent.length <= 5000;
 
 	const moderationStatusLabels = {
 		pending: 'Pending',
@@ -43,6 +47,14 @@
 	$: avatarUrl = comment.author.avatar
         ? $page.data.supabase.storage.from('users').getPublicUrl(comment.author.avatar).data.publicUrl
         : '';
+
+	function handleEditSubmit(event: Event) {
+        event.preventDefault();
+        if (isCommentValid()) {
+            const form = event.currentTarget as HTMLFormElement;
+            form.submit();
+        }
+    }
 
 </script>
 <div class="relative mt-4" style="min-height: 100%;">
@@ -61,7 +73,28 @@
 					Replying to <span class="font-medium">{comment.parent_author}</span>
 				</p>
 			{/if}
-			<p class="line-clamp-2 text-muted-foreground whitespace-pre-wrap break-words">{comment.content}</p>
+			{#if editing}
+					<textarea
+						bind:value={editedContent}
+						rows="3"
+						minlength="1"
+						maxlength="5000"
+						class="w-full rounded border px-3 py-2 text-sm max-h-48 overflow-auto"
+						required
+					/>
+
+					<p class="text-xs mt-1 text-muted-foreground">
+						{editedContent.length} / 5000 characters
+					</p>
+
+					{#if editedContent.length < 1}
+						<p class="text-sm mt-1 font-medium text-destructive">Content must be at least 1 character.</p>
+					{:else if editedContent.length > 5000}
+						<p class="text-sm mt-1 font-medium text-destructive">Content must not exceed 5000 characters.</p>
+					{/if}
+			{:else}
+				<p class="line-clamp-2 whitespace-pre-wrap break-words">{comment.content}</p>
+			{/if}
 			<!--<p class="mt-2 text-sm text-muted-foreground">Updated at: {updatedAt}</p>-->
 			<div class="flex items-center gap-2">
 				<Avatar.Root class="h-8 w-8">
@@ -76,16 +109,41 @@
 					<Button variant="ghost" size="sm" on:click={() => (replying = !replying)}
 						class={cn('flex items-center gap-2', { 'text-orange-500': replying })}>
 						<MessageSquare class="h-4 w-4" />
-						{replying ? 'Replying' : 'Reply'}
+						Reply
 					</Button>
 				</div>
 
 				{#if comment.user_id === currentUserId}
-					<div class="flex gap-2">
-						<Button variant="ghost" size="sm" on:click={() => (openDeleteDialog = true)} class="text-red-500 hover:text-red-600">
-							<Trash class="h-4 w-4" /> 
-							Delete
-						</Button>
+					<div class="flex gap-2 mt-2">
+						{#if editing}
+							<form method="POST" action="?/editThreadComment" class="flex gap-2" on:submit={handleEditSubmit}>
+								<input type="hidden" name="id" value={comment.id} />
+								<input type="hidden" name="content" value={editedContent} />
+								<Button type="submit" variant="ghost" size="sm" disabled={!isCommentValid()} class="text-blue-500 hover:text-blue-600" >
+									<Check class="h-4 w-4" />
+									Save
+								</Button>
+							</form>
+							<Button
+								variant="ghost"
+								size="sm"
+								on:click={() => { editing = false; editedContent = comment.content }}
+								class="text-red-500 hover:text-red-600"
+							>
+								<X class="h-4 w-4" />
+								Cancel
+							</Button>
+						{:else}
+							<!-- Normal Edit/Delete buttons -->
+							<Button variant="ghost" size="sm" on:click={() => (editing = true)} class="text-blue-500 hover:text-blue-600">
+								<Pen class="h-4 w-4" />
+								Edit
+							</Button>
+							<Button variant="ghost" size="sm" on:click={() => (openDeleteDialog = true)} class="text-red-500 hover:text-red-600">
+								<Trash class="h-4 w-4" />
+								Delete
+							</Button>
+						{/if}
 					</div>
 				{/if}
 			</div>
@@ -114,6 +172,6 @@
     {#each comment.replies as reply}
       <ThreadCommentItem comment={reply} createForm={createForm} deleteForm={deleteForm}
 	   toggleCommentLikeForms={toggleCommentLikeForms} currentUserId={currentUserId} currentUserRole={currentUserRole}
-	   level={Math.min(level + 1, 2)}/>
+	   editThreadCommentForms={editThreadCommentForms} level={Math.min(level + 1, 2)}/>
     {/each}
 {/if}
