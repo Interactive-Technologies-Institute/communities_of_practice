@@ -1,4 +1,4 @@
-import type { ThreadWithAuthorAndLikes } from '@/types/types';
+import type { ThreadWithAuthorAndCounters } from '@/types/types';
 import { arrayQueryParam, stringQueryParam } from '@/utils';
 import { error } from '@sveltejs/kit';
 import { setFlash } from 'sveltekit-flash-message/server';
@@ -8,7 +8,7 @@ export const load = async (event) => {
     const search = stringQueryParam().decode(event.url.searchParams.get('s'));
     const tags = arrayQueryParam().decode(event.url.searchParams.get('tags'));
 
-    async function getThreads(): Promise<ThreadWithAuthorAndLikes[]> {
+    async function getThreads(): Promise<ThreadWithAuthorAndCounters[]> {
         let query = event.locals.supabase
             .from('forum_threads_view')
             .select('*, author:profiles_view!inner(*)')
@@ -31,19 +31,26 @@ export const load = async (event) => {
             return error(500, errorMessage);
         }
 
-        const threadsWithAuthorAndLikes = await Promise.all(
-			forumThreads.map(async (thread) => {
-				const { data, error: likesError } = await event.locals.supabase
-					.rpc('get_forum_thread_likes_count', {
-						thread_id: thread.id,
-						user_id: user?.id,
-					})
-					.single();
+        const threadsWithCounters = await Promise.all(
+            forumThreads.map(async (thread) => {
+                const { data: likesData, error: likesError } = await event.locals.supabase
+                    .rpc('get_forum_thread_likes_count', {
+                        thread_id: thread.id,
+                        user_id: user?.id,
+                    })
+                    .single();
 
-				return {
-					...thread,
+                const { data: commentsData, error: commentsError } = await event.locals.supabase
+                    .rpc('get_forum_thread_comments_count', {
+                        thread_id: thread.id
+                    })
+                    .single();
+
+                return {
+                    ...thread,
                     image: thread.image ?? '',
-					likes_count: likesError ? 0 : data.count ?? 0,
+                    likes_count: likesError ? 0 : likesData.count ?? 0,
+                    comments_count: commentsError ? 0 : commentsData.count ?? 0,
                     author: {
                         ...thread.author,
                         interests: thread.author.interests ?? [],
@@ -51,11 +58,11 @@ export const load = async (event) => {
                         education: thread.author.education ?? [],
                         languages: thread.author.languages ?? [],
                     },
-				};
-			})
-		);
+                };
+            })
+        );
 
-		return threadsWithAuthorAndLikes;
+		return threadsWithCounters;
     }
 
     async function getTags(): Promise<Map<string, number>> {
@@ -83,7 +90,7 @@ export const load = async (event) => {
     }
 
     return {
-        forum_threads_with_likes: await getThreads(),
+        forum_threads_with_counters: await getThreads(),
         tags: await getTags(),
     };
 };

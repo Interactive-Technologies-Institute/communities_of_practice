@@ -44,7 +44,7 @@
 		<Card.Content class="space-y-4">
 			<Form.Field {form} name="content">
 				<Form.Control let:attrs>
-					<Form.Label>Write a comment</Form.Label>
+					<Form.Label>Write a reply</Form.Label>
 					<Textarea {...attrs} bind:value={$formData.content} />
 					<Form.FieldErrors />
 				</Form.Control>

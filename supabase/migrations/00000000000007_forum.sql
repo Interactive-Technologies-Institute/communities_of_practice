@@ -63,6 +63,11 @@ select count(*) as likes_count,
 from public.forum_threads_liked
 where thread_id = $1;
 $$;
+create function public.get_forum_thread_comments_count(thread_id int) returns table (count int) language sql security definer
+as $$
+  select count(*) from thread_comments
+  where thread_id = get_forum_thread_comments_count.thread_id;
+$$;
 create view public.latest_forum_threads_moderation with (security_invoker = on) as
 select distinct on (thread_id) *
 from public.forum_threads_moderation
@@ -79,8 +84,8 @@ select unnest(tags) as tag,
 from public.forum_threads
 group by tag;
 -- Storage Buckets
- insert into storage.buckets (id, name, public, allowed_mime_types)
- values ('forum_threads', 'Threads', true, '{"image/*"}');
+insert into storage.buckets (id, name, public, allowed_mime_types)
+values ('forum_threads', 'Threads', true, '{"image/*"}');
 -- RLS policies
 alter table public.forum_threads enable row level security;
 alter table public.forum_threads_moderation enable row level security;

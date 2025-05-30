@@ -14,7 +14,8 @@
 	import ThreadCommentItem from './comment-item.svelte';
 	import ThreadCommentReplyForm from './comment-reply-form.svelte';
 	import ThreadDeleteCommentDialog from './comment-delete-dialog.svelte';
-	import { Trash } from 'lucide-svelte';
+	import { Trash, MessageSquare, Pen } from 'lucide-svelte';
+	import { cn } from '@/utils';
 
 	export let comment: NestedComment;
 	export let createForm: SuperValidated<Infer<typeof createThreadCommentSchema>>;
@@ -39,10 +40,11 @@
 	? new Date(comment.updated_at).toLocaleString()
 	: 'No updates yet';
 
+	$: avatarUrl = comment.author.avatar
+        ? $page.data.supabase.storage.from('users').getPublicUrl(comment.author.avatar).data.publicUrl
+        : '';
+
 </script>
-{#if !comment.is_reply}
-    <hr class="my-1 border-t border-muted" />
-{/if}
 <div class="relative mt-4" style="min-height: 100%;">
     {#if level > 0}
         {#each Array(level) as _, i}
@@ -54,44 +56,56 @@
     {/if}
     <Card class="relative flex h-full flex-col overflow-hidden" style="margin-left: {level * 1.5}rem;">
         <div class="flex flex-1 flex-col px-4 py-3">
-            <div class="mb-5">
-                {#if comment.is_reply}
-                    <p class="text-xs text-muted-foreground mb-2">
-                        Replying to <span class="font-medium">{comment.parent_author}</span>
-                    </p>
-                {/if}
-                <p class="line-clamp-2 text-muted-foreground whitespace-pre-wrap break-words">{comment.content}</p>
-				<!--<p class="mt-2 text-sm text-muted-foreground">Updated at: {updatedAt}</p>-->
-				<div class="flex items-center gap-2">
-					<Avatar.Root class="h-8 w-8">
-						<Avatar.Image src={comment.author.avatar} alt={comment.author.display_name} />
-						<Avatar.Fallback>{firstAndLastInitials(comment.author.display_name)}</Avatar.Fallback>
-					</Avatar.Root>
-					<p class="text-sm font-medium">{comment.author.display_name}</p>
-				</div>
-				<div class="flex flex-wrap gap-2">
+			{#if comment.is_reply}
+				<p class="text-xs text-muted-foreground mb-2">
+					Replying to <span class="font-medium">{comment.parent_author}</span>
+				</p>
+			{/if}
+			<p class="line-clamp-2 text-muted-foreground whitespace-pre-wrap break-words">{comment.content}</p>
+			<!--<p class="mt-2 text-sm text-muted-foreground">Updated at: {updatedAt}</p>-->
+			<div class="flex items-center gap-2">
+				<Avatar.Root class="h-8 w-8">
+					<Avatar.Image src={avatarUrl} alt={comment.author.display_name} />
+					<Avatar.Fallback>{firstAndLastInitials(comment.author.display_name)}</Avatar.Fallback>
+				</Avatar.Root>
+				<p class="text-sm font-medium">{comment.author.display_name}</p>
+			</div>
+			<div class="mt-2 flex items-center justify-between gap-4 border-t pt-2 text-sm text-muted-foreground">
+				<div class="flex gap-4">
 					<ThreadCommentLikeButton count={comment.likes_count} data={toggleCommentLikeForms[comment.id]} />
-				</div>
-				<div class="mt-3 flex gap-x-2">
-					<Button type="button" on:click={() => (replying = !replying)}>
-						{replying ? 'Cancel' : 'Reply'}
+					<Button variant="ghost" size="sm" on:click={() => (replying = !replying)}
+						class={cn('flex items-center gap-2', { 'text-orange-500': replying })}>
+						<MessageSquare class="h-4 w-4" />
+						{replying ? 'Replying' : 'Reply'}
 					</Button>
+				</div>
 
-					{#if comment.author.id === currentUserId || currentUserRole === 'admin' || currentUserRole === 'moderator'}
-						<Button variant="destructive" on:click={() => (openDeleteDialog = true)}>
-							<Trash class="mr-2 h-4 w-4" />
+				{#if comment.user_id === currentUserId}
+					<div class="flex gap-2">
+						<Button variant="ghost" size="sm" on:click={() => (openDeleteDialog = true)} class="text-red-500 hover:text-red-600">
+							<Trash class="h-4 w-4" /> 
 							Delete
 						</Button>
-					{/if}
-				</div>
-				{#if replying}
-					<div class="mt-4">
-						<ThreadCommentReplyForm parentId={comment.id} data={createForm} bind:open={replying} />
 					</div>
 				{/if}
 			</div>
 		</div>
 	</Card>
+	{#if replying}
+		<div class="relative mt-2" style="margin-left: {level * 1.5}rem;">
+			{#if level > 0}
+				{#each Array(level) as _, i}
+					<div
+						class="absolute top-0 h-full w-px bg-gray-300"
+						style="left: {i * 1.5}rem;"
+					></div>
+				{/each}
+			{/if}
+			<div class="relative z-10">
+				<ThreadCommentReplyForm parentId={comment.id} data={createForm} bind:open={replying} />
+			</div>
+		</div>
+	{/if}
 </div>
 <ThreadDeleteCommentDialog commentId={comment.id} data={deleteForm} bind:open={openDeleteDialog} />
 

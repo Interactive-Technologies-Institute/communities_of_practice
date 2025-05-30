@@ -32,7 +32,7 @@
 	</Button>
 </div>
 <div class="container mx-auto grid grid-cols-1 gap-6 py-10 max-w-2xl flex-col gap-y-4">
-	{#each data.forum_threads_with_likes as thread}
+	{#each data.forum_threads_with_counters as thread}
 		<ThreadItem {thread} />
 	{/each}
 </div>

@@ -1488,6 +1488,12 @@ export type Database = {
           has_interest: boolean
         }[]
       }
+      get_forum_thread_comments_count: {
+        Args: { thread_id: number }
+        Returns: {
+          count: number
+        }[]
+      }
       get_forum_thread_likes_count: {
         Args: { thread_id: number; user_id?: string }
         Returns: {

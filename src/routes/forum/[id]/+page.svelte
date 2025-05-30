@@ -15,7 +15,6 @@
 	import * as Avatar from '@/components/ui/avatar';
 	import { firstAndLastInitials } from '@/utils';
 	import { cn } from '@/utils';
-	import type { NestedComment } from '@/types/types';
 
 	export let data;
 
@@ -64,7 +63,7 @@
 			</div>
 		</div>
 		{#if data.thread.image !== null && data.thread.image !== undefined}
-			<InteractableImage src={data.thread.image} class="aspect-[3/2] h-auto w-full rounded-md object-cover"/>
+			<InteractableImage src={data.thread.image} class="w-full object-contain rounded"/>
 		{/if}
 		<p class="whitespace-pre-wrap break-words">{data.thread.content}</p>
 		<div class=" flex flex-wrap gap-2">
@@ -132,7 +131,8 @@
 		{#if showCommentForm}
 			<ThreadCommentForm data={data.createThreadCommentForm} />
 		{/if}
-		
+
+		<hr class="my-1 border-t border-muted" />
 		{#each data.nestedComments as comment}
 			<ThreadCommentItem comment={comment} createForm={data.createThreadCommentForm} deleteForm={data.deleteThreadCommentForm} 
 			toggleCommentLikeForms={data.toggleCommentLikeForms} currentUserId={data.user?.id} currentUserRole={data.user?.role}

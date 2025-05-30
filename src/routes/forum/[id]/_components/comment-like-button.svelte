@@ -45,13 +45,18 @@
 <form method="POST" action="?/toggleCommentLike" use:enhance>
     <input type="hidden" name="id" value={$formData.id} />
     <input type="hidden" name="value" value={localLiked} />
-    <Button type="button" on:click={toggleLike} variant="outline" size="sm" disabled={submitting}>
-        <ThumbsUp class={cn('mr-2 h-4 w-4', { 'fill-foreground': localLiked })} />
+    <Button
+		type="button"
+		on:click={toggleLike}
+		variant="ghost"
+		size="sm"
+		class={cn('flex items-center gap-2', localLiked ? 'text-orange-500' : 'text-muted-foreground hover:text-foreground')}
+	>
+        <ThumbsUp class="h-4 w-4" />
         {#if localLiked}
             Liked
         {:else}
             Like
         {/if}
-        <span class="ml-4 font-mono text-xs">{localCount}</span>
     </Button>
 </form>

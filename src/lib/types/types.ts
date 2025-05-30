@@ -134,7 +134,7 @@ export type Thread = {
 	moderation_status: ModerationStatus;
 };
 
-export type ThreadWithAuthorAndLikes = Thread & { author: UserProfile, likes_count: number };
+export type ThreadWithAuthorAndCounters = Thread & { author: UserProfile, likes_count: number, comments_count: number };
 
 export type ThreadWithAuthor = Thread & { author: UserProfile };
 
