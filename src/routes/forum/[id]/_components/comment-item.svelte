@@ -16,6 +16,7 @@
 	import ThreadDeleteCommentDialog from './comment-delete-dialog.svelte';
 	import { Trash, MessageSquare, Pen, Check, X } from 'lucide-svelte';
 	import { cn } from '@/utils';
+	import dayjs from 'dayjs';
 
 	export let comment: NestedComment;
 	export let createForm: SuperValidated<Infer<typeof createThreadCommentSchema>>;
@@ -39,10 +40,6 @@
 		changes_requested: 'Changes Requested',
 		rejected: 'Rejected'
 	};
-
-	$: updatedAt = comment?.updated_at
-	? new Date(comment.updated_at).toLocaleString()
-	: 'No updates yet';
 
 	$: avatarUrl = comment.author.avatar
         ? $page.data.supabase.storage.from('users').getPublicUrl(comment.author.avatar).data.publicUrl
@@ -103,9 +100,20 @@
 				</Avatar.Root>
 				<p class="text-sm font-medium">{comment.author.display_name}</p>
 			</div>
+			<div class="text-sm text-muted-foreground mt-2 flex gap-4">
+				<span>{comment.likes_count} {comment.likes_count === 1 ? 'like' : 'likes'}</span>
+				<span>Published {dayjs(comment.inserted_at).fromNow()}</span>
+				<span>{#if comment.inserted_at !== comment.updated_at}
+					Edited {dayjs(comment.updated_at).fromNow()}
+				{/if}
+				</span>
+			</div>
 			<div class="mt-2 flex items-center justify-between gap-4 border-t pt-2 text-sm text-muted-foreground">
 				<div class="flex gap-4">
-					<ThreadCommentLikeButton count={comment.likes_count} data={toggleCommentLikeForms[comment.id]} />
+					<ThreadCommentLikeButton
+						commentId={comment.id}
+						isLiked={toggleCommentLikeForms[comment.id]?.data?.value ?? false}
+					/>
 					<Button variant="ghost" size="sm" on:click={() => (replying = !replying)}
 						class={cn('flex items-center gap-2', { 'text-orange-500': replying })}>
 						<MessageSquare class="h-4 w-4" />

@@ -87,7 +87,6 @@
 				Edited {dayjs(data.thread.updated_at).fromNow()}
 			{/if}
 			</span>
-
 		</div>
 		<div class="mt-4 flex items-center justify-between gap-4 border-t pt-4 text-sm text-muted-foreground">
 			<div class="flex gap-4">
