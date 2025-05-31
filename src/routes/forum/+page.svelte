@@ -8,6 +8,7 @@
 	import { MetaTags } from 'svelte-meta-tags';
 	import { queryParam } from 'sveltekit-search-params';
 	import ThreadItem from './_components/thread-item.svelte';
+	import SortButton from '@/components/sort-button.svelte';
 
 	export let data;
 
@@ -15,6 +16,8 @@
 		debounceHistory: 500,
 	});
 	const tags = queryParam('tags', arrayQueryParam());
+	const sortBy = queryParam('sortBy', stringQueryParam());
+	const sortOrder = queryParam('sortOrder', stringQueryParam());
 </script>
 
 <MetaTags title="Forum" description="Find & share content with the community" />
@@ -24,7 +27,7 @@
 	<div class="flex flex-1 flex-row gap-x-2 sm:gap-x-4 md:flex-auto">
 		<Input placeholder="Search..." class="flex-1 sm:max-w-64" bind:value={$search}></Input>
 		<TagFilterButton tags={data.tags} bind:filterValues={$tags} />
-		<!-- <SortButton /> -->
+		<SortButton bind:sortBy={$sortBy} bind:sortOrder={$sortOrder} section='forum'/>
 	</div>
 	<Button href="/forum/create" class="w-10 p-0 sm:w-auto sm:px-4 sm:py-2">
 		<PlusCircle class="h-4 w-4 sm:mr-2" />

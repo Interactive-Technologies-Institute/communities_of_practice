@@ -7,14 +7,24 @@ export const load = async (event) => {
     const { user } = await event.locals.safeGetSession();
     const search = stringQueryParam().decode(event.url.searchParams.get('s'));
     const tags = arrayQueryParam().decode(event.url.searchParams.get('tags'));
+    const sortBy = stringQueryParam().decode(event.url.searchParams.get('sortBy'));
+    const sortOrder = stringQueryParam().decode(event.url.searchParams.get('sortOrder'));
 
     async function getThreads(): Promise<ThreadWithAuthorAndCounters[]> {
         let query = event.locals.supabase
             .from('forum_threads_view')
-            .select('*, author:profiles_view!inner(*)')
-            .order('moderation_status', { ascending: true })
-            .order('inserted_at', { ascending: false });
+            .select('*, author:profiles_view!inner(*)');
 
+            if (sortBy === 'date_inserted') {
+				query = query.order('inserted_at', { ascending: sortOrder === 'asc' });
+			} 
+            else if (sortBy === 'likes') {
+                query = query.order('likes_count', { ascending: sortOrder === 'asc' });
+            }
+			else {
+				// Default sort if nothing is selected.
+				query = query.order('moderation_status', { ascending: true }).order('inserted_at', { ascending: false });
+            }
         if (search) {
             query = query.textSearch('fts', search, { config: 'simple', type: 'websearch' });
         }
@@ -32,35 +42,28 @@ export const load = async (event) => {
         }
 
         const threadsWithCounters = await Promise.all(
-            forumThreads.map(async (thread) => {
-                const { data: likesData, error: likesError } = await event.locals.supabase
-                    .rpc('get_forum_thread_likes_count', {
-                        thread_id: thread.id,
-                        user_id: user?.id,
-                    })
-                    .single();
+		forumThreads.map(async (thread) => {
+			const { data: commentsData, error: commentsError } = await event.locals.supabase
+				.rpc('get_forum_thread_comments_count', {
+					thread_id: thread.id
+				})
+				.single();
 
-                const { data: commentsData, error: commentsError } = await event.locals.supabase
-                    .rpc('get_forum_thread_comments_count', {
-                        thread_id: thread.id
-                    })
-                    .single();
-
-                return {
-                    ...thread,
-                    image: thread.image ?? '',
-                    likes_count: likesError ? 0 : likesData.count ?? 0,
-                    comments_count: commentsError ? 0 : commentsData.count ?? 0,
-                    author: {
-                        ...thread.author,
-                        interests: thread.author.interests ?? [],
-                        skills: thread.author.skills ?? [],
-                        education: thread.author.education ?? [],
-                        languages: thread.author.languages ?? [],
-                    },
-                };
-            })
-        );
+			return {
+				...thread,
+				image: thread.image ?? '',
+                likes_count: thread.likes_count ?? 0,
+				comments_count: commentsError ? 0 : commentsData.count ?? 0,
+				author: {
+					...thread.author,
+					interests: thread.author.interests ?? [],
+					skills: thread.author.skills ?? [],
+					education: thread.author.education ?? [],
+					languages: thread.author.languages ?? [],
+				},
+			};
+		})
+	);
 
 		return threadsWithCounters;
     }

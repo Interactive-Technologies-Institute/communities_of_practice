@@ -5,15 +5,25 @@
     import { ArrowUpDown, Check } from 'lucide-svelte';
 	import { cn } from '$lib/utils.js';
 	import * as Command from '@/components//ui/command';
-    export let sortBy : string;
-    export let sortOrder = 'desc';
+
+    export let section: 'forum' | 'guides' = 'forum';
+    export let sortBy : string | null;
+    export let sortOrder : string | null = 'desc' ;
 
 	let open = false;
 
-    const sortOptions = [
+    $: sortOptions = section === 'forum'
+    ? [
+        { key: 'date_inserted', label: 'Most Recent' },
+        { key: 'likes', label: 'Most Liked' }
+    ]
+    : section === 'guides'
+    ? [
         { key: 'date_updated', label: 'Date Updated' },
         { key: 'difficulty', label: 'Difficulty' }
-    ];
+    ]
+    : [];
+
 
     function handleSortSelect(selectedSort : string) {
         sortBy = selectedSort;
