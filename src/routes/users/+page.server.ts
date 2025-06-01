@@ -6,12 +6,33 @@ import { setFlash } from 'sveltekit-flash-message/server';
 export const load = async (event) => {
     const { user } = await event.locals.safeGetSession();
     const search = stringQueryParam().decode(event.url.searchParams.get('s'));
-    const tags = arrayQueryParam().decode(event.url.searchParams.get('tags'));
+    const roles = arrayQueryParam().decode(event.url.searchParams.get('roles'));
+    const sortBy = stringQueryParam().decode(event.url.searchParams.get('sortBy'));
+    const sortOrder = stringQueryParam().decode(event.url.searchParams.get('sortOrder'));
 
     async function getUsers(): Promise<UserProfile[]> {
         let query = event.locals.supabase
             .from('profiles_view')
             .select('*');
+
+        if (sortBy === 'date_inserted') {
+            query = query.order('inserted_at', { ascending: sortOrder === 'asc' });
+        } 
+        else if (sortBy === 'display_name') {
+			query = query.order('display_name', { ascending: sortOrder === 'asc' });
+		}
+        else {
+            query = query.order('inserted_at', { ascending: false });
+        }
+
+        if (search?.trim()) {
+            query = query.ilike('display_name', `%${search.trim()}%`);
+        }
+
+        if (roles && roles.length) {
+            query = query.in('role', roles);
+        }
+
 
         const { data: userProfiles, error: userProfilesError } = await query;
 

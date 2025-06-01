@@ -14,6 +14,16 @@
 	$: avatarUrl = user.avatar
         ? $page.data.supabase.storage.from('users').getPublicUrl(user.avatar).data.publicUrl
         : '';
+
+
+	function roleDisplay(role: string): string {
+		const roleMap: Record<string, string> = {
+			admin: 'Administrator',
+			moderator: 'Moderator',
+			user: 'Member'
+		};
+		return roleMap[role] ?? 'Unknown';
+	}
 </script>
 
 <a href={`/users/${user.id}`} class="h-full">
@@ -26,6 +36,9 @@
 						<Avatar.Fallback>{firstAndLastInitials(user.display_name)}</Avatar.Fallback>
 					</Avatar.Root>
 					<p class="text-sm font-medium">{user.display_name}</p>
+					<Badge class="text-[10px] font-normal px-1.5 py-0.5">
+						{roleDisplay(user.role)}
+					</Badge>
 				</div>
 				<p class="text-xs text-muted-foreground">{"Joined at " + new Date(user.inserted_at).toLocaleDateString()}</p>
 			</div>
