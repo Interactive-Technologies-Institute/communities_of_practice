@@ -15,12 +15,18 @@
 	import * as Avatar from '@/components/ui/avatar';
 	import { firstAndLastInitials } from '@/utils';
 	import { cn } from '@/utils';
+	import { queryParam } from 'sveltekit-search-params';
+	import { stringQueryParam } from '@/utils';
+	import SortButton from '@/components/sort-button.svelte';
 
 	export let data;
 
 	let showCommentForm = false;
 	let showSummary = false;
 	let openDeleteDialog = false;
+
+	const sortBy = queryParam('sortBy', stringQueryParam());
+	const sortOrder = queryParam('sortOrder', stringQueryParam());
 
 	$: avatarUrl = data.thread.author.avatar
         ? $page.data.supabase.storage.from('users').getPublicUrl(data.thread.author.avatar).data.publicUrl
@@ -132,6 +138,7 @@
 		{/if}
 
 		<hr class="my-1 border-t border-muted" />
+		<SortButton bind:sortBy={$sortBy} bind:sortOrder={$sortOrder} section='comments'/>
 		{#each data.nestedComments as comment}
 			<ThreadCommentItem comment={comment} createForm={data.createThreadCommentForm} deleteForm={data.deleteThreadCommentForm} 
 			toggleCommentLikeForms={data.toggleCommentLikeForms} currentUserId={data.user?.id} currentUserRole={data.user?.role}

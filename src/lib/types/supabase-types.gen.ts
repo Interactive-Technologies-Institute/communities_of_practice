@@ -1417,6 +1417,7 @@ export type Database = {
           id: number | null
           inserted_at: string | null
           is_reply: boolean | null
+          likes_count: number | null
           moderation_status:
             | Database["public"]["Enums"]["moderation_status"]
             | null

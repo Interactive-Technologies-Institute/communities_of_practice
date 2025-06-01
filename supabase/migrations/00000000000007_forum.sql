@@ -177,5 +177,7 @@ create policy "Allow users to delete their own thread liked" on public.forum_thr
 	)
 	and auth.uid() = user_id
 );
+create policy "Allow users to read all likes" on public.forum_threads_liked
+for select using (true);
 create policy "Allow users to upload images for their threads" on storage.objects for
 insert to authenticated with check (bucket_id = 'forum_threads');

@@ -6,7 +6,7 @@
 	import { cn } from '$lib/utils.js';
 	import * as Command from '@/components//ui/command';
 
-    export let section: 'forum' | 'guides' = 'forum';
+    export let section: 'forum' | 'comments' = 'forum';
     export let sortBy : string | null;
     export let sortOrder : string | null = 'desc' ;
 
@@ -17,10 +17,10 @@
         { key: 'date_inserted', label: 'Most Recent' },
         { key: 'likes', label: 'Most Liked' }
     ]
-    : section === 'guides'
+    : section === 'comments'
     ? [
-        { key: 'date_updated', label: 'Date Updated' },
-        { key: 'difficulty', label: 'Difficulty' }
+        { key: 'date_inserted', label: 'Most Recent' },
+        { key: 'likes', label: 'Most Liked' }
     ]
     : [];
 

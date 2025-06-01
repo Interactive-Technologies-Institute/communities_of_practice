@@ -6,11 +6,20 @@
     import { tick } from 'svelte';
     import { superForm } from 'sveltekit-superforms';
     import { zodClient } from 'sveltekit-superforms/adapters';
+    import { onMount } from 'svelte';
 
     export let commentId: number;
     export let isLiked: boolean;
 
     let isLikedLocal = isLiked;
+
+    onMount(() => {
+        isLikedLocal = isLiked;
+    });
+    
+    $: if (commentId !== undefined && isLiked !== undefined) {
+        isLikedLocal = isLiked;
+    }
 
     const form = superForm(
         { id: commentId, value: isLikedLocal },

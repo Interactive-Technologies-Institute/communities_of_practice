@@ -9,9 +9,12 @@ import { zod } from 'sveltekit-superforms/adapters';
 import type { NestedComment } from '@/types/types';
 import type { SuperValidated } from 'sveltekit-superforms';
 import type { Infer } from 'sveltekit-superforms';
+import { stringQueryParam } from '@/utils';
 
 export const load = async (event) => {
     const { user } = await event.locals.safeGetSession();
+    const sortBy = stringQueryParam().decode(event.url.searchParams.get('sortBy'));
+    const sortOrder = stringQueryParam().decode(event.url.searchParams.get('sortOrder'));
 
     async function getThread(id: string): Promise<ThreadWithAuthor> {
         const { data: threadData, error: threadError } = await event.locals.supabase
@@ -112,11 +115,20 @@ export const load = async (event) => {
     }
 
     async function getThreadComments(threadId: string): Promise<NestedComment[]> {
-        const { data: comments, error: commentsError } = await event.locals.supabase
-            .from('thread_comments')
+        const query = event.locals.supabase
+            .from('thread_comments_view')
             .select('*, author:profiles_view!inner(*)')
-            .eq('thread_id', threadId)
-            .order('inserted_at', { ascending: true });
+            .eq('thread_id', threadId);
+
+        if (sortBy === 'likes') {
+            query.order('likes_count', { ascending: sortOrder === 'asc' });
+        } else if (sortBy === 'date_inserted') {
+            query.order('inserted_at', { ascending: sortOrder === 'asc' });
+        } else {
+            query.order('inserted_at', { ascending: true });
+        }
+
+        const { data: comments, error: commentsError } = await query;
 
         if (commentsError) {
             console.error('Supabase commentsError:', commentsError);
@@ -126,27 +138,38 @@ export const load = async (event) => {
         }
         // For each comment, fetch like count and whether the user has liked it
         const commentsWithExtra: NestedComment[] = await Promise.all(
-            comments.map(async (comment) => {
-                const { data, error: likeError } = await event.locals.supabase
-                    .rpc('get_thread_comment_likes_count', {
-                        comment_id: comment.id,
-                        user_id: user?.id
-                    })
-                    .single();
+            comments
+                .map(async (comment) => {
+                    if (comment.id == null) {
+                        throw new Error(`Missing ID on thread comment: ${JSON.stringify(comment)}`);
+                    }
+                    const { data, error: likeError } = await event.locals.supabase
+                        .rpc('get_thread_comment_likes_count', {
+                            comment_id: comment.id,
+                            user_id: user?.id
+                        })
+                        .single();
 
-                return {
-                    ...comment,
-                    likes_count: likeError ? 0 : data.count ?? 0,
-                    replies: [],
-                    author: {
-                        ...comment.author,
-                        interests: comment.author.interests ?? [],
-                        skills: comment.author.skills ?? [],
-                        education: comment.author.education ?? [],
-                        languages: comment.author.languages ?? [],
-                    },
-                };
-            })
+                    return {
+                        ...comment,
+                        thread_id: comment.thread_id as number,
+                        user_id: comment.user_id as string,
+                        inserted_at: comment.inserted_at as string,
+                        updated_at: comment.updated_at as string,
+                        is_reply: comment.is_reply as boolean,
+                        id: comment.id,
+                        likes_count: likeError ? 0 : data.count ?? 0,
+                        replies: [],
+                        content: comment.content ?? '', 
+                        author: {
+                            ...comment.author,
+                            interests: comment.author.interests ?? [],
+                            skills: comment.author.skills ?? [],
+                            education: comment.author.education ?? [],
+                            languages: comment.author.languages ?? [],
+                        },
+                    };
+                })
         );
 	    return commentsWithExtra;
     }

@@ -68,10 +68,16 @@ from public.thread_comments_moderation
 order by comment_id,
 	inserted_at desc;
 create view public.thread_comments_view with (security_invoker = on) as
-select p.*,
-	m.status as moderation_status
+select
+	p.*,
+	m.status as moderation_status,
+	coalesce((
+		select count(*)
+		from public.thread_comments_liked ftl
+		where ftl.comment_id = p.id
+	), 0) as likes_count
 from public.thread_comments p
-	left join public.latest_thread_comments_moderation m on p.id = m.comment_id;
+left join public.latest_thread_comments_moderation m on p.id = m.comment_id;
 -- RLS policies
 alter table public.thread_comments enable row level security;
 alter table public.thread_comments_moderation enable row level security;
@@ -157,5 +163,7 @@ create policy "Allow users to delete their own thread liked" on public.thread_co
 	)
 	and auth.uid() = user_id
 );
+create policy "Allow users to read all likes" on public.thread_comments_liked
+for select using (true);
 create policy "Allow users to upload images for their thread comments" on storage.objects for
 insert to authenticated with check (bucket_id = 'thread_comments');

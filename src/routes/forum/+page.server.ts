@@ -22,7 +22,6 @@ export const load = async (event) => {
                 query = query.order('likes_count', { ascending: sortOrder === 'asc' });
             }
 			else {
-				// Default sort if nothing is selected.
 				query = query.order('moderation_status', { ascending: true }).order('inserted_at', { ascending: false });
             }
         if (search) {
