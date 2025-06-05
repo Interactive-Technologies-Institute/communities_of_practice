@@ -2,6 +2,7 @@ import type { UserProfile } from '@/types/types';
 import { handleSignInRedirect } from '@/utils';
 import { error, redirect } from '@sveltejs/kit';
 import { setFlash } from 'sveltekit-flash-message/server';
+import type { ThreadWithAuthorAndCounters } from '@/types/types';
 
 export const load = async (event) => {
 	const { session, user } = await event.locals.safeGetSession();
@@ -59,22 +60,47 @@ export const load = async (event) => {
 		return guides;
 	}
 
-	async function getThreads(): Promise<{ id: number; label: string }[]> {
-		const { data: threads, error: threadsError } = await event.locals.supabase
-			.from('forum_threads_view')
-			.select('id, label:title')
-			.order('moderation_status', { ascending: true })
-			.order('inserted_at', { ascending: false })
-			.eq('user_id', id);
-
-		if (threadsError) {
-			const errorMessage = 'Error fetching threads, please try again later.';
-			setFlash({ type: 'error', message: errorMessage }, event.cookies);
-			return error(500, errorMessage);
+	async function getThreads(): Promise<ThreadWithAuthorAndCounters[]> {
+			let query = event.locals.supabase
+				.from('forum_threads_view')
+				.select('*, author:profiles_view!inner(*)')
+				.order('moderation_status', { ascending: true })
+				.order('inserted_at', { ascending: false })
+				.eq('user_id', id);
+	
+			const { data: forumThreads, error: forumError } = await query;
+	
+			if (forumError) {
+				const errorMessage = 'Error fetching threads, please try again later.';
+				setFlash({ type: 'error', message: errorMessage }, event.cookies);
+				return error(500, errorMessage);
+			}
+	
+			const threadsWithCounters = await Promise.all(
+			forumThreads.map(async (thread) => {
+				const { data: commentsData, error: commentsError } = await event.locals.supabase
+					.rpc('get_forum_thread_comments_count', {
+						thread_id: thread.id
+					})
+					.single();
+	
+				return {
+					...thread,
+					image: thread.image ?? '',
+					likes_count: thread.likes_count ?? 0,
+					comments_count: commentsError ? 0 : commentsData.count ?? 0,
+					author: {
+						...thread.author,
+						interests: thread.author.interests ?? [],
+						skills: thread.author.skills ?? [],
+						education: thread.author.education ?? [],
+						languages: thread.author.languages ?? [],
+					},
+				};
+			})
+		);
+			return threadsWithCounters;
 		}
-
-		return threads;
-	}
 
 	async function getEvents(): Promise<{ id: number; label: string }[]> {
 		const { data: events, error: eventsError } = await event.locals.supabase

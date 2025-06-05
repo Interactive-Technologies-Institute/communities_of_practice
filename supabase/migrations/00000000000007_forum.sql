@@ -63,11 +63,6 @@ select count(*) as likes_count,
 from public.forum_threads_liked
 where thread_id = $1;
 $$;
-create function public.get_forum_thread_comments_count(thread_id int) returns table (count int) language sql security definer
-as $$
-  select count(*) from thread_comments
-  where thread_id = get_forum_thread_comments_count.thread_id;
-$$;
 create view public.latest_forum_threads_moderation with (security_invoker = on) as
 select distinct on (thread_id) *
 from public.forum_threads_moderation

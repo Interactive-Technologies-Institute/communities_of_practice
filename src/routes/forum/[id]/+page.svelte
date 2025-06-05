@@ -49,11 +49,11 @@
 	}}
 />
 
-<div class="container mx-auto mt-10 space-y-10 pb-10">
+<div class="container mx-auto max-w-3xl mt-10 space-y-10 pb-10">
 	{#if data.moderation[0].status !== 'approved'}
 		<ModerationBanner moderation={data.moderation} />
 	{/if}
-	<Card class="mx-auto max-w-2xl p-6 space-y-4">
+	<Card class="mx-auto p-6 space-y-4">
 		<h1 class="text-2xl font-bold tracking-tight text-foreground">{data.thread.title}</h1>
 		<div class="mx-auto flex max-w-2xl flex-col gap-y-4">
 			<div class="flex items-center gap-3 text-sm text-muted-foreground">
@@ -125,7 +125,7 @@
 			{/if}
 		</div>
 	</Card>
-	<div class="mx-auto flex max-w-2xl flex-col gap-y-6 pb-6">
+	<div class="mx-auto flex flex-col gap-y-6 pb-6">
 		{#if showSummary && data.thread.summary}
 			<Card class="p-4 text-sm">
 				<h2 class="mb-2 text-base font-semibold text-foreground">Summary</h2>

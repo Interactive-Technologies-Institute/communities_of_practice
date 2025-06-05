@@ -48,6 +48,11 @@ create table public.thread_comments_liked (
   comment_id bigint references public.thread_comments on delete cascade not null,
   unique (user_id, comment_id)
 );
+create function public.get_forum_thread_comments_count(thread_id int) returns table (count int) language sql security definer
+as $$
+  select count(*) from thread_comments
+  where thread_id = get_forum_thread_comments_count.thread_id;
+$$;
 create function public.get_thread_comment_likes_count(comment_id bigint, user_id uuid default null) returns table (count bigint, has_likes boolean) language sql security definer as $$
 select count(*) as likes_count,
 	case

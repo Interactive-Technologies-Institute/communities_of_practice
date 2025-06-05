@@ -9,6 +9,7 @@
 	import * as Avatar from '@/components/ui/avatar';
 	import { firstAndLastInitials } from '@/utils';
 	import dayjs from 'dayjs';
+	import InteractableImage from '@/components/interactable-image.svelte';
 
 	export let thread: ThreadWithAuthorAndCounters;
 
@@ -46,20 +47,13 @@
 					</Avatar.Root>
 					<p class="text-sm font-medium">{thread.author.display_name}</p>
 				</div>
+				{#if imageUrl !== ''}
+					<InteractableImage src={imageUrl} class="w-full object-contain rounded mt-2 mb-2"/>
+				{/if}
 				<p class="line-clamp-4 text-muted-foreground whitespace-pre-wrap break-words">{thread.content}</p>
 			</div>
 
-			{#if imageUrl !== ''}
-				<AspectRatio ratio={3 / 2}>
-					<img src={imageUrl} alt="Thread Cover" class="h-full w-full object-contain" />
-					{#if thread.moderation_status !== 'approved'}
-						<Badge class="absolute right-2 top-2" variant={thread.moderation_status === 'rejected' ? 'destructive' : 'secondary'}>
-							{moderationStatusLabels[thread.moderation_status]}
-						</Badge>
-					{/if}
-				</AspectRatio>
-			{/if}
-			<div class=" flex flex-wrap mt-2 gap-2">
+			<div class=" flex flex-wrap gap-2">
 				{#each thread.tags as tag}
 					<Button variant="secondary" size="sm" href="/forum?tags={tag}" class="text-xs px-2 py-1">
 						<Tag class="mr-1 h-3 w-3" />
