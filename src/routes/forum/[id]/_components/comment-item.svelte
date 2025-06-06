@@ -69,7 +69,23 @@
 				<p class="text-xs text-muted-foreground mb-2">
 					Replying to <span class="font-medium">{comment.parent_author}</span>
 				</p>
-			{/if}
+				{/if}
+				<div class="flex items-start mb-3 gap-2">
+					<Avatar.Root class="h-10 w-10">
+						<Avatar.Image src={avatarUrl} alt={comment.author.display_name} />
+						<Avatar.Fallback>
+							{firstAndLastInitials(comment.author.display_name)}
+						</Avatar.Fallback>
+					</Avatar.Root>
+					<div>
+						<p class="text-sm font-medium">{comment.author.display_name}</p>
+						<p class="text-xs text-muted-foreground">{dayjs(comment.inserted_at).fromNow()}
+							{#if comment.inserted_at !== comment.updated_at}
+								(edited)
+							{/if}
+						</p>
+					</div>
+				</div>
 			{#if editing}
 					<textarea
 						bind:value={editedContent}
@@ -92,21 +108,10 @@
 			{:else}
 				<p class="line-clamp-2 whitespace-pre-wrap break-words">{comment.content}</p>
 			{/if}
-			<!--<p class="mt-2 text-sm text-muted-foreground">Updated at: {updatedAt}</p>-->
-			<div class="flex items-center gap-2">
-				<Avatar.Root class="h-8 w-8">
-					<Avatar.Image src={avatarUrl} alt={comment.author.display_name} />
-					<Avatar.Fallback>{firstAndLastInitials(comment.author.display_name)}</Avatar.Fallback>
-				</Avatar.Root>
-				<p class="text-sm font-medium">{comment.author.display_name}</p>
-			</div>
-			<div class="text-sm text-muted-foreground mt-2 flex gap-4">
-				<span>{comment.likes_count} {comment.likes_count === 1 ? 'like' : 'likes'}</span>
-				<span>Published {dayjs(comment.inserted_at).fromNow()}</span>
-				<span>{#if comment.inserted_at !== comment.updated_at}
-					Edited {dayjs(comment.updated_at).fromNow()}
-				{/if}
-				</span>
+			<div class="text-base text-muted-foreground flex flex-wrap items-center justify-between w-full">
+				<div class="flex items-center gap-1">
+					<span>{comment.likes_count} {comment.likes_count === 1 ? 'like' : 'likes'}</span>
+				</div>
 			</div>
 			<div class="mt-2 flex items-center justify-between gap-4 border-t pt-2 text-sm text-muted-foreground">
 				<div class="flex gap-4">

@@ -5,7 +5,7 @@
 	import { Button } from '@/components/ui/button';
 	import { Card } from '@/components/ui/card';
 	import type { ThreadWithAuthorAndCounters } from '@/types/types';
-	import { Tag } from 'lucide-svelte';
+	import { Tag, ThumbsUp, MessageSquare} from 'lucide-svelte';
 	import * as Avatar from '@/components/ui/avatar';
 	import { firstAndLastInitials } from '@/utils';
 	import dayjs from 'dayjs';
@@ -31,40 +31,52 @@
 	$: avatarUrl = thread.author.avatar
         ? $page.data.supabase.storage.from('users').getPublicUrl(thread.author.avatar).data.publicUrl
         : '';
-
 </script>
 
 
 <a href={`/forum/${thread.id}`} class="h-full">
 	<Card class="relative flex h-full flex-col overflow-hidden">
 		<div class="flex flex-1 flex-col px-4 py-3">
-			<div class="mb-5">
-				<h2 class="line-clamp-2 text-lg font-medium whitespace-pre-wrap break-words">{thread.title}</h2>
-				<div class="flex items-center gap-2">
-					<Avatar.Root class="h-8 w-8">
+			<div class="mb-3">
+				<div class="flex items-start gap-2">
+					<Avatar.Root class="h-10 w-10">
 						<Avatar.Image src={avatarUrl} alt={thread.author.display_name} />
 						<Avatar.Fallback>{firstAndLastInitials(thread.author.display_name)}</Avatar.Fallback>
 					</Avatar.Root>
-					<p class="text-sm font-medium">{thread.author.display_name}</p>
+					<div>
+						<p class="text-sm font-medium">{thread.author.display_name}</p>
+						<p class="text-xs text-muted-foreground">{dayjs(thread.inserted_at).fromNow()}
+							{#if thread.inserted_at !== thread.updated_at}
+								(edited)
+							{/if}
+						</p>
+					</div>
 				</div>
+				<h2 class="line-clamp-2 text-lg font-medium whitespace-pre-wrap break-words mt-2">{thread.title}</h2>
 				{#if imageUrl !== ''}
-					<InteractableImage src={imageUrl} class="w-full object-contain rounded mt-2 mb-2"/>
+					<InteractableImage src={imageUrl} class="w-full object-contain rounded mb-2"/>
 				{/if}
-				<p class="line-clamp-4 text-muted-foreground whitespace-pre-wrap break-words">{thread.content}</p>
+				<p class="line-clamp-2 whitespace-pre-wrap break-words">{thread.content}</p>
 			</div>
-
-			<div class=" flex flex-wrap gap-2">
-				{#each thread.tags as tag}
-					<Button variant="secondary" size="sm" href="/forum?tags={tag}" class="text-xs px-2 py-1">
-						<Tag class="mr-1 h-3 w-3" />
-						{tag}
-					</Button>
-				{/each}
-			</div>
-			<div class="text-sm text-muted-foreground mt-2 flex gap-4">
-				<span>{thread.likes_count} {thread.likes_count === 1 ? 'like' : 'likes'}</span>
-				<span>{thread.comments_count} {thread.comments_count === 1 ? 'comment' : 'comments'}</span>
-				<span>Published {dayjs(thread.inserted_at).fromNow()}</span>
+			<div class="text-base text-muted-foreground flex flex-wrap items-center justify-between w-full">
+				<div class="flex items-center gap-5">
+					<div class="flex items-center gap-1">
+						<ThumbsUp class="h-4 w-4" />
+						<span>{thread.likes_count}</span>
+					</div>
+					<div class="flex items-center gap-1">
+						<MessageSquare class="h-4 w-4" />
+						<span>{thread.comments_count}</span>
+					</div>
+				</div>
+				<div class="flex items-center gap-3 flex-wrap">
+					{#each thread.tags as tag}
+						<a href={`/forum?tags=${tag}`} class="flex items-center gap-1 hover:underline">
+							<Tag class="h-4 w-4" />
+							<span>{tag}</span>
+						</a>
+					{/each}
+				</div>
 			</div>
 		</div>
 	</Card>

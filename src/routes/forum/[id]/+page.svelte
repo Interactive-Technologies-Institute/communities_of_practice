@@ -53,76 +53,77 @@
 	{#if data.moderation[0].status !== 'approved'}
 		<ModerationBanner moderation={data.moderation} />
 	{/if}
-	<Card class="mx-auto p-6 space-y-4">
-		<h1 class="text-2xl font-bold tracking-tight text-foreground">{data.thread.title}</h1>
-		<div class="mx-auto flex max-w-2xl flex-col gap-y-4">
-			<div class="flex items-center gap-3 text-sm text-muted-foreground">
-				<Avatar.Root class="h-8 w-8">
+	<Card class="mx-auto p-2 space-y-4">
+		<div class="flex flex-1 flex-col px-4 py-3">
+			<div class="flex items-start mb-3 gap-2">
+				<Avatar.Root class="h-10 w-10">
 					<Avatar.Image src={avatarUrl} alt={data.thread.author.display_name} />
 					<Avatar.Fallback>
 						{firstAndLastInitials(data.thread.author.display_name)}
 					</Avatar.Fallback>
 				</Avatar.Root>
-				<Button variant="link" size="sm" href={`/users/${data.thread.author.id}`} class="p-0 h-auto">
-					{data.thread.author.display_name}
-				</Button>
+				<div>
+					<p class="text-sm font-medium">{data.thread.author.display_name}</p>
+					<p class="text-xs text-muted-foreground">{dayjs(data.thread.inserted_at).fromNow()}
+						{#if data.thread.inserted_at !== data.thread.updated_at}
+								(edited)
+							{/if}
+					</p>
+				</div>
 			</div>
-		</div>
-		{#if data.thread.image !== null && data.thread.image !== undefined}
-			<InteractableImage src={data.thread.image} class="w-full object-contain rounded"/>
-		{/if}
-		<p class="whitespace-pre-wrap break-words">{data.thread.content}</p>
-		<div class=" flex flex-wrap gap-2">
-			{#each data.thread.tags as tag}
-				<Button
-					variant="secondary"
-					size="sm"
-					href="/forum?tags={tag}"
-					class="text-xs px-2 py-1"
-				>
-					<Tag class="mr-1 h-3 w-3" />
-					{tag}
-				</Button>
-			{/each}
-		</div>
-		<div class="text-sm text-muted-foreground mt-2 flex gap-4">
-			<span>{data.likesCount} {data.likesCount === 1 ? 'like' : 'likes'}</span>
-			<span>{data.commentsCount} {data.commentsCount === 1 ? 'comment' : 'comments'}</span>
-			<span>Published {dayjs(data.thread.inserted_at).fromNow()}</span>
-			<span>{#if data.thread.inserted_at !== data.thread.updated_at}
-				Edited {dayjs(data.thread.updated_at).fromNow()}
+			<h1 class="text-2xl font-bold tracking-tight text-foreground mb-3">{data.thread.title}</h1>
+			{#if data.thread.image !== null && data.thread.image !== undefined}
+				<InteractableImage src={data.thread.image} class="w-full object-contain rounded mb-3"/>
 			{/if}
-			</span>
-		</div>
-		<div class="mt-4 flex items-center justify-between gap-4 border-t pt-4 text-sm text-muted-foreground">
-			<div class="flex gap-4">
-				<ThreadLikeButton data={data.toggleLikeForm} />
-				<Button variant="ghost" size="sm" on:click={() => (showCommentForm = !showCommentForm)}
-					class={cn('flex items-center gap-2', { 'text-orange-500': showCommentForm })}>
-					<MessageSquare class="h-4 w-4" />
-					Comment
-				</Button>
-				{#if data.thread.summary}
-					<Button variant="ghost" size="sm" on:click={() => (showSummary = !showSummary)}
-						class={cn('flex items-center gap-2', { 'text-orange-500': showSummary })}>
-						<Text class="h-4 w-4" />
-						Summary
+			<p class="whitespace-pre-wrap break-words mb-3">{data.thread.content}</p>
+			<div class="text-base text-muted-foreground flex flex-wrap items-center justify-between w-full">
+				<div class="flex items-center gap-5">
+					<div class="flex items-center gap-1">
+						<span>{data.likesCount} {data.likesCount === 1 ? 'like' : 'likes'}</span>
+					</div>
+					<div class="flex items-center gap-1">
+						<span>{data.commentsCount} {data.commentsCount === 1 ? 'comment' : 'comments'}</span>
+					</div>
+				</div>
+				<div class="flex items-center gap-3 flex-wrap">
+					{#each data.thread.tags as tag}
+						<a href={`/forum?tags=${tag}`} class="flex items-center gap-1 hover:underline">
+							<Tag class="h-4 w-4" />
+							<span>{tag}</span>
+						</a>
+					{/each}
+				</div>
+			</div>
+			<div class="mt-4 flex items-center justify-between gap-4 border-t pt-4 text-sm text-muted-foreground">
+				<div class="flex gap-4">
+					<ThreadLikeButton data={data.toggleLikeForm} />
+					<Button variant="ghost" size="sm" on:click={() => (showCommentForm = !showCommentForm)}
+						class={cn('flex items-center gap-2', { 'text-orange-500': showCommentForm })}>
+						<MessageSquare class="h-4 w-4" />
+						Comment
 					</Button>
+					{#if data.thread.summary}
+						<Button variant="ghost" size="sm" on:click={() => (showSummary = !showSummary)}
+							class={cn('flex items-center gap-2', { 'text-orange-500': showSummary })}>
+							<Text class="h-4 w-4" />
+							Summary
+						</Button>
+					{/if}
+				</div>
+
+				{#if data.thread.user_id === data.user?.id}
+					<div class="flex gap-2">
+						<Button variant="ghost" size="sm" href="/forum/{data.thread.id}/edit" class="text-blue-500 hover:text-blue-600">
+							<Pen class="h-4 w-4" />
+							Edit
+						</Button>
+						<Button variant="ghost" size="sm" on:click={() => (openDeleteDialog = true)} class="text-red-500 hover:text-red-600">
+							<Trash class="h-4 w-4" /> 
+							Delete
+						</Button>
+					</div>
 				{/if}
 			</div>
-
-			{#if data.thread.user_id === data.user?.id}
-				<div class="flex gap-2">
-					<Button variant="ghost" size="sm" href="/forum/{data.thread.id}/edit" class="text-blue-500 hover:text-blue-600">
-						<Pen class="h-4 w-4" />
-						Edit
-					</Button>
-					<Button variant="ghost" size="sm" on:click={() => (openDeleteDialog = true)} class="text-red-500 hover:text-red-600">
-						<Trash class="h-4 w-4" /> 
-						Delete
-					</Button>
-				</div>
-			{/if}
 		</div>
 	</Card>
 	<div class="mx-auto flex flex-col gap-y-6 pb-6">
