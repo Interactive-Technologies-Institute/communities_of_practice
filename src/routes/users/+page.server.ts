@@ -30,7 +30,11 @@ export const load = async (event) => {
         }
 
         if (roles && roles.length) {
-            query = query.in('role', roles);
+            const validRoles = ['user', 'moderator', 'admin'];
+            const allValid = roles.every((r) => validRoles.includes(r));
+            if (allValid) {
+                query = query.in('role', roles as ('user' | 'moderator' | 'admin')[]);
+            }
         }
 
 
@@ -42,14 +46,7 @@ export const load = async (event) => {
             return error(500, errorMessage);
         }
 
-        return userProfiles.map(profile => ({
-            ...profile,
-            avatar: profile.avatar ?? '',
-            interests: profile.interests ?? [],
-            skills: profile.skills ?? [],
-            education: profile.education ?? [],
-            languages: profile.languages ?? [],
-        }));
+        return userProfiles;
     }
         
     return {

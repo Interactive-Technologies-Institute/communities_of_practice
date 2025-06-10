@@ -68,17 +68,6 @@ select distinct on (thread_id) *
 from public.forum_threads_moderation
 order by thread_id,
 	inserted_at desc;
-create view public.forum_threads_view with (security_invoker = on) as
-select
-	p.*,
-	m.status as moderation_status,
-	coalesce((
-		select count(*)
-		from public.forum_threads_liked ftl
-		where ftl.thread_id = p.id
-	), 0) as likes_count
-from public.forum_threads p
-left join public.latest_forum_threads_moderation m on p.id = m.thread_id;
 create view public.forum_threads_tags with (security_invoker = on) as
 select unnest(tags) as tag,
 	count(*) as count

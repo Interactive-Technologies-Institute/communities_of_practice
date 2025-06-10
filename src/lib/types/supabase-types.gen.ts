@@ -46,11 +46,13 @@ export type Database = {
         Row: {
           date: string
           description: string
+          end_time: string
           fts: unknown | null
           id: number
           image: string
           inserted_at: string
           location: string
+          start_time: string
           tags: string[]
           title: string
           updated_at: string
@@ -59,11 +61,13 @@ export type Database = {
         Insert: {
           date: string
           description: string
+          end_time: string
           fts?: unknown | null
           id?: number
           image: string
           inserted_at?: string
           location: string
+          start_time: string
           tags: string[]
           title: string
           updated_at?: string
@@ -72,11 +76,13 @@ export type Database = {
         Update: {
           date?: string
           description?: string
+          end_time?: string
           fts?: unknown | null
           id?: number
           image?: string
           inserted_at?: string
           location?: string
+          start_time?: string
           tags?: string[]
           title?: string
           updated_at?: string
@@ -1045,6 +1051,7 @@ export type Database = {
         Row: {
           date: string | null
           description: string | null
+          end_time: string | null
           fts: unknown | null
           id: number | null
           image: string | null
@@ -1053,6 +1060,7 @@ export type Database = {
           moderation_status:
             | Database["public"]["Enums"]["moderation_status"]
             | null
+          start_time: string | null
           tags: string[] | null
           title: string | null
           updated_at: string | null

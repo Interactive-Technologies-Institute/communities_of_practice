@@ -34,13 +34,7 @@ export const load = async (event) => {
 				.getPublicUrl(userProfile.avatar).data.publicUrl;
 		}
 
-		return {
-			...userProfile,
-			interests: userProfile.interests ?? [],
-			skills: userProfile.skills ?? [],
-			education: userProfile.education ?? [],
-			languages: userProfile.languages ?? [],
-    };
+		return userProfile;
 	}
 
 	async function getGuides(): Promise<{ id: number; label: string }[]> {
@@ -75,31 +69,7 @@ export const load = async (event) => {
 				setFlash({ type: 'error', message: errorMessage }, event.cookies);
 				return error(500, errorMessage);
 			}
-	
-			const threadsWithCounters = await Promise.all(
-			forumThreads.map(async (thread) => {
-				const { data: commentsData, error: commentsError } = await event.locals.supabase
-					.rpc('get_forum_thread_comments_count', {
-						thread_id: thread.id
-					})
-					.single();
-	
-				return {
-					...thread,
-					image: thread.image ?? '',
-					likes_count: thread.likes_count ?? 0,
-					comments_count: commentsError ? 0 : commentsData.count ?? 0,
-					author: {
-						...thread.author,
-						interests: thread.author.interests ?? [],
-						skills: thread.author.skills ?? [],
-						education: thread.author.education ?? [],
-						languages: thread.author.languages ?? [],
-					},
-				};
-			})
-		);
-			return threadsWithCounters;
+			return forumThreads;
 		}
 
 	async function getEvents(): Promise<{ id: number; label: string }[]> {

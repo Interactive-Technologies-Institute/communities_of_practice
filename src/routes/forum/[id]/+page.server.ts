@@ -16,7 +16,7 @@ export const load = async (event) => {
     const sortBy = stringQueryParam().decode(event.url.searchParams.get('sortBy'));
     const sortOrder = stringQueryParam().decode(event.url.searchParams.get('sortOrder'));
 
-    async function getThread(id: string): Promise<ThreadWithAuthor> {
+    async function getThread(id: number): Promise<ThreadWithAuthor> {
         const { data: threadData, error: threadError } = await event.locals.supabase
             .from('forum_threads_view')
             .select('*, author:profiles_view!inner(*)')
@@ -35,17 +35,10 @@ export const load = async (event) => {
 
         return {
         ...threadData,
-        image: imageUrl,
-        author: {
-            ...threadData.author,
-            interests: threadData.author.interests ?? [],
-            skills: threadData.author.skills ?? [],
-            education: threadData.author.education ?? [],
-            languages: threadData.author.languages ?? [],
-        },
+        image: imageUrl
     };
     }
-    async function getThreadModeration(id: string): Promise<ModerationInfo[]> {
+    async function getThreadModeration(id: number): Promise<ModerationInfo[]> {
         const { data: moderation, error: moderationError } = await event.locals.supabase
             .from('forum_threads_moderation')
             .select('*')
@@ -61,10 +54,10 @@ export const load = async (event) => {
         return moderation;
     }
 
-    async function getLikesCount(id: string): Promise<{ count: number; userLikes: boolean }> {
+    async function getLikesCount(id: number): Promise<{ count: number; userLikes: boolean }> {
         const { data: likes, error: likesError } = await event.locals.supabase
             .rpc('get_forum_thread_likes_count', {
-                thread_id: parseInt(id),
+                thread_id: id,
                 user_id: user?.id,
             })
             .single();
@@ -114,11 +107,11 @@ export const load = async (event) => {
         return roots;
     }
 
-    async function getThreadComments(threadId: string): Promise<NestedComment[]> {
+    async function getThreadComments(id: number): Promise<NestedComment[]> {
         const query = event.locals.supabase
             .from('thread_comments_view')
             .select('*, author:profiles_view!inner(*)')
-            .eq('thread_id', threadId);
+            .eq('thread_id', id);
 
         if (sortBy === 'likes') {
             query.order('likes_count', { ascending: sortOrder === 'asc' });
@@ -152,32 +145,20 @@ export const load = async (event) => {
 
                     return {
                         ...comment,
-                        thread_id: comment.thread_id as number,
-                        user_id: comment.user_id as string,
-                        inserted_at: comment.inserted_at as string,
-                        updated_at: comment.updated_at as string,
-                        is_reply: comment.is_reply as boolean,
-                        id: comment.id,
-                        likes_count: likeError ? 0 : data.count ?? 0,
                         replies: [],
-                        content: comment.content ?? '', 
-                        author: {
-                            ...comment.author,
-                            interests: comment.author.interests ?? [],
-                            skills: comment.author.skills ?? [],
-                            education: comment.author.education ?? [],
-                            languages: comment.author.languages ?? [],
-                        },
                     };
                 })
         );
 	    return commentsWithExtra;
     }
+    
+    const threadId = parseInt(event.params.id);
+    if (isNaN(threadId)) throw error(400, 'Invalid thread ID');
 
-    const likesCount = await getLikesCount(event.params.id);
-    const commentsCount = await getCommentsCount(await getThreadComments(event.params.id));
+    const likesCount = await getLikesCount(threadId);
+    const commentsCount = await getCommentsCount(await getThreadComments(threadId));
     // Fetch all comments and build the like forms for each
-    const comments = await getThreadComments(event.params.id);
+    const comments = await getThreadComments(threadId);
     const commentLikeForms: Record<string, SuperValidated<Infer<typeof toggleThreadCommentLikeSchema>>> = {};
     const editThreadCommentForms: Record<string, SuperValidated<Infer<typeof updateThreadCommentSchema>>> = {};
     
@@ -206,8 +187,8 @@ export const load = async (event) => {
     }
 
     return {
-        thread: await getThread(event.params.id),
-        moderation: await getThreadModeration(event.params.id),
+        thread: await getThread(threadId),
+        moderation: await getThreadModeration(threadId),
         likesCount: likesCount.count,
         commentsCount,
         deleteForm: await superValidate(zod(deleteThreadSchema), {
@@ -226,7 +207,7 @@ export const load = async (event) => {
         }),
         toggleCommentLikeForms: commentLikeForms,
         editThreadCommentForms,
-        nestedComments: buildCommentTree(await getThreadComments(event.params.id)),
+        nestedComments: buildCommentTree(await getThreadComments(threadId)),
     };
 };
 

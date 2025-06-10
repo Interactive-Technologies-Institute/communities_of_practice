@@ -53,6 +53,22 @@ as $$
   select count(*) from thread_comments
   where thread_id = get_forum_thread_comments_count.thread_id;
 $$;
+create view public.forum_threads_view with (security_invoker = on) as
+select
+    p.*,
+    m.status as moderation_status,
+    coalesce((
+        select count(*)
+        from public.forum_threads_liked ftl
+        where ftl.thread_id = p.id
+    ), 0) as likes_count,
+    coalesce((
+        select count(*)
+        from public.thread_comments tc
+        where tc.thread_id = p.id
+    ), 0) as comments_count
+from public.forum_threads p
+left join public.latest_forum_threads_moderation m on p.id = m.thread_id;
 create function public.get_thread_comment_likes_count(comment_id bigint, user_id uuid default null) returns table (count bigint, has_likes boolean) language sql security definer as $$
 select count(*) as likes_count,
 	case
