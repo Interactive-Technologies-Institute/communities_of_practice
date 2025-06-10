@@ -8,8 +8,11 @@ create table public.events (
 	description text not null,
 	image text not null,
 	tags text [] not null,
-	date timestamp with time zone not null,
-	location text not null
+	date date not null,
+	start_time time not null,
+	end_time time not null,
+	location text not null,
+	constraint end_after_start check (end_time > start_time)
 );
 alter table public.events
 add column fts tsvector generated always as (

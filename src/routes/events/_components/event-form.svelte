@@ -115,6 +115,20 @@
 						<Form.FieldErrors />
 					</Form.Control>
 				</Form.Field>
+				<Form.Field {form} name="start_time">
+					<Form.Control let:attrs>
+						<Form.Label>Start Time*</Form.Label>
+						<Input type="time" step="60" {...attrs} bind:value={$formData.start_time} />
+						<Form.FieldErrors />
+					</Form.Control>
+				</Form.Field>
+				<Form.Field {form} name="end_time">
+					<Form.Control let:attrs>
+						<Form.Label>End Time*</Form.Label>
+						<Input type="time" step="60" {...attrs} bind:value={$formData.end_time} />
+						<Form.FieldErrors />
+					</Form.Control>
+				</Form.Field>
 				<Form.Field {form} name="location">
 					<Form.Control let:attrs>
 						<Form.Label>Location*</Form.Label>

@@ -54,9 +54,16 @@ export const actions = {
 
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			const { imageUrl, ...data } = form.data;
+			const dateOnly = new Date(data.date).toISOString().slice(0, 10);
 			const { error: supabaseError } = await event.locals.supabase
 				.from('events')
-				.insert({ ...data, user_id: userId, image: imagePath });
+				.insert({
+					...data,
+					date: dateOnly,
+					user_id: userId,
+					image: imagePath
+				});
+
 
 			if (supabaseError) {
 				setFlash({ type: 'error', message: supabaseError.message }, event.cookies);

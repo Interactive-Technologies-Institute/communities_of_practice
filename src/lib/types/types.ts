@@ -113,6 +113,8 @@ export type Event = {
 	tags: string[];
 	image: string;
 	date: string;
+	start_time: string;
+	end_time: string;
 	location: string;
 	moderation_status: ModerationStatus;
 };
