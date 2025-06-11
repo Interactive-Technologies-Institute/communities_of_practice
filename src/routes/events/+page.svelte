@@ -8,6 +8,7 @@
 	import { MetaTags } from 'svelte-meta-tags';
 	import { queryParam } from 'sveltekit-search-params';
 	import EventItem from './_components/event-item.svelte';
+	import FullCalendar from './_components/full-calendar.svelte';
 
 	export let data;
 
@@ -30,6 +31,9 @@
 		<PlusCircle class="h-4 w-4 sm:mr-2" />
 		<span class="sr-only sm:not-sr-only">Create Event</span>
 	</Button>
+</div>
+<div class="container mx-auto py-10">
+	<FullCalendar events={data.events} />
 </div>
 <div class="container mx-auto grid grid-cols-1 gap-6 py-10 md:grid-cols-2 lg:grid-cols-3">
 	{#each data.events as event}

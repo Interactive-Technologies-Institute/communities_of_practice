@@ -49,6 +49,8 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@fullcalendar/core": "^6.1.17",
+		"@fullcalendar/daygrid": "^6.1.17",
 		"@internationalized/date": "^3.5.5",
 		"@supabase/ssr": "^0.5.1",
 		"@supabase/supabase-js": "^2.45.4",
