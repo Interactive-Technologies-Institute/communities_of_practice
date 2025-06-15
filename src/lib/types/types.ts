@@ -21,10 +21,10 @@ export type UserProfile = {
 	website: string | null;
 	gender: string | null;
 	nationality: string | null;
-	interests: string[]; // default: []
-	skills: string[];    // default: []
-	education: string[]; // default: []
-	languages: string[]; // default: []
+	interests: string[];
+	skills: string[];
+	education: string[];
+	languages: string[];
 };
 
 export type UserType = {
@@ -112,12 +112,44 @@ export type Event = {
 	description: string;
 	tags: string[];
 	image: string;
+	location: string;
+	date: string | null;
+	start_time: string | null;
+	end_time: string | null;
+	voting_end_date: string | null;
+	voting_end_time: string | null;
+	moderation_status: ModerationStatus;
+	final_voting_option_id?: number | null;
+};
+
+export type EventVotingOption = {
+	id: number;
+	event_id: number;
 	date: string;
 	start_time: string;
 	end_time: string;
-	location: string;
-	moderation_status: ModerationStatus;
 };
+
+export type EventWithVotingOptions = Event & {
+	voting_options: EventVotingOption[];
+};
+
+export type VotingSummary = {
+	event_id: number;
+	voting_option_id: number;
+	date: string;
+	start_time: string;
+	end_time: string;
+	vote_count: number;
+};
+
+export type EventVote = {
+	id: number;
+	inserted_at: string;
+	user_id: string;
+	voting_option_id: number;
+};
+
 
 export type EventWithAuthor = Event & { author: UserProfile };
 

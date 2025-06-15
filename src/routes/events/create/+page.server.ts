@@ -53,21 +53,40 @@ export const actions = {
 			}
 
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars
-			const { imageUrl, ...data } = form.data;
-			const dateOnly = new Date(data.date).toISOString().slice(0, 10);
-			const { error: supabaseError } = await event.locals.supabase
+			const { imageUrl, image, voting_options, ...eventData } = form.data;
+
+			const { data: insertedEvent, error: insertError } = await event.locals.supabase
 				.from('events')
 				.insert({
-					...data,
-					date: dateOnly,
+					...eventData,
 					user_id: userId,
 					image: imagePath
-				});
+				})
+				.select('id')
+				.single();
 
+			if (insertError || !insertedEvent) {
+				setFlash({ type: 'error', message: insertError?.message ?? 'Insert failed' }, event.cookies);
+				return fail(500, withFiles({ message: insertError?.message, form }));
+			}
+			
+			// Insert voting options if provided
+			if (eventData.allow_voting && voting_options && voting_options.length > 0) {
+				const votingData = voting_options.map((opt) => ({
+					event_id: insertedEvent.id,
+					date: new Date(opt.date).toISOString().slice(0, 10),
+					start_time: opt.start_time,
+					end_time: opt.end_time,
+				}));
 
-			if (supabaseError) {
-				setFlash({ type: 'error', message: supabaseError.message }, event.cookies);
-				return fail(500, withFiles({ message: supabaseError.message, form }));
+				const { error: votingError } = await event.locals.supabase
+					.from('events_voting_options')
+					.insert(votingData);
+
+				if (votingError) {
+					setFlash({ type: 'error', message: votingError.message }, event.cookies);
+					return fail(500, withFiles({ message: votingError.message, form }));
+				}
 			}
 
 			return redirect(303, '/events');

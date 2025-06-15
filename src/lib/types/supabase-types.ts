@@ -42,9 +42,9 @@ export type Database = MergeDeep<
 						description: string;
 						image: string;
 						tags: string[];
-						date: string;
-						start_time: string;
-						end_time: string;
+						date: string | null;
+						start_time: string | null;
+						end_time: string | null;
 						location: string;
 						fts: unknown;
 						moderation_status: Database['public']['Enums']['moderation_status'];
@@ -210,6 +210,16 @@ export type Database = MergeDeep<
 					Returns: {
 						count: number;
 						has_interest: boolean;
+					}[];
+				};
+				get_vote_option_count: {
+					Args: {
+						voting_option_id: number;
+						user_id?: string;
+					};
+					Returns: {
+						vote_count: number;
+						has_voted: boolean;
 					}[];
 				};
 				get_guides_ordered_by_useful: {

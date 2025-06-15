@@ -13,7 +13,7 @@ export const load = async (event) => {
         return redirect(302, handleSignInRedirect(event));
     }
 
-    async function getThread(id: string) {
+    async function getThread(id: number) {
         const { data: threadData, error: threadError } = await event.locals.supabase
             .from('forum_threads')
             .select('*')
@@ -28,8 +28,9 @@ export const load = async (event) => {
 		const imageUrl = event.locals.supabase.storage.from('forum_threads').getPublicUrl(threadData.image);
         return { ...threadData, image: undefined, imageUrl: imageUrl.data.publicUrl };
     }
-
-    const thread = await getThread(event.params.id);
+    
+    const threadId = parseInt(event.params.id);
+    const thread = await getThread(threadId);
 
     return {
         updateForm: await superValidate(thread, zod(createThreadSchema), {
@@ -75,7 +76,7 @@ export const actions = {
             const { error: supabaseError } = await event.locals.supabase
                 .from('forum_threads')
                 .update({ ...data, user_id: userId, image: imagePath })
-                .eq('id', event.params.id);
+                .eq('id', parseInt(event.params.id));
 
             if (supabaseError) {
                 setFlash({ type: 'error', message: supabaseError.message }, event.cookies);

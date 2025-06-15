@@ -44,51 +44,77 @@ export type Database = {
       }
       events: {
         Row: {
-          date: string
+          allow_voting: boolean
+          date: string | null
           description: string
-          end_time: string
+          end_time: string | null
+          final_voting_option_id: number | null
           fts: unknown | null
           id: number
           image: string
           inserted_at: string
           location: string
-          start_time: string
+          start_time: string | null
           tags: string[]
           title: string
           updated_at: string
           user_id: string
+          voting_end_date: string | null
+          voting_end_time: string | null
         }
         Insert: {
-          date: string
+          allow_voting?: boolean
+          date?: string | null
           description: string
-          end_time: string
+          end_time?: string | null
+          final_voting_option_id?: number | null
           fts?: unknown | null
           id?: number
           image: string
           inserted_at?: string
           location: string
-          start_time: string
+          start_time?: string | null
           tags: string[]
           title: string
           updated_at?: string
           user_id: string
+          voting_end_date?: string | null
+          voting_end_time?: string | null
         }
         Update: {
-          date?: string
+          allow_voting?: boolean
+          date?: string | null
           description?: string
-          end_time?: string
+          end_time?: string | null
+          final_voting_option_id?: number | null
           fts?: unknown | null
           id?: number
           image?: string
           inserted_at?: string
           location?: string
-          start_time?: string
+          start_time?: string | null
           tags?: string[]
           title?: string
           updated_at?: string
           user_id?: string
+          voting_end_date?: string | null
+          voting_end_time?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "events_final_voting_option_id_fkey"
+            columns: ["final_voting_option_id"]
+            isOneToOne: false
+            referencedRelation: "events_voting_options"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_final_voting_option_id_fkey"
+            columns: ["final_voting_option_id"]
+            isOneToOne: false
+            referencedRelation: "events_voting_summary_view"
+            referencedColumns: ["voting_option_id"]
+          },
           {
             foreignKeyName: "events_user_id_fkey"
             columns: ["user_id"]
@@ -207,6 +233,95 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles_view"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events_votes: {
+        Row: {
+          id: number
+          inserted_at: string
+          user_id: string
+          voting_option_id: number
+        }
+        Insert: {
+          id?: number
+          inserted_at?: string
+          user_id: string
+          voting_option_id: number
+        }
+        Update: {
+          id?: number
+          inserted_at?: string
+          user_id?: string
+          voting_option_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_votes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_votes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_votes_voting_option_id_fkey"
+            columns: ["voting_option_id"]
+            isOneToOne: false
+            referencedRelation: "events_voting_options"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_votes_voting_option_id_fkey"
+            columns: ["voting_option_id"]
+            isOneToOne: false
+            referencedRelation: "events_voting_summary_view"
+            referencedColumns: ["voting_option_id"]
+          },
+        ]
+      }
+      events_voting_options: {
+        Row: {
+          date: string
+          end_time: string
+          event_id: number
+          id: number
+          start_time: string
+        }
+        Insert: {
+          date: string
+          end_time: string
+          event_id: number
+          id?: number
+          start_time: string
+        }
+        Update: {
+          date?: string
+          end_time?: string
+          event_id?: number
+          id?: number
+          start_time?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_voting_options_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_voting_options_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_view"
             referencedColumns: ["id"]
           },
         ]
@@ -1049,6 +1164,7 @@ export type Database = {
       }
       events_view: {
         Row: {
+          allow_voting: boolean | null
           date: string | null
           description: string | null
           end_time: string | null
@@ -1065,6 +1181,8 @@ export type Database = {
           title: string | null
           updated_at: string | null
           user_id: string | null
+          voting_end_date: string | null
+          voting_end_time: string | null
         }
         Relationships: [
           {
@@ -1083,6 +1201,32 @@ export type Database = {
           },
         ]
       }
+      events_voting_summary_view: {
+        Row: {
+          date: string | null
+          end_time: string | null
+          event_id: number | null
+          start_time: string | null
+          vote_count: number | null
+          voting_option_id: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_voting_options_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_voting_options_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_view"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       forum_threads_tags: {
         Row: {
           count: number | null
@@ -1092,6 +1236,7 @@ export type Database = {
       }
       forum_threads_view: {
         Row: {
+          comments_count: number | null
           content: string | null
           fts: unknown | null
           id: number | null
@@ -1556,6 +1701,13 @@ export type Database = {
         Returns: {
           count: number
           has_likes: boolean
+        }[]
+      }
+      get_vote_option_count: {
+        Args: { voting_option_id: number; user_id?: string }
+        Returns: {
+          vote_count: number
+          has_voted: boolean
         }[]
       }
       update_user_types: {
