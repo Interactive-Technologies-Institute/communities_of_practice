@@ -58,7 +58,7 @@
 			imageUrl = $formData.imageUrl;
 		}
 	}
-
+	
 	function addVotingOption() {
 		if (!$formData.voting_options) {
 			$formData.voting_options = [];
@@ -66,10 +66,10 @@
 		$formData.voting_options = $formData.voting_options.concat({ date: '', start_time: '', end_time: '' });
 	}
 
-	function removeVotingOption() {
-		if (!$formData.voting_options || $formData.voting_options.length === 0) return;
-		const updated = $formData.voting_options.slice(0, -1);
-		$formData.voting_options = updated;
+	function removeVotingOption(i: number) {
+		const opts = $formData.voting_options ?? [];
+		opts.splice(i, 1);
+		$formData.voting_options = opts;
 	}
 
 </script>
@@ -120,6 +120,8 @@
 								value="true"
 								checked={$formData.allow_voting === true}
 								on:change={() => {
+									addVotingOption();
+									addVotingOption();
 									$formData.allow_voting = true;
 									$formData.date = null;
 									$formData.start_time = null;
@@ -233,69 +235,82 @@
 						</Form.Control>
 					</Form.Field>
 				</div>
-				<h3 class="font-medium text-lg mt-6">Voting Options</h3>
-				{#each $formData.voting_options as option, i }
-					<div class="grid grid-cols-1 gap-x-4 gap-y-4 md:grid-cols-3">
-						<Form.Field {form} name={`voting_options[${i}].date`}>
-							<Form.Control id={`vote-date-${i}`} let:attrs>
+				<Form.Field {form} name="voting_options">
+					<Form.Control let:attrs>
+						<Form.Label class="text-lg font-semibold">Voting Options*</Form.Label>
+						<Form.FieldErrors />
+					</Form.Control>
+				</Form.Field>
+				{#each $formData.voting_options as option, i(i)}
+					<div class="flex items-center gap-4">
+						<div class="grid grid-cols-1 gap-x-4 gap-y-4 md:grid-cols-3 flex-1">
+							<Form.Field {form} name={`voting_options[${i}].date`}>
+								<Form.Control id={`vote-date-${i}`} let:attrs>
 								<Form.Label for={`vote-date-${i}`}>Date</Form.Label>
 								<Popover.Root>
 									<Popover.Trigger
-										{...attrs}
-										class={cn(
-											buttonVariants({ variant: 'outline' }),
-											'w-full justify-start pl-4 text-left font-normal',
-											!votingParsedDates[i] && 'text-muted-foreground'
-										)}
-									>	
-										{#if votingParsedDates[i]}
-											{df.format(votingParsedDates[i].toDate(getLocalTimeZone()))}
-										{:else}
-											Pick a date
-										{/if}
-
-										<CalendarIcon class="ml-auto h-4 w-4 opacity-50" />
+									{...attrs}
+									class={cn(
+										buttonVariants({ variant: 'outline' }),
+										'w-full justify-start pl-4 text-left font-normal',
+										!votingParsedDates[i] && 'text-muted-foreground'
+									)}
+									>
+									{votingParsedDates[i]
+									? df.format(votingParsedDates[i].toDate(getLocalTimeZone()))
+									: 'Pick a date'}
+									<CalendarIcon class="ml-auto h-4 w-4 opacity-50" />
 									</Popover.Trigger>
 									<Popover.Content class="w-auto p-0" side="top">
-										<Calendar
-											initialFocus
-											value={votingParsedDates[i]}
-											onValueChange={(v) => {
-												if (v && $formData.voting_options) {
-													$formData.voting_options = $formData.voting_options.map((opt, j) =>
-														j === i
-															? { ...opt, date: v.toString() }
-															: opt
-													);
-												}
-											}}
-										/>
+									<Calendar
+										initialFocus
+										value={votingParsedDates[i]}
+										onValueChange={(v) => {
+										$formData.voting_options = $formData.voting_options.map((opt,j) =>
+											j === i ? { ...opt, date: v?.toString() ?? '' } : opt
+										);
+										}}
+									/>
 									</Popover.Content>
 								</Popover.Root>
-								<input
-									hidden
-									value={$formData.voting_options[i].date}
-									name={attrs.name}
-								/>
+								{#if $formData.voting_options && $formData.voting_options[i]}
+									<input hidden name={attrs.name} value={$formData.voting_options[i].date}/>
+								{/if}
 								<Form.FieldErrors />
 							</Form.Control>
 						</Form.Field>
 						<Form.Field {form} name={`voting_options[${i}].start_time`}>
 							<Form.Control let:attrs>
-								<Form.Label>Start Time</Form.Label>
+							<Form.Label>Start Time</Form.Label>
+							{#if $formData.voting_options && $formData.voting_options[i]}
 								<Input type="time" {...attrs} bind:value={$formData.voting_options[i].start_time} />
-								<Form.FieldErrors />
+							{/if}
+							<Form.FieldErrors />
 							</Form.Control>
 						</Form.Field>
 						<Form.Field {form} name={`voting_options[${i}].end_time`}>
 							<Form.Control let:attrs>
-								<Form.Label>End Time</Form.Label>
+							<Form.Label>End Time</Form.Label>
+							{#if $formData.voting_options && $formData.voting_options[i]}
 								<Input type="time" {...attrs} bind:value={$formData.voting_options[i].end_time} />
-								<Form.FieldErrors />
+							{/if}
+							<Form.FieldErrors />
 							</Form.Control>
 						</Form.Field>
+						</div>
+						<Button
+						type="button"
+						variant="outline"
+						size="icon"
+						class="h-10 w-10 self-center"
+						on:click={() => {removeVotingOption(i); if ($formData.allow_voting && $formData.voting_options.length < 2) addVotingOption();}}
+						aria-label="Remove option"
+						>
+						✕
+						</Button>
 					</div>
 					{/each}
+
 					
 					<Button type="button" size="icon" variant="outline" on:click={addVotingOption}>+</Button>
 					<!--{#if $formData.voting_options.length > 0}<Button type="button" size="icon" variant="outline" on:click={removeVotingOption}>-</Button>{/if}

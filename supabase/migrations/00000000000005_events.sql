@@ -76,10 +76,16 @@ from public.events_moderation
 order by event_id,
 	inserted_at desc;
 create view public.events_view with (security_invoker = on) as
-select e.*,
-	m.status as moderation_status
+select
+    e.*,
+    m.status as moderation_status,
+    coalesce((
+        select count(*)
+        from public.events_interested ei
+        where ei.event_id = e.id
+    ), 0) as interests_count
 from public.events e
-	left join public.latest_events_moderation m on e.id = m.event_id;
+left join public.latest_events_moderation m on e.id = m.event_id;
 create view public.events_tags with (security_invoker = on) as
 select unnest(tags) as tag,
 	count(*) as count
@@ -215,6 +221,8 @@ create policy "Allow users to delete their own events interested" on public.even
 	)
 	and auth.uid() = user_id
 );
+create policy "Allow users to read all interests" on public.events_interested
+for select using (true);
 create policy "Allow users to vote on events voting options" on public.events_votes for
 insert with check (
   auth.uid() = user_id

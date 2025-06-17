@@ -4,11 +4,11 @@
 	import { Badge } from '@/components/ui/badge';
 	import { Button } from '@/components/ui/button';
 	import { Card } from '@/components/ui/card';
-	import type { Event } from '@/types/types';
 	import dayjs from 'dayjs';
-	import { Tag } from 'lucide-svelte';
+	import { Tag, ThumbsUp } from 'lucide-svelte';
+	import type { EventWithCounters } from '@/types/types';
 
-	export let event: Event;
+	export let event: EventWithCounters;
 
 	const moderationStatusLabels = {
 		pending: 'Pending',
@@ -49,13 +49,21 @@
 				<h2 class="line-clamp-2 text-lg font-medium">{event.title}</h2>
 				<p class="line-clamp-2 text-muted-foreground">{event.description}</p>
 			</div>
-			<div class="flex flex-wrap gap-2">
-				{#each event.tags as tag}
-					<Button variant="secondary" size="sm" href="/events?tags={tag}">
-						<Tag class="mr-2 h-4 w-4" />
-						{tag}
-					</Button>
-				{/each}
+			<div class="text-base text-muted-foreground flex flex-wrap items-center justify-between w-full">
+				<div class="flex items-center gap-5">
+					<div class="flex items-center gap-1">
+						<ThumbsUp class="h-4 w-4" />
+						<span>{event.interests_count}</span>
+					</div>
+				</div>
+				<div class="flex items-center gap-3 flex-wrap">
+					{#each event.tags as tag}
+						<a href={`/events?tags=${tag}`} class="flex items-center gap-1 hover:underline">
+							<Tag class="h-4 w-4" />
+							<span>{tag}</span>
+						</a>
+					{/each}
+				</div>
 			</div>
 		</div>
 	</Card>

@@ -122,6 +122,8 @@ export type Event = {
 	final_voting_option_id?: number | null;
 };
 
+export type EventWithCounters = Event & { interests_count: number };
+
 export type EventVotingOption = {
 	id: number;
 	event_id: number;

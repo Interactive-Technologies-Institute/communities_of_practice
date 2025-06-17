@@ -48,6 +48,7 @@ export type Database = MergeDeep<
 						location: string;
 						fts: unknown;
 						moderation_status: Database['public']['Enums']['moderation_status'];
+						interests_count: number;
 					};
 				};
 				events_tags: {

@@ -1,13 +1,13 @@
-import type { Event } from '@/types/types';
 import { arrayQueryParam, stringQueryParam } from '@/utils';
 import { error } from '@sveltejs/kit';
 import { setFlash } from 'sveltekit-flash-message/server';
+import type { EventWithCounters } from '@/types/types';
 
 export const load = async (event) => {
 	const search = stringQueryParam().decode(event.url.searchParams.get('s'));
 	const tags = arrayQueryParam().decode(event.url.searchParams.get('tags'));
 
-	async function getEvents(): Promise<Event[]> {
+	async function getEvents(): Promise<EventWithCounters[]> {
 		let query = event.locals.supabase
 			.from('events_view')
 			.select('*')

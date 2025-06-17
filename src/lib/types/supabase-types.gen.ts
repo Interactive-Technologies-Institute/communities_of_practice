@@ -1172,6 +1172,7 @@ export type Database = {
           id: number | null
           image: string | null
           inserted_at: string | null
+          interests_count: number | null
           location: string | null
           moderation_status:
             | Database["public"]["Enums"]["moderation_status"]
