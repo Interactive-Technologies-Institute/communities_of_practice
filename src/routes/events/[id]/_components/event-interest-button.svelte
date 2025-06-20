@@ -7,7 +7,6 @@
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 
-	export let count: number;
 	export let data: SuperValidated<Infer<ToggleEventInterestSchema>>;
 
 	const form = superForm(data, {
@@ -16,7 +15,6 @@
 		onUpdate: ({ result }) => {
 			if (result.type === 'failure') {
 				$formData.value = !$formData.value;
-				count += $formData.value ? 1 : -1;
 			}
 		},
 	});
@@ -25,7 +23,6 @@
 
 	async function toggleInterest() {
 		$formData.value = !$formData.value;
-		count += $formData.value ? 1 : -1;
 		await tick();
 		submit();
 	}
@@ -33,13 +30,17 @@
 
 <form method="POST" action="?/toggleInterest" use:enhance>
 	<input type="hidden" name="value" value={$formData.value} />
-	<Button type="button" on:click={toggleInterest} variant="outline" size="sm">
-		<Bookmark class={cn('mr-2 h-4 w-4', { 'fill-foreground': $formData.value })} />
+	<Button type="button" 
+		on:click={toggleInterest}
+		variant="ghost"
+		size="sm"
+		class={cn('flex items-center gap-2', $formData.value ? 'text-orange-500' : 'text-muted-foreground hover:text-foreground')}
+	>
+		<Bookmark/>
 		{#if $formData.value}
-			Marked as interested
+			Interested
 		{:else}
-			Mark as interested
+			Interest
 		{/if}
-		<span class="ml-4 font-mono text-xs">{count}</span>
 	</Button>
 </form>

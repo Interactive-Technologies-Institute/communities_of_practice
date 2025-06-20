@@ -2,15 +2,17 @@
 	import InteractableImage from '@/components/interactable-image.svelte';
 	import ModerationBanner from '@/components/moderation-banner.svelte';
 	import PageHeader from '@/components/page-header.svelte';
+	import Card from '@/components/ui/card/card.svelte';
 	import { Button } from '@/components/ui/button';
 	import dayjs from 'dayjs';
 	import { Calendar, MapPin, Pen, Tag, Trash } from 'lucide-svelte';
 	import { MetaTags } from 'svelte-meta-tags';
 	import EventDeleteDialog from './_components/event-delete-dialog.svelte';
 	import EventInterestButton from './_components/event-interest-button.svelte';
+	import EventVoteSchedule from './_components/event-vote-schedule.svelte';
 
 	export let data;
-
+	
 	let openDeleteDialog = false;
 </script>
 
@@ -31,69 +33,81 @@
 />
 
 <PageHeader title={data.event.title} subtitle={data.event.description} />
-<div class="container mx-auto space-y-10 pb-10">
+<div class="container mx-auto max-w-3xl mt-10 space-y-10 pb-10">
 	{#if data.moderation[0].status !== 'approved'}
 		<ModerationBanner moderation={data.moderation} />
 	{/if}
-	<div class="flex flex-col items-center gap-y-4">
-		<div class="flex flex-row gap-x-4">
-			<div class="flex flex-row items-center gap-x-2">
-				<Calendar class="text-muted-foreground" />
-				{dayjs(data.event.date).format(
-					dayjs(data.event.date).year() === dayjs().year()
-						? 'ddd, MM/DD [at] HH:mm'
-						: 'ddd, MM/DD/YYYY [at] HH:mm'
-				)}
+	<Card class="mx-auto p-2 space-y-4">
+		<div class="flex flex-1 flex-col px-4 py-3">
+			<h1 class="text-2xl font-bold tracking-tight text-foreground mb-3">{data.event.title}</h1>
+			<div class="flex flex-row gap-x-4">
+				<div class="flex flex-row items-center gap-x-2">
+					<Calendar class="text-muted-foreground" />
+					{#if data.event.date}
+						{dayjs(data.event.date).format(
+							dayjs(data.event.date).year() === dayjs().year()
+								? 'ddd, MM/DD [at] HH:mm'
+								: 'ddd, MM/DD/YYYY [at] HH:mm'
+						)}
+					{:else}
+						Not decided yet
+					{/if}
+				</div>
+				<div class="flex flex-row items-center gap-x-2">
+					<MapPin class="text-muted-foreground" />
+					{data.event.location}
+				</div>
 			</div>
-			<div class="flex flex-row items-center gap-x-2">
-				<MapPin class="text-muted-foreground" />
-				{data.event.location}
-			</div>
-		</div>
-		<EventInterestButton count={data.interestCount} data={data.toggleInterestForm} />
-	</div>
-	<div class="mx-auto flex max-w-2xl flex-col gap-y-4">
-		<InteractableImage
-			src={data.event.image}
-			alt="Event Cover"
-			class="aspect-[3/2] h-auto w-full rounded-md object-cover"
-		/>
-		<p>{data.event.description}</p>
-		<div class=" flex flex-wrap gap-2">
-			{#each data.event.tags as tag}
-				<Button variant="secondary" size="sm" href="/events?tags={tag}">
-					<Tag class="mr-2 h-4 w-4" />
-					{tag}
-				</Button>
-			{/each}
-		</div>
-	</div>
-	<div class="flex flex-col items-center">
-		<p class="text-xs text-muted-foreground">
-			Published {dayjs(data.event.inserted_at).fromNow()}
-			{#if data.event.inserted_at !== data.event.updated_at}
-				• Updated {dayjs(data.event.updated_at).fromNow()}
+			{#if data.event.image !== null && data.event.image !== undefined}
+				<InteractableImage src={data.event.image} class="w-full object-contain rounded mb-3"/>
 			{/if}
-		</p>
-		<Button variant="link" size="sm" href="/users/{data.event.author.id}">
-			by
-			{data.event.author.display_name}
-		</Button>
-	</div>
-	{#if data.event.user_id === data.user?.id}
-		<div
-			class="sticky bottom-0 flex w-full flex-row items-center justify-center gap-x-10 border-t bg-background/95 py-8 backdrop-blur supports-[backdrop-filter]:bg-background/60"
-		>
-			<Button variant="outline" href="/events/{data.event.id}/edit">
-				<Pen class="mr-2 h-4 w-4" />
-				Edit
-			</Button>
-			<Button variant="destructive" on:click={() => (openDeleteDialog = true)}>
-				<Trash class="mr-2 h-4 w-4" />
-				Delete
-			</Button>
+			<p class="whitespace-pre-wrap break-words mb-3">{data.event.description}</p>
+			<div class="text-base text-muted-foreground flex flex-wrap items-center justify-between w-full">
+				<div class="flex items-center gap-5">
+					<div class="flex items-center gap-1">
+						<span>{data.interestCount + ' members interested'}</span>
+					</div>
+				</div>
+				<div class="flex items-center gap-3 flex-wrap">
+					{#each data.event.tags as tag}
+						<a href={`/forum?tags=${tag}`} class="flex items-center gap-1 hover:underline">
+							<Tag class="h-4 w-4" />
+							<span>{tag}</span>
+						</a>
+					{/each}
+				</div>
+			</div>
+			<div class="mt-4 flex items-center justify-between gap-4 border-t pt-4 text-sm text-muted-foreground">
+				<div class="flex gap-4">
+					<EventInterestButton data={data.toggleInterestForm} />
+				</div>
+
+				{#if data.event.user_id === data.user?.id}
+					<div class="flex gap-2">
+						<Button variant="ghost" size="sm" href="/events/{data.event.id}/edit" class="text-blue-500 hover:text-blue-600">
+							<Pen class="h-4 w-4" />
+							Edit
+						</Button>
+						<Button variant="ghost" size="sm" on:click={() => (openDeleteDialog = true)} class="text-red-500 hover:text-red-600">
+							<Trash class="h-4 w-4" /> 
+							Delete
+						</Button>
+					</div>
+				{/if}
+			</div>
 		</div>
-	{/if}
+	</Card>
+	<Card class="mx-auto p-2 space-y-4">
+		<h2 class="text-lg font-semibold">Vote for Event Schedule</h2>
+		{#if data.votingOptions.length > 1}
+			<EventVoteSchedule voteOnSchedule={data.voteOnScheduleForm} removeVotes={data.removeVotesForm} votingOptions={data.votingOptions} hasVoted={data.hasVoted}/>
+		{:else}
+			<p class="text-muted-foreground">No voting options available.</p>
+		{/if}
+	</Card>
+	<div class="mx-auto flex flex-col gap-y-6 pb-6">
+		
+	</div>
 </div>
 
 <EventDeleteDialog eventId={data.event.id} data={data.deleteForm} bind:open={openDeleteDialog} />

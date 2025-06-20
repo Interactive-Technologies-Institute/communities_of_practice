@@ -239,18 +239,21 @@ export type Database = {
       }
       events_votes: {
         Row: {
+          event_id: number
           id: number
           inserted_at: string
           user_id: string
           voting_option_id: number
         }
         Insert: {
+          event_id: number
           id?: number
           inserted_at?: string
           user_id: string
           voting_option_id: number
         }
         Update: {
+          event_id?: number
           id?: number
           inserted_at?: string
           user_id?: string
@@ -284,6 +287,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "events_voting_summary_view"
             referencedColumns: ["voting_option_id"]
+          },
+          {
+            foreignKeyName: "fk_events_votes_event"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_events_votes_event"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_view"
+            referencedColumns: ["id"]
           },
         ]
       }

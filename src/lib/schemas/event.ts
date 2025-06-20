@@ -210,3 +210,14 @@ export const toggleEventInterestSchema = z.object({
 });
 
 export type ToggleEventInterestSchema = typeof toggleEventInterestSchema;
+
+export const voteOnScheduleSchema = z.object({
+	votes_ids: z.array(z.number()).default([]),
+});
+
+export type VoteOnScheduleSchema = typeof voteOnScheduleSchema;
+
+export const removeVotesSchema = z.object({});
+
+export type RemoveVotesSchema = typeof removeVotesSchema;
+
