@@ -46,6 +46,7 @@ export type Database = MergeDeep<
 						start_time: string | null;
 						end_time: string | null;
 						location: string;
+						allow_voting: boolean;
 						fts: unknown;
 						moderation_status: Database['public']['Enums']['moderation_status'];
 						interests_count: number;
@@ -244,12 +245,12 @@ export type Database = MergeDeep<
 				};
 				get_forum_thread_likes_count: {
 					Args: {
-					  thread_id: number;
-					  user_id?: string;
+						thread_id: number;
+						user_id?: string;
 					};
 					Returns: {
-					  count: number;
-					  has_likes: boolean;
+						count: number;
+						has_likes: boolean;
 					}[];
 				};
 				get_thread_comment_likes_count: {

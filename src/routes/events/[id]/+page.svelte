@@ -100,7 +100,7 @@
 	<Card class="mx-auto p-2 space-y-4">
 		<h2 class="text-lg font-semibold">Vote for Event Schedule</h2>
 		{#if data.votingOptions.length > 1}
-			<EventVoteSchedule voteOnSchedule={data.voteOnScheduleForm} removeVotes={data.removeVotesForm} votingOptions={data.votingOptions} hasVoted={data.hasVoted}/>
+			<EventVoteSchedule event={data.event} voteOnSchedule={data.voteOnScheduleForm} removeVotes={data.removeVotesForm} votingOptions={data.votingOptions} hasVoted={data.hasVoted}/>
 		{:else}
 			<p class="text-muted-foreground">No voting options available.</p>
 		{/if}

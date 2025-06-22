@@ -116,6 +116,7 @@ export type Event = {
 	date: string | null;
 	start_time: string | null;
 	end_time: string | null;
+	allow_voting: boolean;
 	voting_end_date: string | null;
 	voting_end_time: string | null;
 	moderation_status: ModerationStatus;

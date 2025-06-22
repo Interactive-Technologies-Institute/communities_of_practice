@@ -9,7 +9,7 @@
 	import * as Popover from '@/components/ui/popover';
 	import { TagInput } from '@/components/ui/tag-input';
 	import { Textarea } from '@/components/ui/textarea';
-	import { createEventSchema, type CreateEventSchema } from '@/schemas/event';
+	import { editEventSchema, type EditEventSchema } from '@/schemas/event';
 	import { cn } from '@/utils';
 	import {
 		DateFormatter,
@@ -21,15 +21,15 @@
 	import { fileProxy, superForm, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient, type Infer } from 'sveltekit-superforms/adapters';
 
-	export let data: SuperValidated<Infer<CreateEventSchema>>;
+	export let data: SuperValidated<Infer<EditEventSchema>>;
 
 	const form = superForm(data, {
-		validators: zodClient(createEventSchema),
+		validators: zodClient(editEventSchema),
 		taintedMessage: true,
 		dataType: 'json'
 	});
 
-	const { form: formData, enhance, submitting } = form;
+	const { form: formData, enhance, submitting, errors } = form;
 
 	const df = new DateFormatter('en-US', {
 		dateStyle: 'long',
@@ -37,9 +37,6 @@
 	
 	let date: DateValue | undefined;
 	$: date = $formData.date ? parseDate($formData.date) : undefined;
-
-	let votingParsedDates: (DateValue | undefined)[] = [];
-	$: votingParsedDates = $formData.voting_options .map(opt => opt.date ? parseDate(opt.date) : undefined);
 
 	let votingParsedEndDate: DateValue | undefined;
 	$: votingParsedEndDate = $formData.voting_end_date ? parseDate($formData.voting_end_date) : undefined;
@@ -58,20 +55,6 @@
 			imageUrl = $formData.imageUrl;
 		}
 	}
-	
-	function addVotingOption() {
-		if (!$formData.voting_options) {
-			$formData.voting_options = [];
-		}
-		$formData.voting_options = $formData.voting_options.concat({ date: '', start_time: '', end_time: '' });
-	}
-
-	function removeVotingOption(i: number) {
-		const opts = $formData.voting_options ?? [];
-		opts.splice(i, 1);
-		$formData.voting_options = opts;
-	}
-
 	let backupDate: string | null | undefined = null;
 	let backupStartTime: string | null | undefined = null;
 	let backupEndTime: string | null | undefined = null;
@@ -81,45 +64,37 @@
 	let backupVotingEndTime: string | null | undefined = null;
 
 	function switchToVoting() {
-	// Backup fixed fields
+	// Backup fixed-date fields
 	backupDate = $formData.date;
 	backupStartTime = $formData.start_time;
 	backupEndTime = $formData.end_time;
 
-	
-	// Restore or init voting fields
-	$formData.voting_options = backupVotingOptions.length > 0
-	? backupVotingOptions
-	: [{ date: '', start_time: '', end_time: '' }, { date: '', start_time: '', end_time: '' }];
-	
+	// Restore voting fields
 	$formData.allow_voting = true;
-	$formData.voting_end_date = backupVotingEndDate;
-	$formData.voting_end_time = backupVotingEndTime;
-
-	// Clear fixed-date inputs
 	$formData.date = null;
 	$formData.start_time = null;
 	$formData.end_time = null;
+	$formData.voting_options = backupVotingOptions;
+	$formData.voting_end_date = backupVotingEndDate;
+	$formData.voting_end_time = backupVotingEndTime;
 }
 
 function switchToFixed() {
-	// Backup voting data
+	// Backup voting fields
 	backupVotingOptions = $formData.voting_options;
 	backupVotingEndDate = $formData.voting_end_date;
 	backupVotingEndTime = $formData.voting_end_time;
 
+	// Restore fixed-date fields
 	$formData.allow_voting = false;
-
-	// Restore fixed fields
-	$formData.date = backupDate;
-	$formData.start_time = backupStartTime;
-	$formData.end_time = backupEndTime;
-
-	// Clear voting fields
 	$formData.voting_options = [];
 	$formData.voting_end_date = null;
 	$formData.voting_end_time = null;
+	$formData.date = backupDate;
+	$formData.start_time = backupStartTime;
+	$formData.end_time = backupEndTime;
 }
+
 
 </script>
 
@@ -168,9 +143,7 @@ function switchToFixed() {
 								name="allow_voting"
 								value="true"
 								checked={$formData.allow_voting === true}
-								on:change={() => {
-									switchToVoting();
-								}}
+								on:change={() => {switchToVoting();}}
 							/>
 							<span>Yes</span>
 						</label>
@@ -180,9 +153,7 @@ function switchToFixed() {
 								name="allow_voting"
 								value="false"
 								checked={$formData.allow_voting === false}
-								on:change={() => {
-									switchToFixed();
-								}}
+								on:change={() => {switchToFixed();}}
 							/>
 							<span>No</span>
 						</label>
@@ -276,86 +247,30 @@ function switchToFixed() {
 						</Form.Control>
 					</Form.Field>
 				</div>
-				<Form.Field {form} name="voting_options">
-					<Form.Control let:attrs>
-						<Form.Label class="text-lg font-semibold">Voting Options*</Form.Label>
-						<Form.FieldErrors />
-					</Form.Control>
-				</Form.Field>
-				{#each $formData.voting_options as option, i(i)}
-					<div class="flex items-center gap-4">
-						<div class="grid grid-cols-1 gap-x-4 gap-y-4 md:grid-cols-3 flex-1">
-							<Form.Field {form} name={`voting_options[${i}].date`}>
-								<Form.Control id={`vote-date-${i}`} let:attrs>
-								<Form.Label for={`vote-date-${i}`}>Date</Form.Label>
-								<Popover.Root>
-									<Popover.Trigger
-									{...attrs}
-									class={cn(
-										buttonVariants({ variant: 'outline' }),
-										'w-full justify-start pl-4 text-left font-normal',
-										!votingParsedDates[i] && 'text-muted-foreground'
-									)}
-									>
-									{votingParsedDates[i]
-									? df.format(votingParsedDates[i].toDate(getLocalTimeZone()))
-									: 'Pick a date'}
-									<CalendarIcon class="ml-auto h-4 w-4 opacity-50" />
-									</Popover.Trigger>
-									<Popover.Content class="w-auto p-0" side="top">
-									<Calendar
-										initialFocus
-										value={votingParsedDates[i]}
-										onValueChange={(v) => {
-										$formData.voting_options = $formData.voting_options.map((opt,j) =>
-											j === i ? { ...opt, date: v?.toString() ?? '' } : opt
-										);
-										}}
-									/>
-									</Popover.Content>
-								</Popover.Root>
-								{#if $formData.voting_options && $formData.voting_options[i]}
-									<input hidden name={attrs.name} value={$formData.voting_options[i].date}/>
-								{/if}
-								<Form.FieldErrors />
-							</Form.Control>
-						</Form.Field>
-						<Form.Field {form} name={`voting_options[${i}].start_time`}>
-							<Form.Control let:attrs>
-							<Form.Label>Start Time</Form.Label>
-							{#if $formData.voting_options && $formData.voting_options[i]}
-								<Input type="time" {...attrs} bind:value={$formData.voting_options[i].start_time} />
-							{/if}
-							<Form.FieldErrors />
-							</Form.Control>
-						</Form.Field>
-						<Form.Field {form} name={`voting_options[${i}].end_time`}>
-							<Form.Control let:attrs>
-							<Form.Label>End Time</Form.Label>
-							{#if $formData.voting_options && $formData.voting_options[i]}
-								<Input type="time" {...attrs} bind:value={$formData.voting_options[i].end_time} />
-							{/if}
-							<Form.FieldErrors />
-							</Form.Control>
-						</Form.Field>
-						</div>
-						<Button
-						type="button"
-						variant="outline"
-						size="icon"
-						class="h-10 w-10 self-center"
-						on:click={() => {removeVotingOption(i); if ($formData.allow_voting && $formData.voting_options.length < 2) addVotingOption();}}
-						aria-label="Remove option"
-						>
-						✕
-						</Button>
-					</div>
-					{/each}
-
-					
-					<Button type="button" size="icon" variant="outline" on:click={addVotingOption}>+</Button>
-					<!--{#if $formData.voting_options.length > 0}<Button type="button" size="icon" variant="outline" on:click={removeVotingOption}>-</Button>{/if}
-				-->
+                {#if $formData.voting_options}
+                    <Form.Field {form} name="voting_options">
+                        <Form.Control let:attrs>
+                            <Form.Label class="text-lg font-semibold">Voting Options*</Form.Label>
+                            <Form.FieldErrors />
+                        </Form.Control>
+                    </Form.Field>
+                    {#each $formData.voting_options as option, i (i)}
+                        <div class="grid grid-cols-1 gap-x-4 gap-y-1 md:grid-cols-3 px-4 py-3 border rounded bg-muted/20">
+                            <div>
+                                <p class="text-sm font-medium text-muted-foreground">Date</p>
+                                <p>{df.format(parseDate(option.date).toDate(getLocalTimeZone()))}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-muted-foreground">Start Time</p>
+                                <p>{option.start_time?.slice(0, 5)}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-muted-foreground">End Time</p>
+                                <p>{option.end_time?.slice(0, 5)}</p>
+                            </div>
+                        </div>
+                    {/each}
+                {/if}
 			{/if}
 			<div class="grid grid-cols-1 gap-x-4 md:grid-cols-2">
 				<Form.Field {form} name="image">
@@ -380,7 +295,10 @@ function switchToFixed() {
 	</Card.Root>
 	<div
 		class="sticky bottom-0 flex w-full flex-row items-center justify-center gap-x-10 border-t bg-background/95 py-8 backdrop-blur supports-[backdrop-filter]:bg-background/60"
-	>
+	>   
+    <pre class="text-xs text-red-500">{JSON.stringify($errors, null, 2)}</pre>
+
+
 		<Button variant="outline" href="/events">Cancel</Button>
 		<Button type="submit" disabled={$submitting}>
 			{#if $submitting}

@@ -1,4 +1,4 @@
-import { createEventSchema } from '@/schemas/event';
+import { editEventSchema } from '@/schemas/event';
 import { handleFormAction, handleSignInRedirect } from '@/utils';
 import type { StorageError } from '@supabase/storage-js';
 import { error, fail, redirect } from '@sveltejs/kit';
@@ -12,8 +12,9 @@ export const load = async (event) => {
 	if (!session) {
 		return redirect(302, handleSignInRedirect(event));
 	}
+	const eventId = parseInt(event.params.id);
 
-	async function getEvent(id: string) {
+	async function getEvent(id: number) {
 		const { data: eventData, error: eventError } = await event.locals.supabase
 			.from('events')
 			.select('*')
@@ -29,18 +30,51 @@ export const load = async (event) => {
 		return { ...eventData, image: undefined, imageUrl: imageUrl.data.publicUrl };
 	}
 
-	const eventData = await getEvent(event.params.id);
+	async function getVotingOptions(id: number) {
+		const { data: votingOptions, error: votingError } = await event.locals.supabase
+			.from('events_voting_options')
+			.select('*')
+			.eq('event_id', id);
+
+		if (votingError) {
+			const errorMessage = 'Error fetching voting options, please try again later.';
+			setFlash({ type: 'error', message: errorMessage }, event.cookies);
+			return error(500, errorMessage);
+		}
+		return votingOptions;
+	}
+
+	function stripSeconds(time: string) {
+		if (typeof (time) === 'string') return time.slice(0, 5);
+		return time;
+	}
+
+	const eventData = await getEvent(eventId);
+	// To avoid zod validation errors
+	eventData.start_time = eventData.start_time !== null ? stripSeconds(eventData.start_time) : null;
+	eventData.end_time = eventData.end_time !== null ? stripSeconds(eventData.end_time) : null;
+	eventData.voting_end_time = eventData.voting_end_time !== null ? stripSeconds(eventData.voting_end_time) : null;
+
+	let votingOptions = await getVotingOptions(eventId);
+	// To avoid zod validation errors
+	votingOptions = votingOptions?.map((opt) => ({
+		...opt,
+		start_time: stripSeconds(opt.start_time),
+		end_time: stripSeconds(opt.end_time),
+	}));
 
 	return {
-		updateForm: await superValidate(eventData, zod(createEventSchema), {
-			id: 'update-event',
-		}),
+		updateForm: await superValidate(
+			{ ...eventData, voting_options: votingOptions ?? [] },
+			zod(editEventSchema),
+			{ id: 'update-event' }
+		),
 	};
 };
 
 export const actions = {
 	default: async (event) =>
-		handleFormAction(event, createEventSchema, 'update-event', async (event, userId, form) => {
+		handleFormAction(event, editEventSchema, 'update-event', async (event, userId, form) => {
 			async function uploadImage(
 				image: File
 			): Promise<{ path: string; error: StorageError | null }> {
@@ -71,11 +105,11 @@ export const actions = {
 			}
 
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars
-			const { imageUrl, ...data } = form.data;
+			const { imageUrl, voting_options, ...data } = form.data;
 			const { error: supabaseError } = await event.locals.supabase
 				.from('events')
 				.update({ ...data, user_id: userId, image: imagePath })
-				.eq('id', event.params.id);
+				.eq('id', parseInt(event.params.id));
 
 			if (supabaseError) {
 				setFlash({ type: 'error', message: supabaseError.message }, event.cookies);
