@@ -350,12 +350,10 @@ function switchToFixed() {
 						✕
 						</Button>
 					</div>
-					{/each}
+				{/each}
 
-					
-					<Button type="button" size="icon" variant="outline" on:click={addVotingOption}>+</Button>
-					<!--{#if $formData.voting_options.length > 0}<Button type="button" size="icon" variant="outline" on:click={removeVotingOption}>-</Button>{/if}
-				-->
+				<Button type="button" size="icon" variant="outline" on:click={addVotingOption}>+</Button>
+
 			{/if}
 			<div class="grid grid-cols-1 gap-x-4 md:grid-cols-2">
 				<Form.Field {form} name="image">

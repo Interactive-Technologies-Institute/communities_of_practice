@@ -59,7 +59,7 @@
 	let backupStartTime: string | null | undefined = null;
 	let backupEndTime: string | null | undefined = null;
 
-	let backupVotingOptions: typeof $formData.voting_options = [];
+	let backupVotingOptions = $formData.voting_options;
 	let backupVotingEndDate: string | null | undefined = null;
 	let backupVotingEndTime: string | null | undefined = null;
 

@@ -76,17 +76,21 @@
 		<form method="POST" action="?/voteOnSchedule" use:enhanceVote>
 			<div class="space-y-2">
 				{#each votingOptions as option}
-					<label class="flex items-center gap-2">
+					<label class="flex flex-col gap-1 md:flex-row md:items-center md:gap-2">
 						<input
 							type="checkbox"
 							checked={$voteFormData.votes_ids.includes(option.id)}
 							on:change={() => toggleOption(option.id)}
 						/>
 						<span>
-							{dayjs(option.date).format('dddd, DD/MM/YYYY')}
+							{dayjs(option.date).format('dddd , DD/MM/YYYY')}
+							{#if option.start_time && option.end_time}
+								, {option.start_time.slice(0, 5)}–{option.end_time.slice(0, 5)}
+							{/if}
 						</span>
 					</label>
 				{/each}
+
 			</div>
 			<div class="pt-4">
 				<Button type="submit" disabled={$submittingVote}>

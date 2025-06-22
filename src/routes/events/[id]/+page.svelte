@@ -43,9 +43,20 @@
 			<div class="flex flex-row gap-x-4">
 				<div class="flex flex-row items-center gap-x-2">
 					<Calendar class="text-muted-foreground" />
-					{#if data.event.date}
+					<!-- Fixed date -->
+					{#if !data.event.allow_voting && data.event.date}
 						{dayjs(data.event.date).format(
 							dayjs(data.event.date).year() === dayjs().year()
+								? 'ddd, MM/DD [at] HH:mm'
+								: 'ddd, MM/DD/YYYY [at] HH:mm'
+						)}
+					<!-- Voting ended, show most voted -->
+					{:else if data.event.allow_voting && data.event.voting_end_date 
+						&& data.event.voting_end_time 
+						&& dayjs().isAfter(`${data.event.voting_end_date}T${data.event.voting_end_time}`) 
+						&& data.mostVotedOption}
+						{dayjs(data.mostVotedOption.date).format(
+							dayjs(data.mostVotedOption.date).year() === dayjs().year()
 								? 'ddd, MM/DD [at] HH:mm'
 								: 'ddd, MM/DD/YYYY [at] HH:mm'
 						)}
@@ -53,6 +64,7 @@
 						Not decided yet
 					{/if}
 				</div>
+
 				<div class="flex flex-row items-center gap-x-2">
 					<MapPin class="text-muted-foreground" />
 					{data.event.location}
@@ -97,14 +109,16 @@
 			</div>
 		</div>
 	</Card>
-	<Card class="mx-auto p-2 space-y-4">
-		<h2 class="text-lg font-semibold">Vote for Event Schedule</h2>
-		{#if data.votingOptions.length > 1}
-			<EventVoteSchedule event={data.event} voteOnSchedule={data.voteOnScheduleForm} removeVotes={data.removeVotesForm} votingOptions={data.votingOptions} hasVoted={data.hasVoted}/>
-		{:else}
-			<p class="text-muted-foreground">No voting options available.</p>
-		{/if}
-	</Card>
+	{#if data.event.allow_voting}
+		<Card class="mx-auto p-2 space-y-4">
+			<h2 class="text-lg font-semibold">Vote for Event Schedule</h2>
+			{#if data.votingOptions.length > 1}
+				<EventVoteSchedule event={data.event} voteOnSchedule={data.voteOnScheduleForm} removeVotes={data.removeVotesForm} votingOptions={data.votingOptions} hasVoted={data.hasVoted}/>
+			{:else}
+				<p class="text-muted-foreground">No voting options available.</p>
+			{/if}
+		</Card>
+	{/if}
 	<div class="mx-auto flex flex-col gap-y-6 pb-6">
 		
 	</div>

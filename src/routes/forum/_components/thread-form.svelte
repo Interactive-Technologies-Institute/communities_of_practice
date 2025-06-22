@@ -48,18 +48,18 @@
 	}
 
 	const openai = new OpenAI({ apiKey: PUBLIC_OPENAI_API_KEY, dangerouslyAllowBrowser: true});
-	const prompt = 'This is the content of a forum thread on a platform for communities of practice. Summarize it: ';
 
-	let loading = false;
+	let loadingTags = false;
+	let loadingSummary = false;
 
 	async function generateSummary(content: string): Promise<string | null> {
 		try {
-			/*const response = await openai.chat.completions.create({
+			const response = await openai.chat.completions.create({
 				model: 'gpt-3.5-turbo',
 				messages: [
 					{
 						role: 'system',
-						content: 'You are an assistant that summarizes forum threads clearly and concisely.'
+						content: 'You are an assistant that reduces/summarizes forum threads on a platform for communities of practice clearly and concisely.'
 					},
 					{
 						role: 'user',
@@ -68,9 +68,10 @@
 				],
 				temperature: 0.7,
 				max_tokens: 300
-			});*/
-			// return response.choices[0]?.message?.content?.trim() ?? null;
-			return "OLAAAAA"
+			});
+
+			return response.choices[0]?.message?.content?.trim() ?? null;
+
 		} catch (error) {
 			console.error('Error generating summary:', error);
 			return null;
@@ -79,7 +80,7 @@
 
 	async function generateTags(content: string): Promise<string[] | null> {
 	try {
-		/*const response = await openai.chat.completions.create({
+		const response = await openai.chat.completions.create({
 			model: 'gpt-3.5-turbo',
 			messages: [
 				{
@@ -99,9 +100,9 @@
 		if (!generated) return null;
 
 		const tags: string[] = JSON.parse(generated);
-		if (Array.isArray(tags)) return tags;*/
+		if (Array.isArray(tags)) return tags;
 
-		return ['tag1', 'tag2', 'tag3', 'tag4', 'tag5'];
+		return null;
 	} catch (error) {
 		console.error('Error generating tags:', error);
 		return null;
@@ -109,7 +110,7 @@
 }
 
 	async function handleGenerateSummary() {
-		loading = true;
+		loadingSummary = true;
 
 		const summary = await generateSummary($formData.content);
 
@@ -120,11 +121,11 @@
 			};
 		}
 
-		loading = false;
+		loadingSummary = false;
 	}
 
 	async function handleGenerateTags() {
-		loading = true;
+		loadingTags = true;
 
 		const tags = await generateTags($formData.content);
 
@@ -135,7 +136,7 @@
 			};
 		}
 
-		loading = false;
+		loadingTags = false;
 	}
 
 </script>
@@ -169,9 +170,9 @@
 							type="button"
 							size="sm"
 							on:click={handleGenerateTags}
-							disabled={loading}
+							disabled={loadingTags}
 						>
-							{#if loading}
+							{#if loadingTags}
 								<Loader2 class="mr-2 h-4 w-4 animate-spin" />
 							{:else}
 								Generate Tags
@@ -190,16 +191,16 @@
 							type="button"
 							size="sm"
 							on:click={handleGenerateSummary}
-							disabled={loading}
+							disabled={loadingSummary}
 						>
-							{#if loading}
+							{#if loadingSummary}
 								<Loader2 class="mr-2 h-4 w-4 animate-spin" />
 							{:else}
 								Generate Summary
 							{/if}
 						</Button>
 					</Form.Label>
-					<Textarea {...attrs} bind:value={$formData.summary} disabled={loading} />
+					<Textarea {...attrs} bind:value={$formData.summary} disabled={loadingSummary} />
 					<Form.FieldErrors />
 				</Form.Control>
 			</Form.Field>
