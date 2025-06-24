@@ -246,6 +246,8 @@ export const editEventSchema = z
 				message: 'End time must be in HH:MM format',
 			})
 			.nullish(),
+		final_voting_option_id: z.number().nullish(),
+
 	})
 	.refine((data) => data.image || data.imageUrl, {
 		message: 'Image is required',
@@ -335,6 +337,27 @@ export const editEventSchema = z
 		});
 	}, {
 		message: 'Voting end time must be before voting options start times',
+		path: ['voting_end_time'],
+	})
+	.refine((data) => {
+		if (!data.allow_voting || data.date || !data.voting_end_date) return true;
+
+		const deadlineDate = new Date(data.voting_end_date);
+		const today = new Date();
+		today.setHours(0, 0, 0, 0);
+
+		return deadlineDate >= today;
+	}, {
+		message: 'Voting deadline date has passed and no date was set.',
+		path: ['voting_end_date'],
+	})
+	.refine((data) => {
+		if (!data.allow_voting || data.date || !data.voting_end_date || !data.voting_end_time) return true;
+
+		const deadline = new Date(`${data.voting_end_date}T${data.voting_end_time}`);
+		return deadline > new Date();
+	}, {
+		message: 'Voting deadline time has passed and no date was set.',
 		path: ['voting_end_time'],
 	});
 

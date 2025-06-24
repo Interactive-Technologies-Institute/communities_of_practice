@@ -37,15 +37,19 @@
 		</AspectRatio>
 		<div class="flex flex-1 flex-col px-4 py-3">
 			<div class="mb-5">
-				<p class="font-medium leading-none">
-					{dayjs(event.date).format(
-						dayjs(event.date).year() === dayjs().year()
-							? 'ddd, MM/DD [at] HH:mm'
-							: 'ddd, MM/DD/YYYY [at] HH:mm'
-					)}
-					•
-					{event.location}
-				</p>
+				{#if event.date && event.start_time && event.end_time}
+					<p class="font-medium leading-none">
+						{dayjs(`${event.date}T${event.start_time}`).format(
+							dayjs(event.date).year() === dayjs().year()
+								? 'ddd, MM/DD [at] HH:mm'
+								: 'ddd, MM/DD/YYYY [at] HH:mm'
+						)}–{dayjs(`${event.date}T${event.end_time}`).format('HH:mm')}
+						•
+						{event.location}
+					</p>
+				{:else}
+					<p class="font-medium leading-none text-muted-foreground">Not decided yet • {event.location}</p>
+				{/if}
 				<h2 class="line-clamp-2 text-lg font-medium">{event.title}</h2>
 				<p class="line-clamp-2 text-muted-foreground">{event.description}</p>
 			</div>

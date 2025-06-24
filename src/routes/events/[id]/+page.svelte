@@ -3,6 +3,7 @@
 	import ModerationBanner from '@/components/moderation-banner.svelte';
 	import PageHeader from '@/components/page-header.svelte';
 	import Card from '@/components/ui/card/card.svelte';
+	import { AspectRatio } from '@/components/ui/aspect-ratio';
 	import { Button } from '@/components/ui/button';
 	import dayjs from 'dayjs';
 	import { Calendar, MapPin, Pen, Tag, Trash } from 'lucide-svelte';
@@ -38,28 +39,24 @@
 		<ModerationBanner moderation={data.moderation} />
 	{/if}
 	<Card class="mx-auto p-2 space-y-4">
+		<AspectRatio ratio={4 / 1}>
+			{#if data.event.image}
+				<img src={data.event.image} alt="Event Cover" class="h-full w-full object-cover" />
+			{/if}
+		</AspectRatio>
 		<div class="flex flex-1 flex-col px-4 py-3">
 			<h1 class="text-2xl font-bold tracking-tight text-foreground mb-3">{data.event.title}</h1>
 			<div class="flex flex-row gap-x-4">
 				<div class="flex flex-row items-center gap-x-2">
 					<Calendar class="text-muted-foreground" />
-					<!-- Fixed date -->
-					{#if !data.event.allow_voting && data.event.date}
-						{dayjs(data.event.date).format(
+					<!-- Fixed date / Voting ended-->
+					{#if data.event.date}
+						{dayjs(`${data.event.date}T${data.event.start_time}`).format(
 							dayjs(data.event.date).year() === dayjs().year()
-								? 'ddd, MM/DD [at] HH:mm'
-								: 'ddd, MM/DD/YYYY [at] HH:mm'
-						)}
-					<!-- Voting ended, show most voted -->
-					{:else if data.event.allow_voting && data.event.voting_end_date 
-						&& data.event.voting_end_time 
-						&& dayjs().isAfter(`${data.event.voting_end_date}T${data.event.voting_end_time}`) 
-						&& data.mostVotedOption}
-						{dayjs(data.mostVotedOption.date).format(
-							dayjs(data.mostVotedOption.date).year() === dayjs().year()
-								? 'ddd, MM/DD [at] HH:mm'
-								: 'ddd, MM/DD/YYYY [at] HH:mm'
-						)}
+							? 'ddd, MM/DD [at] HH:mm'
+							: 'ddd, MM/DD/YYYY [at] HH:mm'
+							)}–{dayjs(`${data.event.date}T${data.event.end_time}`).format('HH:mm')}
+					<!-- Allow voting, voting open -->		
 					{:else}
 						Not decided yet
 					{/if}
@@ -70,10 +67,10 @@
 					{data.event.location}
 				</div>
 			</div>
-			{#if data.event.image !== null && data.event.image !== undefined}
+			<!--{#if data.event.image !== null && data.event.image !== undefined}
 				<InteractableImage src={data.event.image} class="w-full object-contain rounded mb-3"/>
-			{/if}
-			<p class="whitespace-pre-wrap break-words mb-3">{data.event.description}</p>
+			{/if}-->
+			<p class="whitespace-pre-wrap break-words mb-3 mt-3">{data.event.description}</p>
 			<div class="text-base text-muted-foreground flex flex-wrap items-center justify-between w-full">
 				<div class="flex items-center gap-5">
 					<div class="flex items-center gap-1">

@@ -6,3 +6,4 @@ create type public.moderation_status as enum (
 	'approved',
 	'rejected'
 );
+create extension if not exists pg_cron;

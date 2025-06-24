@@ -10,7 +10,6 @@ export const load = async (event) => {
 	const { user } = await event.locals.safeGetSession();
 	const eventId = parseInt(event.params.id);
 
-
 	async function getEvent(id: number): Promise<EventWithAuthor> {
 		const { data: eventData, error: eventError } = await event.locals.supabase
 			.from('events_view')
@@ -72,23 +71,6 @@ export const load = async (event) => {
 		return userVotes;
 	}
 
-	async function getMostVotedOption(id: number) {
-		const { data, error } = await event.locals.supabase
-			.from('events_voting_summary_view')
-			.select('*')
-			.eq('event_id', id)
-			.order('vote_count', { ascending: false })
-			.limit(1)
-			.single();
-
-		if (error) {
-			console.error('Error fetching most voted option:', error);
-			return null;
-		}
-		return data;
-	}
-
-
 	async function getInterestCount(id: string): Promise<{ count: number; userInterested: boolean }> {
 		const { data: interested, error: interestedError } = await event.locals.supabase
 			.rpc('get_event_interest_count', {
@@ -118,7 +100,6 @@ export const load = async (event) => {
 		event: await getEvent(eventId),
 		moderation: await getEventModeration(eventId),
 		votingOptions: await getVotingOptions(eventId),
-		mostVotedOption: await getMostVotedOption(eventId),
 		hasVoted: hasVoted,
 		interestCount: interestCount.count,
 		deleteForm: await superValidate(zod(deleteEventSchema), {

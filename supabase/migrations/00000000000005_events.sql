@@ -132,6 +132,48 @@ where voting_option_id = $1;
 $$;
 alter table public.events
 add column final_voting_option_id bigint references public.events_voting_options;
+create or replace function public.finalize_event_votes()
+returns void
+language plpgsql
+as $$
+declare
+	ev_id bigint;
+	option_id bigint;
+begin
+	for ev_id in
+		select id
+		from events
+		where allow_voting
+		  and voting_end_date is not null
+		  and voting_end_time is not null
+		  and (voting_end_date + voting_end_time::time) < now() AT TIME ZONE 'Europe/Lisbon'
+		  and date is null
+	loop
+		select vo.id
+		into option_id
+		from events_voting_options vo
+		left join events_votes v on v.voting_option_id = vo.id
+		where vo.event_id = ev_id
+		group by vo.id
+		order by count(v.id) desc, vo.id asc
+		limit 1;
+
+		if option_id is not null then
+			update events
+			set date = (select date from events_voting_options where id = option_id),
+			    start_time = (select start_time from events_voting_options where id = option_id),
+			    end_time = (select end_time from events_voting_options where id = option_id),
+			    final_voting_option_id = option_id
+			where id = ev_id;
+		end if;
+	end loop;
+end;
+$$;
+select cron.schedule(
+  'finalize event votes',
+  '*/15 * * * *',
+  $$ select public.finalize_event_votes(); $$
+);
 -- Storage Buckets
 insert into storage.buckets (id, name, public, allowed_mime_types)
 values ('events', 'Events', true, '{"image/*"}');

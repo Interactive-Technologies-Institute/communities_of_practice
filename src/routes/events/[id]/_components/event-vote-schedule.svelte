@@ -73,6 +73,7 @@
 			</Button>
 		</form>
 	{:else}
+		<p class="text-green-700 font-semibold">Voting deadline: {dayjs(`${event.voting_end_date}T${event.voting_end_time}`).format('DD/MM/YYYY [at] HH:mm')}</p>
 		<form method="POST" action="?/voteOnSchedule" use:enhanceVote>
 			<div class="space-y-2">
 				{#each votingOptions as option}
