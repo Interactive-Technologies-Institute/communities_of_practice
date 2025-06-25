@@ -26,10 +26,18 @@
 		event_changes_requested: 'Your event needs changes',
 		event_approved: 'Your event has been approved',
 		event_rejected: 'Your event has been rejected',
+		event_announcement: 'A new event has been approved',
+		event_voting_closed: 'Voting has ended on an event',
+		event_voting_reopened: 'Voting has reopened on an event',
 		map_pin_pending: 'Your map pin is pending moderation',
 		map_pin_changes_requested: 'Your map pin needs changes',
 		map_pin_approved: 'Your map pin has been approved',
 		map_pin_rejected: 'Your map pin has been rejected',
+		forum_thread_pending: 'Your thread is pending moderation',
+		forum_thread_changes_requested: 'Your thread needs changes',
+		forum_thread_approved: 'Your thread has been approved',
+		forum_thread_rejected: 'Your thread has been rejected',
+		forum_thread_announcement: 'A new thread has been approved',
 	};
 
 	function getNotificationHref(notification: Notification): string {
@@ -43,12 +51,21 @@
 			case 'event_changes_requested':
 			case 'event_approved':
 			case 'event_rejected':
+			case 'event_announcement':
+			case 'event_voting_closed':
+			case 'event_voting_reopened':
 				return `/events/${notification.data.event_id ?? 'error'}`;
 			case 'map_pin_pending':
 			case 'map_pin_changes_requested':
 			case 'map_pin_approved':
 			case 'map_pin_rejected':
 				return `/map?id=${notification.data.map_pin_id ?? 'error'}`;
+			case 'forum_thread_pending':
+			case 'forum_thread_changes_requested':
+			case 'forum_thread_approved':
+			case 'forum_thread_rejected':
+			case 'forum_thread_announcement':
+				return `/forum/${notification.data.thread_id ?? 'error'}`;
 			default:
 				return 'error';
 		}

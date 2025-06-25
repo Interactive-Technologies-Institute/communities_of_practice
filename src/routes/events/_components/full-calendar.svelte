@@ -7,10 +7,12 @@
 
 	export let events: Event[] = [];
 
-	const transformedEvents = events.map(event => ({
-		title: event.title,
-		start: new Date(`${event.date}T${event.start_time}`),
-		url: `/events/${event.id}`,
+	const transformedEvents = events
+		.filter(event => event.moderation_status === 'approved')
+		.map(event => ({
+			title: event.title,
+			start: new Date(`${event.date}T${event.start_time}`),
+			url: `/events/${event.id}`,
 	}));
 
 	let calendarEl: HTMLDivElement;

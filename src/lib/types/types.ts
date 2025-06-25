@@ -201,10 +201,18 @@ export type NotificationType =
 	| 'event_changes_requested'
 	| 'event_approved'
 	| 'event_rejected'
+	| 'event_announcement'
+	| 'event_voting_closed'
+	| 'event_voting_reopened'
 	| 'map_pin_pending'
 	| 'map_pin_changes_requested'
 	| 'map_pin_approved'
-	| 'map_pin_rejected';
+	| 'map_pin_rejected'
+	| 'forum_thread_pending'
+	| 'forum_thread_changes_requested'
+	| 'forum_thread_approved'
+	| 'forum_thread_rejected'
+	| 'forum_thread_announcement';
 
 export type Notification = {
 	id: number;

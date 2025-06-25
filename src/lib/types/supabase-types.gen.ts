@@ -1654,6 +1654,10 @@ export type Database = {
         Args: { event: Json }
         Returns: Json
       }
+      finalize_event_votes: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       get_event_interest_count: {
         Args: { event_id: number; user_id?: string }
         Returns: {
@@ -1759,6 +1763,14 @@ export type Database = {
         | "map_pin_changes_requested"
         | "map_pin_approved"
         | "map_pin_rejected"
+        | "event_announcement"
+        | "forum_thread_announcement"
+        | "forum_thread_pending"
+        | "forum_thread_changes_requested"
+        | "forum_thread_rejected"
+        | "forum_thread_approved"
+        | "event_voting_closed"
+        | "event_voting_reopened"
       user_permission:
         | "user_roles.update"
         | "user_types.update"
@@ -1926,6 +1938,14 @@ export const Constants = {
         "map_pin_changes_requested",
         "map_pin_approved",
         "map_pin_rejected",
+        "event_announcement",
+        "forum_thread_announcement",
+        "forum_thread_pending",
+        "forum_thread_changes_requested",
+        "forum_thread_rejected",
+        "forum_thread_approved",
+        "event_voting_closed",
+        "event_voting_reopened",
       ],
       user_permission: [
         "user_roles.update",
