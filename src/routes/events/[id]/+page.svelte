@@ -33,7 +33,6 @@
 	}}
 />
 
-<PageHeader title={data.event.title} subtitle={data.event.description} />
 <div class="container mx-auto max-w-3xl mt-10 space-y-10 pb-10">
 	{#if data.moderation[0].status !== 'approved'}
 		<ModerationBanner moderation={data.moderation} />
@@ -106,7 +105,7 @@
 			</div>
 		</div>
 	</Card>
-	{#if data.event.allow_voting}
+	{#if data.event.moderation_status === "approved" && data.event.allow_voting}
 		<Card class="mx-auto p-2 space-y-4">
 			<h2 class="text-lg font-semibold">Vote for Event Schedule</h2>
 			{#if data.votingOptions.length > 1}

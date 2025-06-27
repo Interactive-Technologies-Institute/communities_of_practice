@@ -25,8 +25,8 @@ export const updateUserProfileSchema = z.object({
                 return new Set(interests).size === interests.length;
             }, 'Interests must be unique')
             .refine((interests) => {
-                return interests.every((interest) => interest.length >= 3 && interest.length <= 20);
-            }, 'Interests must be between 3 and 20 characters').default([]),
+                return interests.every((interest) => interest.length >= 3 && interest.length <= 30);
+            }, 'Interests must be between 3 and 30 characters').default([]),
 	skills: z
             .array(z.string())
             .refine((skills) => skills.length <= 5, {
@@ -36,8 +36,8 @@ export const updateUserProfileSchema = z.object({
                 return new Set(skills).size === skills.length;
             }, 'Skills must be unique')
             .refine((skills) => {
-                return skills.every((skill) => skill.length >= 3 && skill.length <= 20);
-            }, 'Skills must be between 3 and 20 characters').default([]),
+                return skills.every((skill) => skill.length >= 3 && skill.length <= 30);
+            }, 'Skills must be between 3 and 30 characters').default([]),
 	education_exps: z
             .array(z.string())
             .refine((education_exps) => education_exps.length <= 5, {
@@ -47,8 +47,8 @@ export const updateUserProfileSchema = z.object({
                 return new Set(education_exps).size === education_exps.length;
             }, 'Educational experiences must be unique')
             .refine((education_exps) => {
-                return education_exps.every((education_exp) => education_exp.length >= 3 && education_exp.length <= 20);
-            }, 'Educational experiences must be between 3 and 20 characters').default([]),
+                return education_exps.every((education_exp) => education_exp.length >= 3 && education_exp.length <= 30);
+            }, 'Educational experiences must be between 3 and 30 characters').default([]),
 	languages: z
             .array(z.string())
             .refine((languages) => languages.length <= 5, {
@@ -58,8 +58,8 @@ export const updateUserProfileSchema = z.object({
                 return new Set(languages).size === languages.length;
             }, 'Languages must be unique')
             .refine((languages) => {
-                return languages.every((language) => language.length >= 3 && language.length <= 20);
-            }, 'Languages must be between 3 and 20 characters').default([]),
+                return languages.every((language) => language.length >= 3 && language.length <= 30);
+            }, 'Languages must be between 3 and 30 characters').default([]),
 });
 
 export type UpdateUserProfileSchema = typeof updateUserProfileSchema;

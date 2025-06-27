@@ -23,8 +23,8 @@ export const createThreadSchema = z
                 return new Set(tags).size === tags.length;
             }, 'Tags must be unique')
             .refine((tags) => {
-                return tags.every((tag) => tag.length >= 3 && tag.length <= 20);
-            }, 'Tags must be between 3 and 20 characters'),
+                return tags.every((tag) => tag.length >= 3 && tag.length <= 30);
+            }, 'Tags must be between 3 and 30 characters'),
     });
 
 export type CreateThreadSchema = typeof createThreadSchema;

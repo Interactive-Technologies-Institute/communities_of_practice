@@ -33,7 +33,7 @@ export const createEventSchema = z
 				message: 'Must be less than 5 tags',
 			})
 			.refine((tags) => new Set(tags).size === tags.length, 'Tags must be unique')
-			.refine((tags) => tags.every((tag) => tag.length >= 3 && tag.length <= 20), 'Tags must be between 3 and 20 characters'),
+			.refine((tags) => tags.every((tag) => tag.length >= 3 && tag.length <= 30), 'Tags must be between 3 and 30 characters'),
 		location: z.string().min(1, { message: 'Location is required' }),
 		allow_voting: z.boolean(),
 		date: z.string().refine((val) => !isNaN(Date.parse(val)), 'Invalid date').nullish(),
@@ -217,8 +217,8 @@ export const editEventSchema = z
 			})
 			.refine((tags) => new Set(tags).size === tags.length, 'Tags must be unique')
 			.refine(
-				(tags) => tags.every((tag) => tag.length >= 3 && tag.length <= 20),
-				'Tags must be between 3 and 20 characters'
+				(tags) => tags.every((tag) => tag.length >= 3 && tag.length <= 30),
+				'Tags must be between 3 and 30 characters'
 			),
 		location: z.string().min(1, { message: 'Location is required' }),
 		allow_voting: z.boolean(),

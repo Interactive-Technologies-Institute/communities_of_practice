@@ -17,6 +17,7 @@
 	import { Trash, MessageSquare, Pen, Check, X } from 'lucide-svelte';
 	import { cn } from '@/utils';
 	import dayjs from 'dayjs';
+	import { onMount } from 'svelte';
 
 	export let comment: NestedComment;
 	export let createForm: SuperValidated<Infer<typeof createThreadCommentSchema>>;
@@ -31,6 +32,19 @@
 	let editing = false;
 	let editedContent = comment.content;
 	let openDeleteDialog = false;
+	let expanded = false;
+	let showToggle = false;
+	let pRef: HTMLParagraphElement;
+
+	function updateClampState() {
+		if (!expanded && pRef) {
+			showToggle = pRef.scrollHeight > pRef.clientHeight;
+		}
+	}
+
+	onMount(updateClampState);
+
+	$: comment.content, updateClampState();
 
 	const isCommentValid = () => editedContent.length >= 1 && editedContent.length <= 5000;
 
@@ -106,7 +120,15 @@
 						<p class="text-sm mt-1 font-medium text-destructive">Content must not exceed 5000 characters.</p>
 					{/if}
 			{:else}
-				<p class="line-clamp-2 whitespace-pre-wrap break-words">{comment.content}</p>
+				<p bind:this={pRef} class="whitespace-pre-wrap break-words" class:line-clamp-4={!expanded}>
+					{comment.content}
+				</p>
+				{#if showToggle}
+					<button on:click={() => (expanded = !expanded)}
+						class="mt-1 text-sm font-medium text-blue-600 hover:underline focus:outline-none">
+						{expanded ? 'Show less' : 'Show more'}
+					</button>
+				{/if}
 			{/if}
 			<div class="text-base text-muted-foreground flex flex-wrap items-center justify-between w-full">
 				<div class="flex items-center gap-1">

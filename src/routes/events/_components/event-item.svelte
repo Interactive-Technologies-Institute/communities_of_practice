@@ -48,9 +48,9 @@
 						{event.location}
 					</p>
 				{:else}
-					<p class="font-medium leading-none text-muted-foreground">Not decided yet • {event.location}</p>
+					<p class="font-medium leading-none">Date not decided yet • {event.location}</p>
 				{/if}
-				<h2 class="line-clamp-2 text-lg font-medium">{event.title}</h2>
+				<h2 class="line-clamp-2 text-lg font-medium mt-2">{event.title}</h2>
 				<p class="line-clamp-2 text-muted-foreground">{event.description}</p>
 			</div>
 			<div class="text-base text-muted-foreground flex flex-wrap items-center justify-between w-full">

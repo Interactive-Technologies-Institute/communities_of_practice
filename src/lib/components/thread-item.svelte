@@ -52,9 +52,9 @@
 						</p>
 					</div>
 				</div>
-				<h2 class="line-clamp-2 text-lg font-medium whitespace-pre-wrap break-words mt-2">{thread.title}</h2>
+				<h2 class="line-clamp-2 text-lg font-medium whitespace-pre-wrap break-words mt-1 mb-1">{thread.title}</h2>
 				{#if imageUrl !== ''}
-					<InteractableImage src={imageUrl} class="w-full object-contain rounded mb-2"/>
+					<InteractableImage src={imageUrl} class="w-full object-contain rounded mt-1 mb-1"/>
 				{/if}
 				<p class="line-clamp-2 whitespace-pre-wrap break-words">{thread.content}</p>
 			</div>

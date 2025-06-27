@@ -261,6 +261,20 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "events_votes_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_votes_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_view"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "events_votes_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
@@ -287,20 +301,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "events_voting_summary_view"
             referencedColumns: ["voting_option_id"]
-          },
-          {
-            foreignKeyName: "fk_events_votes_event"
-            columns: ["event_id"]
-            isOneToOne: false
-            referencedRelation: "events"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_events_votes_event"
-            columns: ["event_id"]
-            isOneToOne: false
-            referencedRelation: "events_view"
-            referencedColumns: ["id"]
           },
         ]
       }
@@ -1759,18 +1759,18 @@ export type Database = {
         | "event_changes_requested"
         | "event_approved"
         | "event_rejected"
+        | "event_announcement"
+        | "event_voting_closed"
+        | "event_voting_reopened"
         | "map_pin_pending"
         | "map_pin_changes_requested"
         | "map_pin_approved"
         | "map_pin_rejected"
-        | "event_announcement"
-        | "forum_thread_announcement"
         | "forum_thread_pending"
         | "forum_thread_changes_requested"
-        | "forum_thread_rejected"
         | "forum_thread_approved"
-        | "event_voting_closed"
-        | "event_voting_reopened"
+        | "forum_thread_rejected"
+        | "forum_thread_announcement"
       user_permission:
         | "user_roles.update"
         | "user_types.update"
@@ -1934,18 +1934,18 @@ export const Constants = {
         "event_changes_requested",
         "event_approved",
         "event_rejected",
+        "event_announcement",
+        "event_voting_closed",
+        "event_voting_reopened",
         "map_pin_pending",
         "map_pin_changes_requested",
         "map_pin_approved",
         "map_pin_rejected",
-        "event_announcement",
-        "forum_thread_announcement",
         "forum_thread_pending",
         "forum_thread_changes_requested",
-        "forum_thread_rejected",
         "forum_thread_approved",
-        "event_voting_closed",
-        "event_voting_reopened",
+        "forum_thread_rejected",
+        "forum_thread_announcement",
       ],
       user_permission: [
         "user_roles.update",

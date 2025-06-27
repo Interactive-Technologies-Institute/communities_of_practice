@@ -83,6 +83,47 @@ $$ language plpgsql security definer;
 create trigger event_notification_trigger
 after
 insert on public.events_moderation for each row execute function public.handle_events_moderation_notification();
+create or replace function public.handle_event_voting_closed_notification()
+returns trigger as $$
+begin
+
+	if old.final_voting_option_id is null and new.final_voting_option_id is not null then
+		insert into public.notifications (user_id, type, data)
+		select
+			p.id,
+			'event_voting_closed',
+			jsonb_build_object('event_id', new.id, 'final_voting_option_id', new.final_voting_option_id)
+		from public.profiles p;
+	end if;
+
+	return new;
+end;
+$$ language plpgsql security definer;
+create trigger event_voting_closed_trigger
+after update on public.events
+for each row
+execute function public.handle_event_voting_closed_notification();
+create or replace function public.handle_event_voting_reopened_notification()
+returns trigger as $$
+begin
+	if (old.voting_end_date + old.voting_end_time::time) < (now() at time zone 'Europe/Lisbon')
+	   and (new.voting_end_date + new.voting_end_time::time) > (now() at time zone 'Europe/Lisbon') then
+
+		insert into public.notifications (user_id, type, data)
+		select
+			p.id,
+			'event_voting_reopened',
+			jsonb_build_object('event_id', new.id)
+		from public.profiles p;
+	end if;
+
+	return new;
+end;
+$$ language plpgsql security definer;
+create trigger event_voting_reopened_trigger
+after update on public.events
+for each row
+execute function public.handle_event_voting_reopened_notification();
 create or replace function public.handle_map_pins_moderation_notification() returns trigger as $$
 declare notification_type notification_type;
 begin if new.status = 'pending' then notification_type := 'map_pin_pending';
@@ -118,7 +159,7 @@ begin
 		values (
 			new.user_id,
 			'forum_thread_approved',
-			jsonb_build_object('forum_thread_id', new.forum_thread_id)
+			jsonb_build_object('thread_id', new.thread_id)
 		);
 
 		-- Notify all other users
@@ -126,7 +167,7 @@ begin
 		select
 			p.id,
 			'forum_thread_announcement',
-			jsonb_build_object('forum_thread_id', new.forum_thread_id)
+			jsonb_build_object('thread_id', new.thread_id)
 		from public.profiles p
 		where p.id != new.user_id;
 
@@ -139,7 +180,7 @@ begin
 		values (
 			new.user_id,
 			notification_type,
-			jsonb_build_object('forum_thread_id', new.forum_thread_id)
+			jsonb_build_object('thread_id', new.thread_id)
 		);
 	end if;
 
@@ -149,49 +190,6 @@ $$ language plpgsql security definer;
 create trigger forum_thread_notification_trigger
 after
 insert on public.forum_threads_moderation for each row execute function public.handle_forum_threads_moderation_notification();
-alter type public.notification_type add value if not exists 'event_voting_closed';
-create or replace function public.handle_event_voting_closed_notification()
-returns trigger as $$
-begin
-
-	if old.final_voting_option_id is null and new.final_voting_option_id is not null then
-		insert into public.notifications (user_id, type, data)
-		select
-			p.id,
-			'event_voting_closed',
-			jsonb_build_object('event_id', new.id, 'final_voting_option_id', new.final_voting_option_id)
-		from public.profiles p;
-	end if;
-
-	return new;
-end;
-$$ language plpgsql security definer;
-
-create trigger event_voting_closed_trigger
-after update on public.events
-for each row
-execute function public.handle_event_voting_closed_notification();
-create or replace function public.handle_event_voting_reopened_notification()
-returns trigger as $$
-begin
-	if (old.voting_end_date + old.voting_end_time::time) < (now() at time zone 'Europe/Lisbon')
-	   and (new.voting_end_date + new.voting_end_time::time) > (now() at time zone 'Europe/Lisbon') then
-
-		insert into public.notifications (user_id, type, data)
-		select
-			p.id,
-			'event_voting_reopened',
-			jsonb_build_object('event_id', new.id)
-		from public.profiles p;
-	end if;
-
-	return new;
-end;
-$$ language plpgsql security definer;
-create trigger event_voting_reopened_trigger
-after update on public.events
-for each row
-execute function public.handle_event_voting_reopened_notification();
 -- RLS policies
 create policy "Allow users to read their own notifications" on public.notifications for
 select using (user_id = auth.uid());
