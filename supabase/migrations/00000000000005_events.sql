@@ -15,6 +15,7 @@ create table public.events (
 	allow_voting boolean not null default false,
 	voting_end_date date,
 	voting_end_time time,
+	voting_closed boolean not null default false,
 	constraint end_after_start check (end_time > start_time)
 );
 alter table public.events
@@ -152,18 +153,22 @@ begin
 		select vo.id
 		into option_id
 		from events_voting_options vo
-		left join events_votes v on v.voting_option_id = vo.id
+		join events_votes v on v.voting_option_id = vo.id
 		where vo.event_id = ev_id
-		group by vo.id
-		order by count(v.id) desc, vo.id asc
+		group by vo.id, vo.date, vo.start_time
+		order by count(v.id) desc, vo.date asc, vo.start_time asc
 		limit 1;
-
 		if option_id is not null then
 			update events
 			set date = (select date from events_voting_options where id = option_id),
 			    start_time = (select start_time from events_voting_options where id = option_id),
 			    end_time = (select end_time from events_voting_options where id = option_id),
-			    final_voting_option_id = option_id
+			    final_voting_option_id = option_id,
+			    voting_closed = true
+			where id = ev_id;
+		else
+			update events
+			set voting_closed = true
 			where id = ev_id;
 		end if;
 	end loop;
@@ -171,9 +176,31 @@ end;
 $$;
 select cron.schedule(
   'finalize event votes',
-  '*/15 * * * *',
+  '*/5 * * * *',
   $$ select public.finalize_event_votes(); $$
 );
+create or replace function public.event_voting_clear()
+returns trigger as $$
+begin
+  if old.voting_end_date is not null and old.voting_end_time is not null and
+    (old.voting_end_date + old.voting_end_time::time) < (now() at time zone 'Europe/Lisbon')
+    and new.voting_end_date is not null and new.voting_end_time is not null and
+    (new.voting_end_date + new.voting_end_time::time) > (now() at time zone 'Europe/Lisbon') then 
+	new.voting_closed := false;
+	new.final_voting_option_id := null;
+  end if;
+  if new.voting_end_date is null or new.voting_end_time is null then
+    new.voting_closed := false;
+    new.final_voting_option_id := null;
+  end if;
+  return new;
+end;
+$$ language plpgsql;
+
+create trigger event_voting_clear_trigger
+before update on public.events
+for each row
+execute function public.event_voting_clear();
 -- Storage Buckets
 insert into storage.buckets (id, name, public, allowed_mime_types)
 values ('events', 'Events', true, '{"image/*"}');

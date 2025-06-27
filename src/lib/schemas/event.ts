@@ -246,8 +246,6 @@ export const editEventSchema = z
 				message: 'End time must be in HH:MM format',
 			})
 			.nullish(),
-		final_voting_option_id: z.number().nullish(),
-
 	})
 	.refine((data) => data.image || data.imageUrl, {
 		message: 'Image is required',

@@ -61,7 +61,6 @@
 	let initialDate = $formData.date;
 	let initialStartTime = $formData.start_time;
 	let initialEndTime = $formData.end_time;
-	let initialFinalVote = $formData.final_voting_option_id
 
 	// When voting is allowed
 	$: if ($formData.allow_voting && $formData.voting_end_date && $formData.voting_end_time) {
@@ -71,13 +70,11 @@
 				$formData.date = null;
 				$formData.start_time = null;
 				$formData.end_time = null;
-				$formData.final_voting_option_id = null;
 		} else{
 			// Keep date and times if voting deadline has passed and allow_voting is true
 			$formData.date = initialDate;
 			$formData.start_time = initialStartTime;
 			$formData.end_time = initialEndTime;
-			$formData.final_voting_option_id = initialFinalVote;
 		}
 	}
 
@@ -100,7 +97,6 @@
 	$formData.date = initialDate;
 	$formData.start_time = initialStartTime;
 	$formData.end_time = initialEndTime;
-	$formData.final_voting_option_id = initialFinalVote;
 	$formData.voting_options = backupVotingOptions;
 	$formData.voting_end_date = backupVotingEndDate;
 	$formData.voting_end_time = backupVotingEndTime;
@@ -117,7 +113,6 @@ function switchToFixed() {
 	$formData.voting_options = [];
 	$formData.voting_end_date = null;
 	$formData.voting_end_time = null;
-	$formData.final_voting_option_id = null;
 	$formData.date = backupDate;
 	$formData.start_time = backupStartTime;
 	$formData.end_time = backupEndTime;
@@ -318,7 +313,6 @@ function switchToFixed() {
 						<Form.FieldErrors />
 					</Form.Control>
 				</Form.Field>
-				<input type="hidden" name="final_voting_option_id" value={$formData.final_voting_option_id ?? null} />
 			</div>
 		</Card.Content>
 	</Card.Root>

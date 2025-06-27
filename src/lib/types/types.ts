@@ -119,6 +119,7 @@ export type Event = {
 	allow_voting: boolean;
 	voting_end_date: string | null;
 	voting_end_time: string | null;
+	voting_closed: boolean;
 	moderation_status: ModerationStatus;
 	final_voting_option_id?: number | null;
 };
@@ -203,6 +204,7 @@ export type NotificationType =
 	| 'event_rejected'
 	| 'event_announcement'
 	| 'event_voting_closed'
+	| 'event_voting_closed_no_votes'
 	| 'event_voting_reopened'
 	| 'map_pin_pending'
 	| 'map_pin_changes_requested'

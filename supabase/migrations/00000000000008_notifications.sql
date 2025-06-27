@@ -10,6 +10,7 @@ create type public.notification_type as enum (
 	'event_rejected',
 	'event_announcement',
 	'event_voting_closed',
+	'event_voting_closed_no_votes',
 	'event_voting_reopened',
 	'map_pin_pending',
 	'map_pin_changes_requested',
@@ -85,18 +86,26 @@ after
 insert on public.events_moderation for each row execute function public.handle_events_moderation_notification();
 create or replace function public.handle_event_voting_closed_notification()
 returns trigger as $$
+declare
+  creator_id uuid;
 begin
-
-	if old.final_voting_option_id is null and new.final_voting_option_id is not null then
-		insert into public.notifications (user_id, type, data)
-		select
-			p.id,
-			'event_voting_closed',
-			jsonb_build_object('event_id', new.id, 'final_voting_option_id', new.final_voting_option_id)
-		from public.profiles p;
-	end if;
-
-	return new;
+  if not old.voting_closed and old.final_voting_option_id is null and new.final_voting_option_id is null and new.voting_closed then
+    select user_id into creator_id from public.events where id = new.id;
+    insert into public.notifications (user_id, type, data)
+    values (
+      creator_id,
+      'event_voting_closed_no_votes',
+      jsonb_build_object('event_id', new.id)
+    );
+  elsif not old.voting_closed and new.voting_closed and new.final_voting_option_id is not null then
+    insert into public.notifications (user_id, type, data)
+    select
+      p.id,
+      'event_voting_closed',
+      jsonb_build_object('event_id', new.id)
+    from public.profiles p;
+  end if;
+  return new;
 end;
 $$ language plpgsql security definer;
 create trigger event_voting_closed_trigger
@@ -147,22 +156,15 @@ create or replace function public.handle_forum_threads_moderation_notification()
 declare
 	notification_type notification_type;
 begin
-	if new.status = 'pending' then
-		notification_type := 'forum_thread_pending';
-
-	elsif new.status = 'changes_requested' then
-		notification_type := 'forum_thread_changes_requested';
-
+	if new.status = 'pending' then notification_type := 'forum_thread_pending';
+	elsif new.status = 'changes_requested' then notification_type := 'forum_thread_changes_requested';
 	elsif new.status = 'approved' then
-		-- Notify the creator
 		insert into public.notifications (user_id, type, data)
 		values (
 			new.user_id,
 			'forum_thread_approved',
 			jsonb_build_object('thread_id', new.thread_id)
 		);
-
-		-- Notify all other users
 		insert into public.notifications (user_id, type, data)
 		select
 			p.id,
@@ -170,11 +172,9 @@ begin
 			jsonb_build_object('thread_id', new.thread_id)
 		from public.profiles p
 		where p.id != new.user_id;
-
 	elsif new.status = 'rejected' then
 		notification_type := 'forum_thread_rejected';
 	end if;
-
 	if new.status != 'approved' then
 		insert into public.notifications (user_id, type, data)
 		values (
@@ -183,7 +183,6 @@ begin
 			jsonb_build_object('thread_id', new.thread_id)
 		);
 	end if;
-
 	return new;
 end;
 $$ language plpgsql security definer;

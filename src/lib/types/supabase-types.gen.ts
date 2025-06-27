@@ -59,6 +59,7 @@ export type Database = {
           title: string
           updated_at: string
           user_id: string
+          voting_closed: boolean | null
           voting_end_date: string | null
           voting_end_time: string | null
         }
@@ -78,6 +79,7 @@ export type Database = {
           title: string
           updated_at?: string
           user_id: string
+          voting_closed?: boolean | null
           voting_end_date?: string | null
           voting_end_time?: string | null
         }
@@ -97,6 +99,7 @@ export type Database = {
           title?: string
           updated_at?: string
           user_id?: string
+          voting_closed?: boolean | null
           voting_end_date?: string | null
           voting_end_time?: string | null
         }
@@ -1771,6 +1774,7 @@ export type Database = {
         | "forum_thread_approved"
         | "forum_thread_rejected"
         | "forum_thread_announcement"
+        | "event_voting_closed_no_votes"
       user_permission:
         | "user_roles.update"
         | "user_types.update"
@@ -1946,6 +1950,7 @@ export const Constants = {
         "forum_thread_approved",
         "forum_thread_rejected",
         "forum_thread_announcement",
+        "event_voting_closed_no_votes",
       ],
       user_permission: [
         "user_roles.update",

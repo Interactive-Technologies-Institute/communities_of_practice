@@ -28,6 +28,7 @@
 		event_rejected: 'Your event has been rejected',
 		event_announcement: 'A new event has been approved',
 		event_voting_closed: 'Voting has ended on an event',
+		event_voting_closed_no_votes: 'Your event voting has ended with no votes',
 		event_voting_reopened: 'Voting has reopened on an event',
 		map_pin_pending: 'Your map pin is pending moderation',
 		map_pin_changes_requested: 'Your map pin needs changes',
@@ -55,6 +56,8 @@
 			case 'event_voting_closed':
 			case 'event_voting_reopened':
 				return `/events/${notification.data.event_id ?? 'error'}`;
+			case 'event_voting_closed_no_votes':
+				return `/events/${notification.data.event_id ?? 'error'}/edit`;
 			case 'map_pin_pending':
 			case 'map_pin_changes_requested':
 			case 'map_pin_approved':
