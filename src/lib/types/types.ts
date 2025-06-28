@@ -199,6 +199,7 @@ export type NotificationType =
 	| 'guide_approved'
 	| 'guide_rejected'
 	| 'event_pending'
+	| 'event_pending_moderation'
 	| 'event_changes_requested'
 	| 'event_approved'
 	| 'event_rejected'

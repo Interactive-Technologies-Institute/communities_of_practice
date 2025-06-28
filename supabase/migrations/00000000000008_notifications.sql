@@ -5,6 +5,7 @@ create type public.notification_type as enum (
 	'guide_approved',
 	'guide_rejected',
 	'event_pending',
+	'event_pending_moderation',
 	'event_changes_requested',
 	'event_approved',
 	'event_rejected',
@@ -51,7 +52,21 @@ after
 insert on public.guides_moderation for each row execute function public.handle_guides_moderation_notification();
 create or replace function public.handle_events_moderation_notification() returns trigger as $$
 declare notification_type notification_type;
-begin if new.status = 'pending' then notification_type := 'event_pending';
+begin 
+ if new.status = 'pending' then notification_type := 'event_pending';
+    insert into public.notifications (user_id, type, data)
+    select
+      p.id,
+      'event_pending_moderation',
+      jsonb_build_object('event_id', new.event_id)
+    from public.profiles p
+    where p.id != new.user_id
+      and exists (
+        select 1
+        from public.user_roles ur
+        where ur.id = p.id
+          and ur.role = 'moderator' or ur.role = 'admin'
+      );
 elsif new.status = 'changes_requested' then notification_type := 'event_changes_requested';
 elsif new.status = 'approved' then
 		insert into public.notifications (user_id, type, data)

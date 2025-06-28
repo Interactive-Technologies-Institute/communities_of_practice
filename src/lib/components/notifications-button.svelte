@@ -23,6 +23,7 @@
 		guide_approved: 'Your guide has been approved',
 		guide_rejected: 'Your guide has been rejected',
 		event_pending: 'Your event is pending moderation',
+		event_pending_moderation: 'An event is pending moderation',
 		event_changes_requested: 'Your event needs changes',
 		event_approved: 'Your event has been approved',
 		event_rejected: 'Your event has been rejected',
@@ -49,6 +50,7 @@
 			case 'guide_rejected':
 				return `/guides/${notification.data.guide_id ?? 'error'}`;
 			case 'event_pending':
+			case 'event_pending_moderation':
 			case 'event_changes_requested':
 			case 'event_approved':
 			case 'event_rejected':

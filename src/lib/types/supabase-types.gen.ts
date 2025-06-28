@@ -1775,6 +1775,7 @@ export type Database = {
         | "forum_thread_rejected"
         | "forum_thread_announcement"
         | "event_voting_closed_no_votes"
+        | "event_pending_moderation"
       user_permission:
         | "user_roles.update"
         | "user_types.update"
@@ -1951,6 +1952,7 @@ export const Constants = {
         "forum_thread_rejected",
         "forum_thread_announcement",
         "event_voting_closed_no_votes",
+        "event_pending_moderation",
       ],
       user_permission: [
         "user_roles.update",
