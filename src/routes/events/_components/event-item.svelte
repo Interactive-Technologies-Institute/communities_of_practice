@@ -17,6 +17,22 @@
 		rejected: 'Rejected',
 	};
 
+	const eventStatusLabels = {
+		voting_open: 'Voting Open',
+		no_one_voted: 'No One Voted',
+		scheduled: 'Scheduled',
+		ongoing: 'Ongoing',
+		completed: 'Completed',
+	};
+
+	const eventStatusVariants: Record<string, 'default' | 'secondary' | 'destructive' | 'warning' | 'success'> = {
+		voting_open: 'default',
+		no_one_voted: 'destructive',
+		scheduled: 'default',
+		ongoing: 'warning',
+		completed: 'success',
+	};
+
 	$: imageUrl = $page.data.supabase.storage.from('events').getPublicUrl(event.image).data.publicUrl;
 </script>
 
@@ -31,6 +47,13 @@
 						variant={event.moderation_status === 'rejected' ? 'destructive' : 'secondary'}
 					>
 						{moderationStatusLabels[event.moderation_status]}
+					</Badge>
+				{:else if event.status !== null && event.status !== undefined}
+					<Badge
+						class="absolute right-2 top-2"
+						variant={eventStatusVariants[event.status] ?? 'default'}
+					>
+						{eventStatusLabels[event.status]}
 					</Badge>
 				{/if}
 			{/if}

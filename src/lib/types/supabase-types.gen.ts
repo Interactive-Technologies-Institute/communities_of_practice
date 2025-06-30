@@ -55,11 +55,11 @@ export type Database = {
           inserted_at: string
           location: string
           start_time: string | null
+          status: Database["public"]["Enums"]["event_status"] | null
           tags: string[]
           title: string
           updated_at: string
           user_id: string
-          voting_closed: boolean | null
           voting_end_date: string | null
           voting_end_time: string | null
         }
@@ -75,11 +75,11 @@ export type Database = {
           inserted_at?: string
           location: string
           start_time?: string | null
+          status?: Database["public"]["Enums"]["event_status"] | null
           tags: string[]
           title: string
           updated_at?: string
           user_id: string
-          voting_closed?: boolean | null
           voting_end_date?: string | null
           voting_end_time?: string | null
         }
@@ -95,11 +95,11 @@ export type Database = {
           inserted_at?: string
           location?: string
           start_time?: string | null
+          status?: Database["public"]["Enums"]["event_status"] | null
           tags?: string[]
           title?: string
           updated_at?: string
           user_id?: string
-          voting_closed?: boolean | null
           voting_end_date?: string | null
           voting_end_time?: string | null
         }
@@ -1188,6 +1188,7 @@ export type Database = {
           date: string | null
           description: string | null
           end_time: string | null
+          final_voting_option_id: number | null
           fts: unknown | null
           id: number | null
           image: string | null
@@ -1198,6 +1199,7 @@ export type Database = {
             | Database["public"]["Enums"]["moderation_status"]
             | null
           start_time: string | null
+          status: Database["public"]["Enums"]["event_status"] | null
           tags: string[] | null
           title: string | null
           updated_at: string | null
@@ -1206,6 +1208,20 @@ export type Database = {
           voting_end_time: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "events_final_voting_option_id_fkey"
+            columns: ["final_voting_option_id"]
+            isOneToOne: false
+            referencedRelation: "events_voting_options"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_final_voting_option_id_fkey"
+            columns: ["final_voting_option_id"]
+            isOneToOne: false
+            referencedRelation: "events_voting_summary_view"
+            referencedColumns: ["voting_option_id"]
+          },
           {
             foreignKeyName: "events_user_id_fkey"
             columns: ["user_id"]
@@ -1735,6 +1751,10 @@ export type Database = {
           has_voted: boolean
         }[]
       }
+      update_event_statuses: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       update_user_types: {
         Args: { types: Database["public"]["CompositeTypes"]["user_type"][] }
         Returns: undefined
@@ -1745,6 +1765,12 @@ export type Database = {
       }
     }
     Enums: {
+      event_status:
+        | "voting_open"
+        | "no_one_voted"
+        | "scheduled"
+        | "ongoing"
+        | "completed"
       feature: "guides" | "events" | "map" | "docs" | "forum_threads" | "users"
       guide_difficulty: "easy" | "medium" | "hard"
       guide_duration: "short" | "medium" | "long"
@@ -1921,6 +1947,13 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      event_status: [
+        "voting_open",
+        "no_one_voted",
+        "scheduled",
+        "ongoing",
+        "completed",
+      ],
       feature: ["guides", "events", "map", "docs", "forum_threads", "users"],
       guide_difficulty: ["easy", "medium", "hard"],
       guide_duration: ["short", "medium", "long"],

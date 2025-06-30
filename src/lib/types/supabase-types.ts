@@ -47,7 +47,7 @@ export type Database = MergeDeep<
 						end_time: string | null;
 						location: string;
 						allow_voting: boolean;
-						voting_closed: boolean;
+						status: Database['public']['Enums']['event_status'] | null;
 						fts: unknown;
 						moderation_status: Database['public']['Enums']['moderation_status'];
 						interests_count: number;

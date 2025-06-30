@@ -6,6 +6,7 @@ import type { EventWithCounters } from '@/types/types';
 export const load = async (event) => {
 	const search = stringQueryParam().decode(event.url.searchParams.get('s'));
 	const tags = arrayQueryParam().decode(event.url.searchParams.get('tags'));
+	const statuses = arrayQueryParam().decode(event.url.searchParams.get('statuses'));
 
 	async function getEvents(): Promise<EventWithCounters[]> {
 		let query = event.locals.supabase
@@ -20,6 +21,14 @@ export const load = async (event) => {
 
 		if (tags && tags.length) {
 			query = query.overlaps('tags', tags);
+		}
+
+		if (statuses && statuses.length) {
+			const validStatuses = ['voting_open', 'no_one_voted', 'scheduled', 'ongoing', 'completed'];
+			const allValid = statuses.every((s) => validStatuses.includes(s));
+			if (allValid) {
+				query = query.in('status', statuses as ('voting_open' | 'no_one_voted' | 'scheduled' | 'ongoing' | 'completed')[]);
+			}
 		}
 
 		const { data: events, error: eventsError } = await query;

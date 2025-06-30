@@ -103,6 +103,8 @@ export type DocGroup = {
 	docs: Doc[];
 };
 
+export type EventStatus = 'voting_open' | 'no_one_voted' | 'scheduled' | 'ongoing' | 'completed' | null;
+
 export type Event = {
 	id: number;
 	inserted_at: string;
@@ -119,7 +121,7 @@ export type Event = {
 	allow_voting: boolean;
 	voting_end_date: string | null;
 	voting_end_time: string | null;
-	voting_closed: boolean;
+	status: EventStatus;
 	moderation_status: ModerationStatus;
 	final_voting_option_id?: number | null;
 };

@@ -104,7 +104,7 @@ returns trigger as $$
 declare
   creator_id uuid;
 begin
-  if not old.voting_closed and old.final_voting_option_id is null and new.final_voting_option_id is null and new.voting_closed then
+  if old.status = 'voting_open' and old.final_voting_option_id is null and new.final_voting_option_id is null and new.status is null then
     select user_id into creator_id from public.events where id = new.id;
     insert into public.notifications (user_id, type, data)
     values (
@@ -112,7 +112,7 @@ begin
       'event_voting_closed_no_votes',
       jsonb_build_object('event_id', new.id)
     );
-  elsif not old.voting_closed and new.voting_closed and new.final_voting_option_id is not null then
+  elsif old.status = 'voting_open' and new.status = 'scheduled' and new.final_voting_option_id is not null then
     insert into public.notifications (user_id, type, data)
     select
       p.id,
