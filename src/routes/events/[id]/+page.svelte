@@ -6,13 +6,27 @@
 	import { AspectRatio } from '@/components/ui/aspect-ratio';
 	import { Button } from '@/components/ui/button';
 	import dayjs from 'dayjs';
-	import { Calendar, MapPin, Pen, Tag, Trash } from 'lucide-svelte';
+	import { Calendar, MapPin, Pen, Tag, Trash, Text, Video } from 'lucide-svelte';
 	import { MetaTags } from 'svelte-meta-tags';
 	import EventDeleteDialog from './_components/event-delete-dialog.svelte';
 	import EventInterestButton from './_components/event-interest-button.svelte';
 	import EventVoteSchedule from './_components/event-vote-schedule.svelte';
+	import { cn } from '@/utils';
 
 	export let data;
+
+	let showSummary = false;
+	let showRecording = false;
+	let showTranscription = false;
+
+	function getGoogleDriveEmbedUrl(url: string): string | null {
+		const match = url.match(/(?:file\/d\/|open\?id=|uc\?id=)([a-zA-Z0-9_-]+)/);
+		if (match && match[1]) {
+			return `https://drive.google.com/file/d/${match[1]}/preview`;
+		}
+		return null;
+	}
+
 	
 	let openDeleteDialog = false;
 </script>
@@ -88,15 +102,29 @@
 			<div class="mt-4 flex items-center justify-between gap-4 border-t pt-4 text-sm text-muted-foreground">
 				<div class="flex gap-4">
 					<EventInterestButton data={data.toggleInterestForm} />
+					{#if data.event.summary}
+						<Button variant="ghost" size="sm" on:click={() => (showSummary = !showSummary)}
+							class={cn('flex items-center gap-2', { 'text-orange-500': showSummary })}>
+							<Text class="h-4 w-4" />
+							Summary
+						</Button>
+					{/if}
+					{#if data.event.recording_link}
+						<Button variant="ghost" size="sm" on:click={() => (showRecording = !showRecording)}
+							class={cn('flex items-center gap-2', { 'text-orange-500': showRecording })}>
+							<Video class="h-4 w-4" />
+							Recording
+						</Button>
+					{/if}
 				</div>
 
 				{#if data.event.user_id === data.user?.id}
 					<div class="flex gap-2">
-						<Button variant="ghost" size="sm" href="/events/{data.event.id}/edit" class="text-blue-500 hover:text-blue-600">
+						<Button variant="ghost" size="sm" href="/events/{data.event.id}/edit" class="text-blue-500 gap-2 hover:text-blue-600">
 							<Pen class="h-4 w-4" />
 							Edit
 						</Button>
-						<Button variant="ghost" size="sm" on:click={() => (openDeleteDialog = true)} class="text-red-500 hover:text-red-600">
+						<Button variant="ghost" size="sm" on:click={() => (openDeleteDialog = true)} class="text-red-500 gap-2 hover:text-red-600">
 							<Trash class="h-4 w-4" /> 
 							Delete
 						</Button>
@@ -105,6 +133,37 @@
 			</div>
 		</div>
 	</Card>
+	{#if showSummary && data.event.summary}
+		<Card class="p-4 text-sm">
+			<h2 class="mb-2 text-base font-semibold text-foreground">Summary</h2>
+			<p class="whitespace-pre-wrap">{data.event.summary}</p>
+		</Card>
+	{/if}
+	{#if showRecording && (data.event.recording_link || data.event.transcription)}
+		<Card class="p-4 text-sm">
+			{#if data.event.recording_link}
+				<h2 class="text-base font-semibold text-foreground">Recording</h2>
+				<iframe
+					class="w-full aspect-video rounded"
+					src={getGoogleDriveEmbedUrl(data.event.recording_link)}
+					title={`Recording of event: ${data.event.title}`}
+					allowfullscreen
+				></iframe> 
+			{/if}
+			{#if data.event.transcription}
+				<div class="mt-2 flex justify-center">
+					<button on:click={() => (showTranscription = !showTranscription)}
+						class="mt-2 text-sm font-medium text-blue-600 hover:underline focus:outline-none">
+						{showTranscription ? 'Hide Transcription' : 'Show Transcription'}
+					</button>
+				</div>
+				{#if showTranscription}
+					<h2 class="mb-2 mt-2 text-base font-semibold text-foreground">Transcription</h2>
+					<p class="whitespace-pre-wrap">{data.event.transcription}</p>
+				{/if}
+			{/if}
+		</Card>
+	{/if}
 	{#if data.event.moderation_status === "approved" && data.event.allow_voting}
 		<Card class="mx-auto p-2 space-y-4">
 			<h2 class="text-lg font-semibold">Vote for Event Schedule</h2>

@@ -113,11 +113,11 @@
 
 				{#if data.thread.user_id === data.user?.id}
 					<div class="flex gap-2">
-						<Button variant="ghost" size="sm" href="/forum/{data.thread.id}/edit" class="text-blue-500 hover:text-blue-600">
+						<Button variant="ghost" size="sm" href="/forum/{data.thread.id}/edit" class="text-blue-500 gap-2 hover:text-blue-600">
 							<Pen class="h-4 w-4" />
 							Edit
 						</Button>
-						<Button variant="ghost" size="sm" on:click={() => (openDeleteDialog = true)} class="text-red-500 hover:text-red-600">
+						<Button variant="ghost" size="sm" on:click={() => (openDeleteDialog = true)} class="text-red-500 gap-2 hover:text-red-600">
 							<Trash class="h-4 w-4" /> 
 							Delete
 						</Button>

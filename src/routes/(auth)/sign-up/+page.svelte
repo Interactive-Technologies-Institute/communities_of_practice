@@ -56,7 +56,7 @@
 			</Form.Field>
 			<Form.Button disabled={$submitting} class="mt-5">
 				{#if $submitting}
-					<Loader2 class="mr-2 h-4 w-4 animate-spin" />
+					<Loader2 class="h-4 w-4 animate-spin" />
 				{/if}
 				Sign Up
 			</Form.Button>

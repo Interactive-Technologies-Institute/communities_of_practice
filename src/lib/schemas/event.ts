@@ -221,6 +221,9 @@ export const editEventSchema = z
 				'Tags must be between 3 and 30 characters'
 			),
 		location: z.string().min(1, { message: 'Location is required' }),
+		recording_link: z.string().nullish(),
+		transcription: z.string().nullish(),
+		summary: z.string().nullish(),
 		allow_voting: z.boolean(),
 		date: z.string().refine((val) => !isNaN(Date.parse(val)), 'Invalid date').nullish(),
 		start_time: z

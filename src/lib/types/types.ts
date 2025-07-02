@@ -115,6 +115,9 @@ export type Event = {
 	tags: string[];
 	image: string;
 	location: string;
+	recording_link: string | null;
+	transcription: string | null;
+	summary: string | null;
 	date: string | null;
 	start_time: string | null;
 	end_time: string | null;

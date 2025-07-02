@@ -20,6 +20,8 @@
 	import { CalendarIcon, Loader2 } from 'lucide-svelte';
 	import { fileProxy, superForm, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient, type Infer } from 'sveltekit-superforms/adapters';
+	import { PUBLIC_OPENAI_API_KEY } from '$env/static/public';
+	import { OpenAI } from 'openai';
 
 	export let data: SuperValidated<Infer<EditEventSchema>>;
 
@@ -30,6 +32,8 @@
 	});
 
 	const { form: formData, enhance, submitting, errors } = form;
+
+	const openai = new OpenAI({ apiKey: PUBLIC_OPENAI_API_KEY, dangerouslyAllowBrowser: true});
 
 	const df = new DateFormatter('en-US', {
 		dateStyle: 'long',
@@ -87,37 +91,159 @@
 	let backupVotingEndTime: string | null | undefined = null;
 
 	function switchToVoting() {
-	// Backup fixed-date fields
-	backupDate = $formData.date;
-	backupStartTime = $formData.start_time;
-	backupEndTime = $formData.end_time;
+		// Backup fixed-date fields
+		backupDate = $formData.date;
+		backupStartTime = $formData.start_time;
+		backupEndTime = $formData.end_time;
 
-	// Restore voting fields
-	$formData.allow_voting = true;
-	$formData.date = initialDate;
-	$formData.start_time = initialStartTime;
-	$formData.end_time = initialEndTime;
-	$formData.voting_options = backupVotingOptions;
-	$formData.voting_end_date = backupVotingEndDate;
-	$formData.voting_end_time = backupVotingEndTime;
-}
+		// Restore voting fields
+		$formData.allow_voting = true;
+		$formData.date = initialDate;
+		$formData.start_time = initialStartTime;
+		$formData.end_time = initialEndTime;
+		$formData.voting_options = backupVotingOptions;
+		$formData.voting_end_date = backupVotingEndDate;
+		$formData.voting_end_time = backupVotingEndTime;
+	}
 
-function switchToFixed() {
-	// Backup voting fields
-	backupVotingOptions = $formData.voting_options;
-	backupVotingEndDate = $formData.voting_end_date;
-	backupVotingEndTime = $formData.voting_end_time;
+	function switchToFixed() {
+		// Backup voting fields
+		backupVotingOptions = $formData.voting_options;
+		backupVotingEndDate = $formData.voting_end_date;
+		backupVotingEndTime = $formData.voting_end_time;
 
-	// Restore fixed-date fields
-	$formData.allow_voting = false;
-	$formData.voting_options = [];
-	$formData.voting_end_date = null;
-	$formData.voting_end_time = null;
-	$formData.date = backupDate;
-	$formData.start_time = backupStartTime;
-	$formData.end_time = backupEndTime;
-}
+		// Restore fixed-date fields
+		$formData.allow_voting = false;
+		$formData.voting_options = [];
+		$formData.voting_end_date = null;
+		$formData.voting_end_time = null;
+		$formData.date = backupDate;
+		$formData.start_time = backupStartTime;
+		$formData.end_time = backupEndTime;
+	}
 
+	async function transcribe(audioFile: File): Promise<string | null> {
+		try {
+			const transcription = await openai.audio.transcriptions.create({
+				file: audioFile,
+				model: 'whisper-1',
+				response_format: 'text',
+			});
+			return transcription;
+
+		} catch (error) {
+			console.log('Error generating transcription', error);
+			return null;
+		}
+	}
+
+	function extractDriveFileId(url: string): string | null {
+		const match = url.match(/\/file\/d\/([^/]+)\//);
+		return match ? match[1] : null;
+	}
+
+	async function getBlobFromGoogleDriveLink(driveLink: string): Promise<Blob> {
+		const fileId = extractDriveFileId(driveLink);
+		if (!fileId) throw new Error('Invalid Google Drive link');
+		const proxyUrl = `/api/gdrive-audio?id=${fileId}`;
+		const response = await fetch(proxyUrl);
+		if (!response.ok) throw new Error('Failed to fetch from server');
+		const blob = await response.blob();
+		return blob;
+	}
+
+	function isGoogleDriveLink(link: string) {
+		return /drive\.google\.com\/file\/d\//.test(link);
+	}
+
+	async function generateTranscription(recordingLink: string): Promise<string | null> {
+		try {
+			let blob: Blob;
+
+			if (isGoogleDriveLink(recordingLink)) {
+				blob = await getBlobFromGoogleDriveLink(recordingLink);
+			} else {
+				const res = await fetch(recordingLink);
+				if (!res.ok) throw new Error('Failed to fetch file from URL');
+				blob = await res.blob();
+			}
+
+			console.log('Blob type:', blob.type, 'size:', blob.size);
+
+			if (!blob.type.startsWith('audio/') && !blob.type.startsWith('video/')) {
+				throw new Error(`Invalid media type for transcription: ${blob.type}`);
+			}
+
+			const file = new File([blob], 'drive_audio.mp3', { type: 'audio/mpeg' });
+
+			const result = await transcribe(file);
+			return result ?? null;
+
+		} catch (error) {
+			console.error('Transcription failed:', error);
+			return null;
+		}
+	}
+
+	async function generateSummary(content: string): Promise<string | null> {
+		try {
+			const response = await openai.chat.completions.create({
+				model: 'gpt-3.5-turbo',
+				messages: [
+					{
+						role: 'system',
+						content: 'You are an assistant that summarizes events / meetings based on their transcription on a platform for communities of practice clearly and concisely. Divide the topics talked about into points if possible.'
+					},
+					{
+						role: 'user',
+						content: `Summarize the following event:\n\n${content}`
+					}
+				],
+				temperature: 0.7,
+				max_tokens: 400
+			});
+
+			return response.choices[0]?.message?.content?.trim() ?? null;
+
+		} catch (error) {
+			console.error('Error generating summary:', error);
+			return null;
+		}
+	}
+
+	let loadingTranscription = false;
+	let loadingSummary = false;
+
+	async function handleGenerateTranscription() {
+		loadingTranscription = true;
+
+		if ($formData.recording_link) {
+			const transcription = await generateTranscription($formData.recording_link);
+			$formData.transcription = transcription ?? '';
+			console.log('Transcription result:', transcription);
+		} else {
+			console.warn('No recording link provided for transcription.');
+		}
+
+		loadingTranscription = false;
+	}
+
+	async function handleGenerateSummary() {
+		loadingSummary = true;
+
+		const content = `Title: ${$formData.title} Description: ${$formData.description} Transcription: ${$formData.transcription}`;
+
+		const summary = await generateSummary(content);
+
+		if (summary) {
+			$formData = {
+				...$formData,
+				summary
+			};
+		}
+
+		loadingSummary = false;
+	}
 
 </script>
 
@@ -150,12 +276,61 @@ function switchToFixed() {
 				</Form.Control>
 			</Form.Field>
 			<Form.Field {form} name="location">
-					<Form.Control let:attrs>
-						<Form.Label>Location*</Form.Label>
-						<Input {...attrs} bind:value={$formData.location} />
-						<Form.FieldErrors />
-					</Form.Control>
-				</Form.Field>
+				<Form.Control let:attrs>
+					<Form.Label>Location*</Form.Label>
+					<Input {...attrs} bind:value={$formData.location} />
+					<Form.FieldErrors />
+				</Form.Control>
+			</Form.Field>
+			<Form.Field {form} name="recording_link">
+				<Form.Control let:attrs>
+					<Form.Label>Video/Audio Recording Link (Google Drive Share Link Only)</Form.Label>
+					<Input {...attrs} bind:value={$formData.recording_link} />
+					<Form.FieldErrors />
+				</Form.Control>
+			</Form.Field>
+			<Form.Field {form} name="transcription">
+				<Form.Control let:attrs>
+					<Form.Label class="flex justify-between items-center">
+						Video/Audio Transcription
+						<Button
+							type="button"
+							size="sm"
+							on:click={handleGenerateTranscription}
+							disabled={loadingTranscription}
+						>
+							{#if loadingTranscription}
+								<Loader2 class="h-4 w-4 animate-spin" />
+							{:else}
+								Generate Transcription
+							{/if}
+						</Button>
+					</Form.Label>
+					<Textarea {...attrs} class="w-full rounded border px-3 py-2 text-sm max-h-48 overflow-auto" bind:value={$formData.transcription} />
+					<Form.FieldErrors />
+				</Form.Control>
+			</Form.Field>
+			<Form.Field {form} name="summary">
+				<Form.Control let:attrs>
+					<Form.Label class="flex justify-between items-center">
+						Summary
+						<Button
+							type="button"
+							size="sm"
+							on:click={handleGenerateSummary}
+							disabled={loadingSummary}
+						>
+							{#if loadingSummary}
+								<Loader2 class="h-4 w-4 animate-spin" />
+							{:else}
+								Generate Summary
+							{/if}
+						</Button>
+					</Form.Label>
+					<Textarea {...attrs} class="w-full rounded border px-3 py-2 text-sm max-h-48 overflow-auto" bind:value={$formData.summary} />
+					<Form.FieldErrors />
+				</Form.Control>
+			</Form.Field>
 			<Form.Field {form} name="allow_voting">
 				<Form.Control let:attrs>
 					<Form.Label>Allow Schedule Voting?</Form.Label>
@@ -325,7 +500,7 @@ function switchToFixed() {
 		<Button variant="outline" href="/events">Cancel</Button>
 		<Button type="submit" disabled={$submitting}>
 			{#if $submitting}
-				<Loader2 class="mr-2 h-4 w-4 animate-spin" />
+				<Loader2 class="h-4 w-4 animate-spin" />
 			{/if}
 			Submit
 		</Button>

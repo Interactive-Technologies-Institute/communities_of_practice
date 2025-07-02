@@ -54,10 +54,13 @@ export type Database = {
           image: string
           inserted_at: string
           location: string
+          recording_link: string | null
           start_time: string | null
           status: Database["public"]["Enums"]["event_status"] | null
+          summary: string | null
           tags: string[]
           title: string
+          transcription: string | null
           updated_at: string
           user_id: string
           voting_end_date: string | null
@@ -74,10 +77,13 @@ export type Database = {
           image: string
           inserted_at?: string
           location: string
+          recording_link?: string | null
           start_time?: string | null
           status?: Database["public"]["Enums"]["event_status"] | null
+          summary?: string | null
           tags: string[]
           title: string
+          transcription?: string | null
           updated_at?: string
           user_id: string
           voting_end_date?: string | null
@@ -94,10 +100,13 @@ export type Database = {
           image?: string
           inserted_at?: string
           location?: string
+          recording_link?: string | null
           start_time?: string | null
           status?: Database["public"]["Enums"]["event_status"] | null
+          summary?: string | null
           tags?: string[]
           title?: string
+          transcription?: string | null
           updated_at?: string
           user_id?: string
           voting_end_date?: string | null
@@ -1198,10 +1207,13 @@ export type Database = {
           moderation_status:
             | Database["public"]["Enums"]["moderation_status"]
             | null
+          recording_link: string | null
           start_time: string | null
           status: Database["public"]["Enums"]["event_status"] | null
+          summary: string | null
           tags: string[] | null
           title: string | null
+          transcription: string | null
           updated_at: string | null
           user_id: string | null
           voting_end_date: string | null

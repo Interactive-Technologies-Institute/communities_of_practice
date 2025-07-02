@@ -382,7 +382,7 @@ function switchToFixed() {
 		<Button variant="outline" href="/events">Cancel</Button>
 		<Button type="submit" disabled={$submitting}>
 			{#if $submitting}
-				<Loader2 class="mr-2 h-4 w-4 animate-spin" />
+				<Loader2 class="h-4 w-4 animate-spin" />
 			{/if}
 			Submit
 		</Button>
