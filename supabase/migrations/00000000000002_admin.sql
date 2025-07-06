@@ -1,6 +1,6 @@
 /* ADMIN */
 -- Features
-create type public.feature as enum ('guides', 'events', 'map', 'docs', 'forum_threads', 'users');
+create type public.feature as enum ('guides', 'events', 'map', 'docs', 'forum_threads', 'contents', 'users');
 create table public.feature_flags (
 	id public.feature primary key,
 	enabled boolean not null default false

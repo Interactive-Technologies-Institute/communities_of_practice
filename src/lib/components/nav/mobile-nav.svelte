@@ -87,6 +87,18 @@
 						Forum
 					</a>
 				</FeatureWrapper>
+				<FeatureWrapper feature="contents">
+					<a
+						href="/contents"
+						on:click={() => (open = false)}
+						class={cn(
+							'transition-colors hover:text-foreground/80',
+							$page.url.pathname.startsWith('/contents') ? 'text-foreground' : 'text-foreground/60'
+						)}
+					>
+						Contents
+					</a>
+				</FeatureWrapper>
 				<FeatureWrapper feature="users">
 					<a
 						href="/users"

@@ -89,6 +89,21 @@
 				</Form.Field>
 				<Form.Field
 					{form}
+					name="contents"
+					class="flex flex-row items-center justify-between rounded-lg border p-4"
+				>
+					<Form.Control let:attrs>
+						<div class="space-y-0.5">
+							<Form.Label>Contents</Form.Label>
+							<Form.Description>
+								Enable this feature to allow users to create contents.
+							</Form.Description>
+						</div>
+						<Switch includeInput {...attrs} bind:checked={$formData.contents} />
+					</Form.Control>
+				</Form.Field>
+				<Form.Field
+					{form}
 					name="users"
 					class="flex flex-row items-center justify-between rounded-lg border p-4"
 				>

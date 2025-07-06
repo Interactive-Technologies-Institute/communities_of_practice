@@ -42,6 +42,169 @@ export type Database = {
         }
         Relationships: []
       }
+      contents: {
+        Row: {
+          description: string | null
+          file_path: string
+          fts: unknown | null
+          id: number
+          inserted_at: string
+          is_public: boolean
+          mime_type: string
+          tags: string[]
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          description?: string | null
+          file_path: string
+          fts?: unknown | null
+          id?: number
+          inserted_at?: string
+          is_public?: boolean
+          mime_type: string
+          tags?: string[]
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          description?: string | null
+          file_path?: string
+          fts?: unknown | null
+          id?: number
+          inserted_at?: string
+          is_public?: boolean
+          mime_type?: string
+          tags?: string[]
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contents_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contents_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_view"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contents_downloaded: {
+        Row: {
+          content_id: number
+          id: number
+          inserted_at: string
+          user_id: string
+        }
+        Insert: {
+          content_id: number
+          id?: number
+          inserted_at?: string
+          user_id: string
+        }
+        Update: {
+          content_id?: number
+          id?: number
+          inserted_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contents_downloaded_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "contents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contents_downloaded_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "contents_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contents_downloaded_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contents_downloaded_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_view"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contents_moderation: {
+        Row: {
+          comment: string
+          content_id: number
+          id: number
+          inserted_at: string
+          status: Database["public"]["Enums"]["moderation_status"]
+          user_id: string
+        }
+        Insert: {
+          comment: string
+          content_id: number
+          id?: number
+          inserted_at?: string
+          status: Database["public"]["Enums"]["moderation_status"]
+          user_id: string
+        }
+        Update: {
+          comment?: string
+          content_id?: number
+          id?: number
+          inserted_at?: string
+          status?: Database["public"]["Enums"]["moderation_status"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contents_moderation_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "contents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contents_moderation_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "contents_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contents_moderation_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contents_moderation_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_view"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           allow_voting: boolean
@@ -970,6 +1133,7 @@ export type Database = {
           fts: unknown | null
           id: number
           inserted_at: string
+          is_deleted: boolean
           is_reply: boolean
           parent_id: number | null
           thread_id: number
@@ -981,6 +1145,7 @@ export type Database = {
           fts?: unknown | null
           id?: number
           inserted_at?: string
+          is_deleted?: boolean
           is_reply?: boolean
           parent_id?: number | null
           thread_id: number
@@ -992,6 +1157,7 @@ export type Database = {
           fts?: unknown | null
           id?: number
           inserted_at?: string
+          is_deleted?: boolean
           is_reply?: boolean
           parent_id?: number | null
           thread_id?: number
@@ -1184,6 +1350,48 @@ export type Database = {
       }
     }
     Views: {
+      contents_tags: {
+        Row: {
+          count: number | null
+          tag: string | null
+        }
+        Relationships: []
+      }
+      contents_view: {
+        Row: {
+          description: string | null
+          downloads_count: number | null
+          file_path: string | null
+          fts: unknown | null
+          id: number | null
+          inserted_at: string | null
+          is_public: boolean | null
+          mime_type: string | null
+          moderation_status:
+            | Database["public"]["Enums"]["moderation_status"]
+            | null
+          tags: string[] | null
+          title: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contents_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contents_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_view"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events_tags: {
         Row: {
           count: number | null
@@ -1353,6 +1561,46 @@ export type Database = {
           },
           {
             foreignKeyName: "guides_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_view"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      latest_contents_moderation: {
+        Row: {
+          comment: string | null
+          content_id: number | null
+          id: number | null
+          inserted_at: string | null
+          status: Database["public"]["Enums"]["moderation_status"] | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contents_moderation_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "contents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contents_moderation_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "contents_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contents_moderation_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contents_moderation_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles_view"
@@ -1618,6 +1866,7 @@ export type Database = {
           fts: unknown | null
           id: number | null
           inserted_at: string | null
+          is_deleted: boolean | null
           is_reply: boolean | null
           likes_count: number | null
           moderation_status:
@@ -1688,6 +1937,13 @@ export type Database = {
       finalize_event_votes: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      get_content_download_count: {
+        Args: { content_id: number; user_id?: string }
+        Returns: {
+          count: number
+          has_download: boolean
+        }[]
       }
       get_event_interest_count: {
         Args: { event_id: number; user_id?: string }
@@ -1783,7 +2039,14 @@ export type Database = {
         | "scheduled"
         | "ongoing"
         | "completed"
-      feature: "guides" | "events" | "map" | "docs" | "forum_threads" | "users"
+      feature:
+        | "guides"
+        | "events"
+        | "map"
+        | "docs"
+        | "forum_threads"
+        | "contents"
+        | "users"
       guide_difficulty: "easy" | "medium" | "hard"
       guide_duration: "short" | "medium" | "long"
       moderation_status:
@@ -1814,6 +2077,11 @@ export type Database = {
         | "forum_thread_announcement"
         | "event_voting_closed_no_votes"
         | "event_pending_moderation"
+        | "content_pending"
+        | "content_changes_requested"
+        | "content_approved"
+        | "content_rejected"
+        | "content_announcement"
       user_permission:
         | "user_roles.update"
         | "user_types.update"
@@ -1839,6 +2107,10 @@ export type Database = {
         | "thread_comments.update"
         | "thread_comments.delete"
         | "thread_comments.moderate"
+        | "contents.create"
+        | "contents.update"
+        | "contents.delete"
+        | "contents.moderate"
       user_role: "user" | "moderator" | "admin"
     }
     CompositeTypes: {
@@ -1966,7 +2238,15 @@ export const Constants = {
         "ongoing",
         "completed",
       ],
-      feature: ["guides", "events", "map", "docs", "forum_threads", "users"],
+      feature: [
+        "guides",
+        "events",
+        "map",
+        "docs",
+        "forum_threads",
+        "contents",
+        "users",
+      ],
       guide_difficulty: ["easy", "medium", "hard"],
       guide_duration: ["short", "medium", "long"],
       moderation_status: [
@@ -1998,6 +2278,11 @@ export const Constants = {
         "forum_thread_announcement",
         "event_voting_closed_no_votes",
         "event_pending_moderation",
+        "content_pending",
+        "content_changes_requested",
+        "content_approved",
+        "content_rejected",
+        "content_announcement",
       ],
       user_permission: [
         "user_roles.update",
@@ -2024,6 +2309,10 @@ export const Constants = {
         "thread_comments.update",
         "thread_comments.delete",
         "thread_comments.moderate",
+        "contents.create",
+        "contents.update",
+        "contents.delete",
+        "contents.moderate",
       ],
       user_role: ["user", "moderator", "admin"],
     },
