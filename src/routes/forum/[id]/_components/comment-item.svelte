@@ -69,138 +69,140 @@
 
 </script>
 <div class="relative mt-4" style="min-height: 100%;">
-    {#if level > 0}
-        {#each Array(level) as _, i}
-            <div
-                class="absolute top-0 h-full w-px bg-gray-300"
-                style="left: {i * 1.5}rem;"
-            ></div>
-        {/each}
-    {/if}
-    <Card class="relative flex h-full flex-col overflow-hidden" style="margin-left: {level * 1.5}rem;">
-        <div class="flex flex-1 flex-col px-4 py-3">
-			{#if comment.is_reply}
-				<p class="text-xs text-muted-foreground mb-2">
-					Replying to <span class="font-medium">{comment.parent_author}</span>
-				</p>
-				{/if}
-				<div class="flex items-start mb-3 gap-2">
-					<Avatar.Root class="h-10 w-10">
-						<Avatar.Image src={avatarUrl} alt={comment.author.display_name} />
-						<Avatar.Fallback>
-							{firstAndLastInitials(comment.author.display_name)}
-						</Avatar.Fallback>
-					</Avatar.Root>
-					<div>
-						<p class="text-sm font-medium">{comment.author.display_name}</p>
-						<p class="text-xs text-muted-foreground">{dayjs(comment.inserted_at).fromNow()}
-							{#if comment.inserted_at !== comment.updated_at}
-								(edited)
-							{/if}
-						</p>
-					</div>
-				</div>
-			{#if editing}
-					<textarea
-						bind:value={editedContent}
-						rows="3"
-						minlength="1"
-						maxlength="5000"
-						class="w-full rounded border px-3 py-2 text-sm max-h-48 overflow-auto"
-						required
-					/>
-
-					<p class="text-xs mt-1 text-muted-foreground">
-						{editedContent.length} / 5000 characters
+	{#if level > 0}
+		{#each Array(level) as _, i}
+			<div
+				class="absolute top-0 h-full w-px bg-gray-300"
+				style="left: {i * 1.5}rem;"
+			></div>
+		{/each}
+	{/if}
+	{#if comment.is_deleted}
+        <Card class="relative flex h-full flex-col overflow-hidden" style="margin-left: {level * 1.5}rem;">
+            <div class="flex flex-1 flex-col px-4 py-3">
+                <p class="text-muted-foreground italic">Deleted comment</p>
+            </div>
+        </Card>
+    {:else}
+		<Card class="relative flex h-full flex-col overflow-hidden" style="margin-left: {level * 1.5}rem;">
+			<div class="flex flex-1 flex-col px-4 py-3">
+				{#if comment.is_reply}
+					<p class="text-xs text-muted-foreground mb-2">
+						Replying to <span class="font-medium">{comment.parent_author}</span>
 					</p>
-
-					{#if editedContent.length < 1}
-						<p class="text-sm mt-1 font-medium text-destructive">Content must be at least 1 character.</p>
-					{:else if editedContent.length > 5000}
-						<p class="text-sm mt-1 font-medium text-destructive">Content must not exceed 5000 characters.</p>
 					{/if}
-			{:else}
-				<p bind:this={pRef} class="whitespace-pre-wrap break-words" class:line-clamp-4={!expanded}>
-					{comment.content}
-				</p>
-				{#if showToggle}
-					<button on:click={() => (expanded = !expanded)}
-						class="mt-1 text-sm font-medium text-blue-600 hover:underline focus:outline-none">
-						{expanded ? 'Show less' : 'Show more'}
-					</button>
-				{/if}
-			{/if}
-			<div class="text-base text-muted-foreground flex flex-wrap items-center justify-between w-full">
-				<div class="flex items-center gap-1">
-					<span>{comment.likes_count} {comment.likes_count === 1 ? 'like' : 'likes'}</span>
-				</div>
-			</div>
-			<div class="mt-2 flex items-center justify-between gap-4 border-t pt-2 text-sm text-muted-foreground">
-				<div class="flex gap-4">
-					<ThreadCommentLikeButton
-						commentId={comment.id}
-						isLiked={toggleCommentLikeForms[comment.id]?.data?.value ?? false}
-					/>
-					<Button variant="ghost" size="sm" on:click={() => (replying = !replying)}
-						class={cn('flex items-center gap-2', { 'text-orange-500': replying })}>
-						<MessageSquare class="h-4 w-4" />
-						Reply
-					</Button>
-				</div>
-
-				{#if comment.user_id === currentUserId}
-					<div class="flex gap-2 mt-2">
-						{#if editing}
-							<form method="POST" action="?/editThreadComment" class="flex gap-2" on:submit={handleEditSubmit}>
-								<input type="hidden" name="id" value={comment.id} />
-								<input type="hidden" name="content" value={editedContent} />
-								<Button type="submit" variant="ghost" size="sm" disabled={!isCommentValid()} class="text-blue-500 hover:text-blue-600" >
-									<Check class="h-4 w-4" />
-									Save
-								</Button>
-							</form>
-							<Button
-								variant="ghost"
-								size="sm"
-								on:click={() => { editing = false; editedContent = comment.content }}
-								class="text-red-500 hover:text-red-600"
-							>
-								<X class="h-4 w-4" />
-								Cancel
-							</Button>
-						{:else}
-							<!-- Normal Edit/Delete buttons -->
-							<Button variant="ghost" size="sm" on:click={() => (editing = true)} class="text-blue-500 hover:text-blue-600">
-								<Pen class="h-4 w-4" />
-								Edit
-							</Button>
-							<Button variant="ghost" size="sm" on:click={() => (openDeleteDialog = true)} class="text-red-500 hover:text-red-600">
-								<Trash class="h-4 w-4" />
-								Delete
-							</Button>
-						{/if}
+					<div class="flex items-start mb-3 gap-2">
+						<Avatar.Root class="h-10 w-10">
+							<Avatar.Image src={avatarUrl} alt={comment.author.display_name} />
+							<Avatar.Fallback>
+								{firstAndLastInitials(comment.author.display_name)}
+							</Avatar.Fallback>
+						</Avatar.Root>
+						<div>
+							<p class="text-sm font-medium">{comment.author.display_name}</p>
+							<p class="text-xs text-muted-foreground">{dayjs(comment.inserted_at).fromNow()}
+								{#if comment.inserted_at !== comment.updated_at}
+									(edited)
+								{/if}
+							</p>
+						</div>
 					</div>
+				{#if editing}
+						<textarea
+							bind:value={editedContent}
+							rows="3"
+							minlength="1"
+							maxlength="5000"
+							class="w-full rounded border px-3 py-2 text-sm max-h-48 overflow-auto"
+							required
+						/>
+
+						<p class="text-xs mt-1 text-muted-foreground">
+							{editedContent.length} / 5000 characters
+						</p>
+
+						{#if editedContent.length < 1}
+							<p class="text-sm mt-1 font-medium text-destructive">Content must be at least 1 character.</p>
+						{:else if editedContent.length > 5000}
+							<p class="text-sm mt-1 font-medium text-destructive">Content must not exceed 5000 characters.</p>
+						{/if}
+				{:else}
+					<p bind:this={pRef} class="whitespace-pre-wrap break-words" class:line-clamp-4={!expanded}>
+						{comment.content}
+					</p>
+					{#if showToggle}
+						<button on:click={() => (expanded = !expanded)}
+							class="mt-1 text-sm font-medium text-blue-600 hover:underline focus:outline-none">
+							{expanded ? 'Show less' : 'Show more'}
+						</button>
+					{/if}
 				{/if}
+				<div class="text-base text-muted-foreground flex flex-wrap items-center justify-between w-full">
+					<div class="flex items-center gap-1">
+						<span>{comment.likes_count} {comment.likes_count === 1 ? 'like' : 'likes'}</span>
+					</div>
+				</div>
+				<div class="mt-2 flex items-center justify-between gap-4 border-t pt-2 text-sm text-muted-foreground">
+					<div class="flex gap-4">
+						<ThreadCommentLikeButton
+							commentId={comment.id}
+							isLiked={toggleCommentLikeForms[comment.id]?.data?.value ?? false}
+						/>
+						<Button variant="ghost" size="sm" on:click={() => (replying = !replying)}
+							class={cn('flex items-center gap-2', { 'text-orange-500': replying })}>
+							<MessageSquare class="h-4 w-4" />
+							Reply
+						</Button>
+					</div>
+
+					{#if comment.user_id === currentUserId}
+						<div class="flex gap-2 mt-2">
+							{#if editing}
+								<form method="POST" action="?/editThreadComment" class="flex gap-2" on:submit={handleEditSubmit}>
+									<input type="hidden" name="id" value={comment.id} />
+									<input type="hidden" name="content" value={editedContent} />
+									<Button type="submit" variant="ghost" size="sm" disabled={!isCommentValid()} class="text-blue-500 hover:text-blue-600" >
+										<Check class="h-4 w-4" />
+										Save
+									</Button>
+								</form>
+								<Button
+									variant="ghost"
+									size="sm"
+									on:click={() => { editing = false; editedContent = comment.content }}
+									class="text-red-500 hover:text-red-600"
+								>
+									<X class="h-4 w-4" />
+									Cancel
+								</Button>
+							{:else}
+								<!-- Normal Edit/Delete buttons -->
+								<Button variant="ghost" size="sm" on:click={() => (editing = true)} class="text-blue-500 hover:text-blue-600">
+									<Pen class="h-4 w-4" />
+									Edit
+								</Button>
+								<Button variant="ghost" size="sm" on:click={() => (openDeleteDialog = true)} class="text-red-500 hover:text-red-600">
+									<Trash class="h-4 w-4" />
+									Delete
+								</Button>
+							{/if}
+						</div>
+					{/if}
+				</div>
 			</div>
-		</div>
-	</Card>
-	{#if replying}
-		<div class="relative mt-2" style="margin-left: {level * 1.5}rem;">
-			{#if level > 0}
-				{#each Array(level) as _, i}
-					<div
-						class="absolute top-0 h-full w-px bg-gray-300"
-						style="left: {i * 1.5}rem;"
-					></div>
-				{/each}
-			{/if}
-			<div class="relative z-10">
-				<ThreadCommentReplyForm parentId={comment.id} data={createForm} bind:open={replying} />
+		</Card>
+		{#if replying}
+			<div class="relative mt-2" style="margin-left: {level * 1.5}rem;">
+				<div class="relative z-10">
+					<ThreadCommentReplyForm parentId={comment.id} data={createForm} bind:open={replying} />
+				</div>
 			</div>
-		</div>
+		{/if}
 	{/if}
 </div>
-<ThreadDeleteCommentDialog commentId={comment.id} data={deleteForm} bind:open={openDeleteDialog} />
+{#if !comment.is_deleted}
+    <ThreadDeleteCommentDialog commentId={comment.id} data={deleteForm} bind:open={openDeleteDialog} />
+{/if}
 
 
 {#if comment.replies && comment.replies.length > 0}

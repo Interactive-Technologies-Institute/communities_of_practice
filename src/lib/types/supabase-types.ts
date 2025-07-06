@@ -117,6 +117,7 @@ export type Database = MergeDeep<
 						inserted_at: string;
 						updated_at: string;
 						is_reply: boolean;
+						is_deleted: boolean;
 						parent_id: number | null;
 						fts: unknown;
 						moderation_status: Database['public']['Enums']['moderation_status'];

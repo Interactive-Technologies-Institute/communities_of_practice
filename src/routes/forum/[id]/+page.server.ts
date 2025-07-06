@@ -233,17 +233,86 @@ export const actions = {
             }),
     deleteThreadComment: async (event) =>
         handleFormAction(event, deleteThreadCommentSchema, 'delete-thread-comment', async (event, userId, form) => {
-            const { error: supabaseError } = await event.locals.supabase
+            // Check if the comment has replies
+            const { data: replies, error: repliesError } = await event.locals.supabase
                 .from('thread_comments')
-                .delete()
-                .eq('id', form.data.id)
-                .eq('user_id', userId);
+                .select('id')
+                .eq('parent_id', form.data.id);
 
-            if (supabaseError) {
-                setFlash({ type: 'error', message: supabaseError.message }, event.cookies);
-                return fail(500, { message: supabaseError.message, form });
+            if (repliesError) {
+                setFlash({ type: 'error', message: repliesError.message }, event.cookies);
+                return fail(500, { message: repliesError.message, form });
             }
 
+            if (replies && replies.length > 0) {
+                // Don't delete completely if there are replies
+                const { error: updateError } = await event.locals.supabase
+                    .from('thread_comments')
+                    .update({
+                        is_deleted: true,
+                    })
+                    .eq('id', form.data.id)
+                    .eq('user_id', userId);
+
+                if (updateError) {
+                    setFlash({ type: 'error', message: updateError.message }, event.cookies);
+                    return fail(500, { message: updateError.message, form });
+                }
+            } else {
+                // Hard-delete if no replies
+                const { data: parentData, error: parentError } = await event.locals.supabase
+                    .from('thread_comments')
+                    .select('parent_id')
+                    .eq('id', form.data.id)
+                    .single();
+
+                if (parentError) {
+                    setFlash({ type: 'error', message: parentError.message }, event.cookies);
+                    return fail(500, { message: parentError.message, form });
+                }
+
+                const { error: supabaseError } = await event.locals.supabase
+                    .from('thread_comments')
+                    .delete()
+                    .eq('id', form.data.id)
+                    .eq('user_id', userId);
+
+                if (supabaseError) {
+                    setFlash({ type: 'error', message: supabaseError.message }, event.cookies);
+                    return fail(500, { message: supabaseError.message, form });
+                }
+
+                if (parentData && parentData.parent_id) {
+                    // Check if parent should be hard-deleted
+                    const { data: parent, error: parentFetchError } = await event.locals.supabase
+                    .from('thread_comments')
+                    .select('id, is_deleted')
+                    .eq('id', parentData.parent_id)
+                    .single();
+
+                    if (parentFetchError) {
+                        setFlash({ type: 'error', message: parentFetchError.message }, event.cookies);
+                        return fail(500, { message: parentFetchError.message, form });
+                    }
+                    
+                    if (parent && parent.is_deleted) {
+                        // Check if parent is soft-deleted and has no non-deleted replies
+                        const { count, error: countError } = await event.locals.supabase
+                            .from('thread_comments')
+                            .select('id', { count: 'exact', head: true })
+                            .eq('parent_id', parent.id)
+                            .eq('is_deleted', false);
+
+                        if (!countError && count === 0) {
+                            // Hard-delete the parent comment
+                            await event.locals.supabase
+                                .from('thread_comments')
+                                .delete()
+                                .eq('id', parent.id);
+                        }
+                    }
+                }
+            }
             return { form };
         }),
     editThreadComment: async (event) =>

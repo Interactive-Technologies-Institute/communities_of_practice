@@ -1,6 +1,6 @@
 import type { User } from '@supabase/supabase-js';
 
-export type Feature = 'map' | 'guides' | 'events' | 'docs' | 'forum_threads' | 'users';
+export type Feature = 'map' | 'guides' | 'events' | 'docs' | 'forum_threads' | 'contents' | 'users';
 
 export type UserRole = 'user' | 'moderator' | 'admin';
 
@@ -191,6 +191,7 @@ export type ThreadComment = {
 	inserted_at: string;
 	updated_at: string;
 	is_reply: boolean;
+	is_deleted: boolean;
 	parent_id: number | null;
   };  
 
@@ -220,7 +221,12 @@ export type NotificationType =
 	| 'forum_thread_changes_requested'
 	| 'forum_thread_approved'
 	| 'forum_thread_rejected'
-	| 'forum_thread_announcement';
+	| 'forum_thread_announcement'
+	| 'content_pending'
+	| 'content_changes_requested'
+	| 'content_approved'
+	| 'content_rejected'
+	| 'content_announcement';
 
 export type Notification = {
 	id: number;
