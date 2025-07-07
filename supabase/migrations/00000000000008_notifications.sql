@@ -23,6 +23,7 @@ create type public.notification_type as enum (
 	'forum_thread_rejected',
 	'forum_thread_announcement',
 	'content_pending',
+	'content_pending_moderation',
 	'content_changes_requested',
 	'content_approved',
 	'content_rejected',

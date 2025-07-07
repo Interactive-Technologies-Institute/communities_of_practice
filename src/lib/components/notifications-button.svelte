@@ -41,6 +41,7 @@
 		forum_thread_rejected: 'Your thread has been rejected',
 		forum_thread_announcement: 'A new thread has been approved',
 		content_pending: 'Your content is pending moderation',
+		content_pending_moderation: 'A content is pending moderation',
 		content_changes_requested: 'Your content needs changes',
 		content_approved: 'Your content has been approved',
 		content_rejected: 'Your content has been rejected',
@@ -77,6 +78,7 @@
 			case 'forum_thread_announcement':
 				return `/forum/${notification.data.thread_id ?? 'error'}`;
 			case 'content_pending':
+			case 'content_pending_moderation':
 			case 'content_changes_requested':
 			case 'content_approved':
 			case 'content_rejected':

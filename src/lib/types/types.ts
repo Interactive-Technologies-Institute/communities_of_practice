@@ -193,11 +193,23 @@ export type ThreadComment = {
 	is_reply: boolean;
 	is_deleted: boolean;
 	parent_id: number | null;
-  };  
+};  
 
-  export type ThreadCommentWithAuthorAndLikes = ThreadComment & { author: UserProfile, likes_count: number };
+export type ThreadCommentWithAuthorAndLikes = ThreadComment & { author: UserProfile, likes_count: number };
 
-  export type NestedComment = ThreadCommentWithAuthorAndLikes & { replies: NestedComment[], parent_author?: string;};
+export type NestedComment = ThreadCommentWithAuthorAndLikes & { replies: NestedComment[], parent_author?: string;};
+
+export type Content = {
+	id: number;
+	inserted_at: string;
+	updated_at: string;
+	user_id: string;
+	title: string;
+	description: string | null;
+	file: string;
+	mime_type: string | null;
+	tags: string[];
+};
 
 export type NotificationType =
 	| 'guide_pending'
@@ -223,6 +235,7 @@ export type NotificationType =
 	| 'forum_thread_rejected'
 	| 'forum_thread_announcement'
 	| 'content_pending'
+	| 'content_pending_moderation'
 	| 'content_changes_requested'
 	| 'content_approved'
 	| 'content_rejected'

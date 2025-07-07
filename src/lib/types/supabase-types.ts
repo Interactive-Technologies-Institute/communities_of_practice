@@ -124,6 +124,23 @@ export type Database = MergeDeep<
 						likes_count: number;
 					};
 				};
+				contents_view: {
+					Row: {
+						id: number;
+						inserted_at: string;
+						updated_at: string;
+						user_id: string;
+						title: string;
+						description: string | null;
+						file: string;
+						mime_type: string | null;
+						file_type: string; 
+						tags: string[];
+						fts: unknown;
+						moderation_status: Database['public']['Enums']['moderation_status'];
+						downloads_count: number;
+					};
+				};
 				latest_events_moderation: {
 					Row: {
 						comment: string;

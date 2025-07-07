@@ -6,10 +6,9 @@ create table public.contents (
     user_id uuid references public.profiles on delete cascade not null,
     title text not null,
     description text,
-    file_path text not null,
+    file text not null,
     mime_type text not null,
     tags text [] not null default '{}',
-    is_public boolean not null default true
 );
 alter table public.contents
 add column fts tsvector generated always as (
@@ -66,8 +65,33 @@ select distinct on (content_id) *
 from public.contents_moderation
 order by content_id,
     inserted_at desc;
-create view public.contents_view with (security_invoker = on) as
-select c.*,
+create or replace view public.contents_view
+with (security_invoker = on) as
+select
+    c.*,
+    case
+        when c.mime_type like 'image/%' then 'Image'
+        when c.mime_type like 'video/%' then 'Video'
+        when c.mime_type like 'audio/%' then 'Audio'
+        when c.mime_type like 'text/%' then 'Text'
+        when c.mime_type = 'application/pdf' then 'PDF'
+        when c.mime_type in (
+            'application/zip',
+            'application/x-7z-compressed',
+            'application/x-rar-compressed',
+            'application/x-tar'
+        ) then 'Archive'
+        when c.mime_type = 'application/json' then 'JSON'
+        when c.mime_type in (
+            'application/vnd.ms-excel',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        ) then 'Spreadsheet'
+        when c.mime_type in (
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        ) then 'Word Doc'
+        else 'File'
+    end as file_type,
     m.status as moderation_status,
     coalesce(
         (
@@ -78,7 +102,8 @@ select c.*,
         0
     ) as downloads_count
 from public.contents c
-    left join public.latest_contents_moderation m on c.id = m.content_id;
+left join public.latest_contents_moderation m on c.id = m.content_id;
+
 create view public.contents_tags with (security_invoker = on) as
 select unnest(tags) as tag,
     count(*) as count
@@ -160,3 +185,5 @@ create policy "Allow users to delete their own contents downloaded" on public.co
 );
 create policy "Allow users to read all download records" on public.contents_downloaded for
 select using (true);
+create policy "Allow users to upload files for their contents" on storage.objects for
+insert to authenticated with check (bucket_id = 'contents');
