@@ -131,7 +131,7 @@ export type Database = MergeDeep<
 						updated_at: string;
 						user_id: string;
 						title: string;
-						description: string | null;
+						description: string;
 						file: string;
 						mime_type: string | null;
 						file_type: string; 
@@ -283,6 +283,16 @@ export type Database = MergeDeep<
 					Returns: {
 						count: number;
 						has_likes: boolean;
+					}[];
+				};
+				get_content_download_count: {
+					Args: {
+						content_id: number;
+						user_id?: string;
+					};
+					Returns: {
+						count: number;
+						has_download: boolean;
 					}[];
 				};
 			};

@@ -205,7 +205,7 @@ export type Content = {
 	updated_at: string;
 	user_id: string;
 	title: string;
-	description: string | null;
+	description: string;
 	file: string;
 	mime_type: string | null;
 	tags: string[];

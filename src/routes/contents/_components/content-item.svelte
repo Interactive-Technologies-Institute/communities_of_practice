@@ -1,13 +1,10 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { AspectRatio } from '@/components/ui/aspect-ratio';
 	import { Badge } from '@/components/ui/badge';
 	import { Button } from '@/components/ui/button';
 	import { Card } from '@/components/ui/card';
 	import type { Content } from '@/types/types';
-	import { Tag, FileImage, FileVideo, FileText, File, FileAudio, FileArchive, FileType2 } from 'lucide-svelte';
-	import * as Avatar from '@/components/ui/avatar';
-	import { firstAndLastInitials } from '@/utils';
+	import { Tag, FileImage, FileVideo, FileText, File, FileAudio, FileArchive, FileType2, Download } from 'lucide-svelte';
 
 	export let content: Content;
 
@@ -50,9 +47,28 @@
 		}
 	}
 
+	async function handleDownload(event: MouseEvent) {
+		event.stopPropagation();
+		event.preventDefault();
+		const { data, error } = await $page.data.supabase.storage.from('contents').download(content.file);
+
+		if (error) {
+			console.error('Download failed:', error.message);
+			alert('Could not download file.');
+			return;
+		}
+		const url = URL.createObjectURL(data);
+		const a = Object.assign(document.createElement('a'), {
+			href: url,
+			download: content.file
+		});
+		a.click();
+		URL.revokeObjectURL(url);
+	}
+
 </script>
 
-<div class="h-full">
+<a href="/contents/{content.id}" class="h-full">
 	<Card class="relative flex h-full flex-col overflow-hidden">
 		<div class="flex flex-1 flex-col px-4 py-3">
 			<div class="flex items-center justify-between">
@@ -63,9 +79,14 @@
 						{fileTypeDisplay(content.mime_type)}
 					</Badge>
 				</div>
-				<p class="text-xs text-muted-foreground">{"Inserted at " + new Date(content.inserted_at).toLocaleDateString()}</p>
+				<div class="flex items-center gap-2">
+					<p class="text-xs text-muted-foreground">{"Inserted at " + new Date(content.inserted_at).toLocaleDateString()}</p>
+					<Button variant="ghost" size="sm" on:click={handleDownload} aria-label="Download">
+						<Download class="h-4 w-4" />
+					</Button>
+				</div>
 			</div>
 		</div>
 	</Card>
-</div>
+</a>
 

@@ -8,8 +8,7 @@ export const createContentSchema = z.object({
   description: z
     .string()
     .min(10, { message: 'Description must be at least 10 characters' })
-    .max(5000, { message: 'Description must be less than 5000 characters' })
-    .nullable(),
+    .max(500, { message: 'Description must be less than 500 characters' }),
   fileUrl: z.string().nullish(),
   file: z.instanceof(File).nullish(),
   mimeType: z.string().nullish(),
@@ -33,8 +32,9 @@ export const deleteContentSchema = z.object({
 
 export type DeleteContentSchema = typeof deleteContentSchema;
 
-export const toggleContentLikeSchema = z.object({
+export const downloadContentSchema = z.object({
   value: z.boolean(),
+  file: z.string(),
 });
 
-export type ToggleContentLikeSchema = typeof toggleContentLikeSchema;
+export type DownloadContentSchema = typeof downloadContentSchema;
