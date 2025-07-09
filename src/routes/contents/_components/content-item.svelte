@@ -8,6 +8,13 @@
 
 	export let content: Content;
 
+	const moderationStatusLabels = {
+		pending: 'Pending',
+		approved: 'Approved',
+		changes_requested: 'Changes Requested',
+		rejected: 'Rejected',
+	};
+
 	function getFileIcon(mimeType: string | null) {
 		if (!mimeType) return File;
 		if (mimeType.startsWith('image/')) return FileImage;
@@ -74,10 +81,17 @@
 			<div class="flex items-center justify-between">
 				<div class="flex items-center gap-2">
 					<svelte:component this={getFileIcon(content.mime_type)} class="h-8 w-8 text-muted-foreground" />
-					<p class="text-sm font-medium">{content.title}</p>
+					<p class="text-sm line-clamp-1 break-all font-medium">{content.title}</p>
 					<Badge class="text-[10px] font-normal px-1.5 py-0.5">
 						{fileTypeDisplay(content.mime_type)}
 					</Badge>
+					{#if content.moderation_status !== 'approved'}
+						<Badge class="text-[10px] font-normal px-1.5 py-0.5"
+							variant={content.moderation_status === 'rejected' ? 'destructive' : 'secondary'}
+						>
+							{moderationStatusLabels[content.moderation_status]}
+						</Badge>
+					{/if}
 				</div>
 				<div class="flex items-center gap-2">
 					<p class="text-xs text-muted-foreground">{"Inserted at " + new Date(content.inserted_at).toLocaleDateString()}</p>

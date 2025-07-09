@@ -58,7 +58,7 @@
 			{/if}
 		</AspectRatio>
 		<div class="flex flex-1 flex-col px-4 py-3">
-			<h1 class="text-2xl font-bold tracking-tight text-foreground mb-3">{data.event.title}</h1>
+			<h1 class="text-2xl font-bold tracking-tight text-foreground mb-3 break-words">{data.event.title}</h1>
 			<div class="flex flex-row gap-x-4">
 				<div class="flex flex-row items-center gap-x-2">
 					<Calendar class="text-muted-foreground" />

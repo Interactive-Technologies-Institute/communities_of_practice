@@ -209,6 +209,7 @@ export type Content = {
 	file: string;
 	mime_type: string | null;
 	tags: string[];
+	moderation_status: ModerationStatus;
 };
 
 export type NotificationType =

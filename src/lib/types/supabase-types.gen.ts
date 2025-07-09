@@ -49,7 +49,7 @@ export type Database = {
       }
       contents: {
         Row: {
-          description: string | null
+          description: string
           file: string
           fts: unknown | null
           id: number
@@ -61,7 +61,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
-          description?: string | null
+          description?: string
           file: string
           fts?: unknown | null
           id?: number
@@ -73,7 +73,7 @@ export type Database = {
           user_id: string
         }
         Update: {
-          description?: string | null
+          description?: string
           file?: string
           fts?: unknown | null
           id?: number

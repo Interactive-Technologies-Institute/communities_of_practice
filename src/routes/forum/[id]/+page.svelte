@@ -71,7 +71,7 @@
 					</p>
 				</div>
 			</div>
-			<h1 class="text-2xl font-bold tracking-tight text-foreground mb-3">{data.thread.title}</h1>
+			<h1 class="text-2xl font-bold tracking-tight text-foreground mb-3 break-words">{data.thread.title}</h1>
 			{#if data.thread.image !== null && data.thread.image !== undefined}
 				<InteractableImage src={data.thread.image} class="w-full object-contain rounded mb-3"/>
 			{/if}

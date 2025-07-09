@@ -183,6 +183,24 @@ create policy "Allow users to delete their own contents downloaded" on public.co
     )
     and auth.uid() = user_id
 );
+create policy "Allow users to read approved contents moderation" on public.contents_moderation for
+select using (
+		status = 'approved'::public.moderation_status
+	);
+create policy "Allow users to read their own contents moderation" on public.contents_moderation for
+select using (auth.uid() = user_id);
+create policy "Allow moderators to read all contents moderation" on public.contents_moderation for
+select using (
+		(
+			select authorize('contents.moderate')
+		)
+	);
+create policy "Allow moderators to insert all contents moderation" on public.contents_moderation for
+insert with check (
+		(
+			select authorize('contents.moderate')
+		)
+	);
 create policy "Allow users to read all download records" on public.contents_downloaded for
 select using (true);
 create policy "Allow users to upload files for their contents" on storage.objects for
