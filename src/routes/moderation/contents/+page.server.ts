@@ -10,13 +10,27 @@ export const load = async (event) => {
     const search = stringQueryParam().decode(event.url.searchParams.get('s'));
     const fileTypes = arrayQueryParam().decode(event.url.searchParams.get('fileTypes'));
     const tags = arrayQueryParam().decode(event.url.searchParams.get('tags'));
+    const sortBy = stringQueryParam().decode(event.url.searchParams.get('sortBy'));
+    const sortOrder = stringQueryParam().decode(event.url.searchParams.get('sortOrder'));
 
     async function getContents(): Promise<ContentWithModeration[]> {
         let query = event.locals.supabase
             .from('contents_view')
-            .select('*, moderation:latest_contents_moderation!inner(status, inserted_at, comment)')
-            .order('updated_at', { ascending: false });
-
+            .select('*, moderation:latest_contents_moderation!inner(status, inserted_at, comment)');
+        
+        if (sortBy === 'date_inserted') {
+            query = query.order('inserted_at', { ascending: sortOrder === 'asc' });
+        }
+        else if (sortBy === 'downloads') {
+            query = query.order('downloads_count', { ascending: sortOrder === 'asc' });
+        } 
+        else if (sortBy === 'title') {
+			query = query.order('title', { ascending: sortOrder === 'asc' });
+		}
+        else {
+            query = query.order('updated_at', { ascending: false });
+        }
+        
         if (search) {
             query = query.textSearch('fts', search, { config: 'simple', type: 'websearch' });
         }

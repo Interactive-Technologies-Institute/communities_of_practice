@@ -5,7 +5,7 @@ create table public.contents (
     updated_at timestamptz not null default timezone('utc', now()),
     user_id uuid references public.profiles on delete cascade not null,
     title text not null,
-    description text,
+    description text not null,
     file text not null,
     mime_type text not null,
     tags text [] not null default '{}',

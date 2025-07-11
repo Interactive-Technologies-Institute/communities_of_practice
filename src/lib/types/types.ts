@@ -212,6 +212,8 @@ export type Content = {
 	moderation_status: ModerationStatus;
 };
 
+export type ContentWithCounter = Content & { downloads_count: number };
+
 export type ContentWithModeration = Content & { moderation: ModerationInfo[] };
 
 export type NotificationType =

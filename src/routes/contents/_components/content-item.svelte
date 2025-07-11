@@ -3,10 +3,10 @@
 	import { Badge } from '@/components/ui/badge';
 	import { Button } from '@/components/ui/button';
 	import { Card } from '@/components/ui/card';
-	import type { Content } from '@/types/types';
+	import type { ContentWithCounter } from '@/types/types';
 	import { Tag, FileImage, FileVideo, FileText, File, FileAudio, FileArchive, FileType2, Download } from 'lucide-svelte';
 
-	export let content: Content;
+	export let content: ContentWithCounter;
 
 	const moderationStatusLabels = {
 		pending: 'Pending',
@@ -93,9 +93,10 @@
 						</Badge>
 					{/if}
 				</div>
-				<div class="flex items-center gap-2">
-					<p class="text-xs text-muted-foreground">{"Inserted at " + new Date(content.inserted_at).toLocaleDateString()}</p>
+				<div class="flex items-center gap-2 ml-2">
+					<p class="text-xs text-muted-foreground">{new Date(content.inserted_at).toLocaleDateString()}</p>
 					<Button variant="ghost" size="sm" on:click={handleDownload} aria-label="Download">
+						<p class="text-xs mr-1">{content.downloads_count}</p>
 						<Download class="h-4 w-4" />
 					</Button>
 				</div>

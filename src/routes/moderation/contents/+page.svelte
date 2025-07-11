@@ -5,13 +5,16 @@
 	import { arrayQueryParam, stringQueryParam } from '@/utils';
 	import { queryParam } from 'sveltekit-search-params';
 	import ContentsModerationTable from './_components/contents-moderation-table.svelte';
-
+	import SortButton from '@/components/sort-button.svelte';
+	
 	export let data;
 
 	const search = queryParam('s', stringQueryParam(), {
 		debounceHistory: 500,
 	});
 	const fileTypes = queryParam('fileTypes', arrayQueryParam());
+	const sortBy = queryParam('sortBy', stringQueryParam());
+	const sortOrder = queryParam('sortOrder', stringQueryParam());
 	const tags = queryParam('tags', arrayQueryParam());
 </script>
 
@@ -19,6 +22,7 @@
 	<div class="flex flex-1 flex-row gap-x-2 sm:gap-x-4 md:flex-auto">
 		<Input placeholder="Search..." class="flex-1 sm:max-w-64" bind:value={$search}></Input>
 		<ContentFilterButton tags={data.tags} bind:tagFilters={$tags} bind:typeFilters={$fileTypes} />
+		<SortButton bind:sortBy={$sortBy} bind:sortOrder={$sortOrder} section='contents'/>
 	</div>
 	<ContentsModerationTable contents={data.contents} updateModerationForm={data.updateModerationForm} />
 </Tabs.Content>

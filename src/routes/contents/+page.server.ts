@@ -1,7 +1,7 @@
 import { arrayQueryParam, stringQueryParam } from '@/utils';
 import { error } from '@sveltejs/kit';
 import { setFlash } from 'sveltekit-flash-message/server';
-import type { Content } from '@/types/types';
+import type { ContentWithCounter } from '@/types/types';
 
 export const load = async (event) => {
     const search = stringQueryParam().decode(event.url.searchParams.get('s'));
@@ -10,7 +10,7 @@ export const load = async (event) => {
     const sortBy = stringQueryParam().decode(event.url.searchParams.get('sortBy'));
     const sortOrder = stringQueryParam().decode(event.url.searchParams.get('sortOrder'));
 
-    async function getContents(): Promise<Content[]> {
+    async function getContents(): Promise<ContentWithCounter[]> {
         let query = event.locals.supabase
             .from('contents_view')
             .select('*')
@@ -18,6 +18,9 @@ export const load = async (event) => {
 
         if (sortBy === 'date_inserted') {
             query = query.order('inserted_at', { ascending: sortOrder === 'asc' });
+        }
+        else if (sortBy === 'downloads') {
+            query = query.order('downloads_count', { ascending: sortOrder === 'asc' });
         } 
         else if (sortBy === 'title') {
 			query = query.order('title', { ascending: sortOrder === 'asc' });

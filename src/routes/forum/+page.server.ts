@@ -15,15 +15,16 @@ export const load = async (event) => {
             .from('forum_threads_view')
             .select('*, author:profiles_view!inner(*)');
 
-            if (sortBy === 'date_inserted') {
-				query = query.order('inserted_at', { ascending: sortOrder === 'asc' });
-			} 
-            else if (sortBy === 'likes') {
-                query = query.order('likes_count', { ascending: sortOrder === 'asc' });
-            }
-			else {
-				query = query.order('moderation_status', { ascending: true }).order('inserted_at', { ascending: false });
-            }
+        if (sortBy === 'date_inserted') {
+            query = query.order('inserted_at', { ascending: sortOrder === 'asc' });
+        } 
+        else if (sortBy === 'likes') {
+            query = query.order('likes_count', { ascending: sortOrder === 'asc' });
+        }
+        else {
+            query = query.order('moderation_status', { ascending: true }).order('inserted_at', { ascending: false });
+        }
+        
         if (search) {
             query = query.textSearch('fts', search, { config: 'simple', type: 'websearch' });
         }
