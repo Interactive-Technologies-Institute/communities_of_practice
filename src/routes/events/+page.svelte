@@ -1,6 +1,5 @@
 <script lang="ts">
 	import PageHeader from '@/components/page-header.svelte';
-	import TagFilterButton from '@/components/tag-filter-button.svelte';
 	import { Button } from '@/components/ui/button';
 	import { Input } from '@/components/ui/input';
 	import { arrayQueryParam, stringQueryParam } from '@/utils';

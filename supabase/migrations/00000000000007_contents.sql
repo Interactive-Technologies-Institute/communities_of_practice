@@ -103,7 +103,6 @@ select
     ) as downloads_count
 from public.contents c
 left join public.latest_contents_moderation m on c.id = m.content_id;
-
 create view public.contents_tags with (security_invoker = on) as
 select unnest(tags) as tag,
     count(*) as count

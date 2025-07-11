@@ -19,11 +19,7 @@
 	const fileTypes = queryParam('fileTypes', arrayQueryParam());
 	const sortBy = queryParam('sortBy', stringQueryParam());
 	const sortOrder = queryParam('sortOrder', stringQueryParam());
-
-	/*const search = queryParam('s', stringQueryParam(), {
-		debounceHistory: 500,
-	});
-	const tags = queryParam('tags', arrayQueryParam());*/
+	const tags = queryParam('tags', arrayQueryParam());
 </script>
 
 <MetaTags title="Contents" description="View all the contents of the community" />
@@ -32,7 +28,7 @@
 <div class="container mx-auto max-w-3xl flex flex-row justify-between gap-x-2">
 	<div class="flex flex-1 flex-row gap-x-2 sm:gap-x-4 md:flex-auto">
 		<Input placeholder="Search..." class="flex-1 sm:max-w-64" bind:value={$search}></Input>
-		<ContentFilterButton bind:filterValues={$fileTypes} />
+		<ContentFilterButton tags={data.tags} bind:tagFilters={$tags} bind:typeFilters={$fileTypes} />
 		<SortButton bind:sortBy={$sortBy} bind:sortOrder={$sortOrder} section='contents'/>
 	</div>
 	<Button href="/contents/create" class="w-10 p-0 sm:w-auto sm:px-4 sm:py-2">

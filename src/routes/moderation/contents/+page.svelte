@@ -1,24 +1,24 @@
 <script lang="ts">
-	import EventFilterButton from '@/components/event-filter-button.svelte';
+	import ContentFilterButton from '@/components/content-filter-button.svelte';
 	import { Input } from '@/components/ui/input';
 	import * as Tabs from '@/components/ui/tabs';
 	import { arrayQueryParam, stringQueryParam } from '@/utils';
 	import { queryParam } from 'sveltekit-search-params';
-	import EventsModerationTable from './_components/events-moderation-table.svelte';
+	import ContentsModerationTable from './_components/contents-moderation-table.svelte';
 
 	export let data;
 
 	const search = queryParam('s', stringQueryParam(), {
 		debounceHistory: 500,
 	});
+	const fileTypes = queryParam('fileTypes', arrayQueryParam());
 	const tags = queryParam('tags', arrayQueryParam());
-	const statuses = queryParam('statuses', arrayQueryParam());
 </script>
 
-<Tabs.Content value="events" class="mt-8 flex flex-col gap-y-4">
+<Tabs.Content value="contents" class="mt-8 flex flex-col gap-y-4">
 	<div class="flex flex-1 flex-row gap-x-2 sm:gap-x-4 md:flex-auto">
 		<Input placeholder="Search..." class="flex-1 sm:max-w-64" bind:value={$search}></Input>
-		<EventFilterButton tags={data.tags} bind:tagFilters={$tags} bind:statusFilters={$statuses} />
+		<ContentFilterButton tags={data.tags} bind:tagFilters={$tags} bind:typeFilters={$fileTypes} />
 	</div>
-	<EventsModerationTable events={data.events} updateModerationForm={data.updateModerationForm} />
+	<ContentsModerationTable contents={data.contents} updateModerationForm={data.updateModerationForm} />
 </Tabs.Content>

@@ -207,6 +207,70 @@ export type Database = {
           },
         ]
       }
+      event_contents: {
+        Row: {
+          content_id: number
+          event_id: number
+          inserted_at: string
+          user_id: string
+        }
+        Insert: {
+          content_id: number
+          event_id: number
+          inserted_at?: string
+          user_id: string
+        }
+        Update: {
+          content_id?: number
+          event_id?: number
+          inserted_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_contents_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "contents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_contents_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "contents_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_contents_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_contents_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_contents_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_contents_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_view"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           allow_voting: boolean
@@ -1317,6 +1381,134 @@ export type Database = {
           },
         ]
       }
+      thread_contents: {
+        Row: {
+          content_id: number
+          inserted_at: string
+          thread_id: number
+          user_id: string
+        }
+        Insert: {
+          content_id: number
+          inserted_at?: string
+          thread_id: number
+          user_id: string
+        }
+        Update: {
+          content_id?: number
+          inserted_at?: string
+          thread_id?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "thread_contents_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "contents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "thread_contents_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "contents_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "thread_contents_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "forum_threads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "thread_contents_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "forum_threads_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "thread_contents_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "thread_contents_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_view"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      thread_events: {
+        Row: {
+          event_id: number
+          inserted_at: string
+          thread_id: number
+          user_id: string
+        }
+        Insert: {
+          event_id: number
+          inserted_at?: string
+          thread_id: number
+          user_id: string
+        }
+        Update: {
+          event_id?: number
+          inserted_at?: string
+          thread_id?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "thread_events_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "thread_events_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "thread_events_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "forum_threads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "thread_events_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "forum_threads_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "thread_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "thread_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_view"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           id: string
@@ -2114,6 +2306,12 @@ export type Database = {
         | "contents.update"
         | "contents.delete"
         | "contents.moderate"
+        | "thread_contents.create"
+        | "thread_contents.delete"
+        | "thread_events.create"
+        | "thread_events.delete"
+        | "event_contents.create"
+        | "event_contents.delete"
       user_role: "user" | "moderator" | "admin"
     }
     CompositeTypes: {
@@ -2329,6 +2527,12 @@ export const Constants = {
         "contents.update",
         "contents.delete",
         "contents.moderate",
+        "thread_contents.create",
+        "thread_contents.delete",
+        "thread_events.create",
+        "thread_events.delete",
+        "event_contents.create",
+        "event_contents.delete",
       ],
       user_role: ["user", "moderator", "admin"],
     },

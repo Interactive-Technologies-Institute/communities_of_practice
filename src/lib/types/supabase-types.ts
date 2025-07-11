@@ -191,6 +191,17 @@ export type Database = MergeDeep<
 						comment: string;
 					};
 				};
+				latest_contents_moderation: {
+					Row: {
+						id: number;
+						inserted_at: string;
+						content_id: number;
+						user_id: string;
+						status: Database['public']['Enums']['moderation_status'];
+						comment: string;
+					};
+				};
+
 				map_pins_view: {
 					Row: {
 						id: number;

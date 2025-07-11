@@ -212,6 +212,8 @@ export type Content = {
 	moderation_status: ModerationStatus;
 };
 
+export type ContentWithModeration = Content & { moderation: ModerationInfo[] };
+
 export type NotificationType =
 	| 'guide_pending'
 	| 'guide_changes_requested'

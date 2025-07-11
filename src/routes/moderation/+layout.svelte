@@ -17,6 +17,7 @@
 			<Tabs.TriggerLink href="/moderation/guides" value="guides">Guides</Tabs.TriggerLink>
 			<Tabs.TriggerLink href="/moderation/events" value="events">Events</Tabs.TriggerLink>
 			<Tabs.TriggerLink href="/moderation/map" value="map">Map</Tabs.TriggerLink>
+			<Tabs.TriggerLink href="/moderation/contents" value="contents">Contents</Tabs.TriggerLink>
 		</Tabs.List>
 		<slot />
 	</Tabs.Root>
