@@ -53,14 +53,13 @@ export const actions = {
             }
 
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const { fileUrl, file, mimeType, ...data } = form.data;			
+            const { fileUrl, file, ...data } = form.data;			
             const { error: supabaseError } = await event.locals.supabase
                 .from('contents')
                 .insert({
                     ...data,
                     user_id: userId,
-                    file: filePath,
-                    mime_type: mimeType
+                    file: filePath
                 });
 
             if (supabaseError) {

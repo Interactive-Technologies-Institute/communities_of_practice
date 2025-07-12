@@ -1,4 +1,4 @@
-import { createContentSchema } from '@/schemas/content';
+import { editContentSchema } from '@/schemas/content';
 import { handleFormAction, handleSignInRedirect } from '@/utils';
 import type { StorageError } from '@supabase/storage-js';
 import { error, fail, redirect } from '@sveltejs/kit';
@@ -33,7 +33,7 @@ export const load = async (event) => {
     const contentData = await getContent(contentId);
 
     return {
-        updateForm: await superValidate(contentData, zod(createContentSchema), {
+        updateForm: await superValidate(contentData, zod(editContentSchema), {
             id: 'update-content',
         }),
     };
@@ -41,7 +41,7 @@ export const load = async (event) => {
 
 export const actions = {
     default: async (event) =>
-        handleFormAction(event, createContentSchema, 'create-content', async (event, userId, form) => {
+        handleFormAction(event, editContentSchema, 'update-content', async (event, userId, form) => {
             async function uploadFile(
                 file: File
             ): Promise<{ path: string; error: StorageError | null }> {
@@ -72,14 +72,13 @@ export const actions = {
             }
 
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const { fileUrl, file, mimeType, ...data } = form.data;			
+            const { fileUrl, file, ...data } = form.data;			
             const { error: supabaseError } = await event.locals.supabase
                 .from('contents')
                 .update({
                     ...data,
                     user_id: userId,
-                    file: filePath,
-                    mime_type: mimeType})
+                    file: filePath})
                 .eq('id', parseInt(event.params.id));
 
             if (supabaseError) {
