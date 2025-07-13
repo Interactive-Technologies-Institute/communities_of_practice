@@ -7,7 +7,7 @@
 	import { PlusCircle } from 'lucide-svelte';
 	import { MetaTags } from 'svelte-meta-tags';
 	import { queryParam } from 'sveltekit-search-params';
-	import CommentItem from './_components/content-item.svelte';
+	import ContentItem from './_components/content-item.svelte';
 	import SortButton from '@/components/sort-button.svelte';
 	import ContentFilterButton from '@/components/content-filter-button.svelte';
 
@@ -38,6 +38,6 @@
 </div>
 <div class="container mx-auto max-w-5xl flex flex-col gap-y-6 py-10">
 	{#each data.contents as content}
-		<CommentItem {content} />
+		<ContentItem {content} />
 	{/each}
 </div>
