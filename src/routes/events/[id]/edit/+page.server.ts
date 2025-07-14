@@ -116,6 +116,6 @@ export const actions = {
 				return fail(500, withFiles({ message: supabaseError.message, form }));
 			}
 
-			return redirect(303, `/events/${event.params.id}`);
+			
 		}),
 };

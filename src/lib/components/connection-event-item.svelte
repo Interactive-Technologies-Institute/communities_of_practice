@@ -9,6 +9,19 @@
 	import type { EventWithCounters } from '@/types/types';
 
 	export let event: EventWithCounters;
+    export let selectedEventIds: number[];
+
+    $: checked = selectedEventIds.includes(event.id);
+
+	function toggleCheckbox(e: Event) {
+		e.stopPropagation();
+		e.preventDefault();
+		if (checked) {
+			selectedEventIds = selectedEventIds.filter(id => id !== event.id);
+		} else {
+			selectedEventIds = [...selectedEventIds, event.id];
+		}
+	}
 
 	const moderationStatusLabels = {
 		pending: 'Pending',
@@ -36,7 +49,7 @@
 	$: imageUrl = $page.data.supabase.storage.from('events').getPublicUrl(event.image).data.publicUrl;
 </script>
 
-<a href="/events/{event.id}" class="h-full">
+<a href="/events/{event.id}" target="_blank" rel="noopener noreferrer" class="h-full">
 	<Card class="relative flex h-full flex-col overflow-hidden">
 		<AspectRatio ratio={3 / 2}>
 			{#if imageUrl}
@@ -84,12 +97,14 @@
 					</div>
 				</div>
 				<div class="flex items-center gap-3 flex-wrap">
-					{#each event.tags as tag}
-						<a href={`/events?tags=${tag}`} class="flex items-center gap-1 hover:underline">
-							<Tag class="h-4 w-4" />
-							<span>{tag}</span>
-						</a>
-					{/each}
+					<input
+						type="checkbox"
+						name="eventIds"
+						value={event.id}
+						checked={checked}
+						on:change={toggleCheckbox}
+						class="ml-2"
+					/>
 				</div>
 			</div>
 		</div>

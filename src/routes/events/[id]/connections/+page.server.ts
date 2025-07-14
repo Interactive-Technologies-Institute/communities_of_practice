@@ -3,7 +3,7 @@ import { error } from '@sveltejs/kit';
 import { setFlash } from 'sveltekit-flash-message/server';
 import { handleFormAction, handleSignInRedirect } from '@/utils';
 import type { ContentWithCounter } from '@/types/types';
-import { connectEventContentSchema } from '@/schemas/connection';
+import { createEventConnectionsSchema } from '@/schemas/connection';
 import { superValidate } from 'sveltekit-superforms/server';
 import { zod } from 'sveltekit-superforms/adapters';
 import { redirect } from '@sveltejs/kit';
@@ -118,26 +118,25 @@ export const load = async (event) => {
     return {
         contents: await getContents(),
         tags: await getTags(),
-        selectedContentIds: await getConnectedContentIds(eventId),
+        connectedContentIds: await getConnectedContentIds(eventId),
         connectForm: await superValidate(
                     { contentIds: [] },
-                    zod(connectEventContentSchema),
-                    { id: 'connect-event-contents' }
+                    zod(createEventConnectionsSchema),
+                    { id: 'create-event-connections' }
                 ),
     };
 };
 
 export const actions = {
 	default: async (event) =>
-		handleFormAction(event, connectEventContentSchema, 'connect-event-contents', async (event, userId, form) => {
+		handleFormAction(event, createEventConnectionsSchema, 'create-event-connections', async (event, userId, form) => {
             const eventId = parseInt(event.params.id);
             
 			// Delete existing connections
 			await event.locals.supabase
 				.from('event_contents')
 				.delete()
-				.eq('event_id', eventId)
-				.eq('user_id', userId);
+				.eq('event_id', eventId);
 
 			// Insert new connections
 			if (form.data.contentIds.length > 0) {

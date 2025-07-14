@@ -11,18 +11,18 @@
 	import ContentFilterButton from '@/components/content-filter-button.svelte';
 	import { superForm } from 'sveltekit-superforms/client';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import { connectEventContentSchema } from '@/schemas/connection';
+	import { createEventConnectionsSchema } from '@/schemas/connection';
 
 	export let data;
 
 	const form = superForm(data.connectForm, {
-		validators: zodClient(connectEventContentSchema),
+		validators: zodClient(createEventConnectionsSchema),
 		taintedMessage: false
 	});
 
 	const { form: formData, enhance, submitting } = form;
 	
-	let selectedContentIds: number[] = data.selectedContentIds;
+	let selectedContentIds: number[] = data.connectedContentIds;
 
 	$: $formData.contentIds = selectedContentIds;
 
