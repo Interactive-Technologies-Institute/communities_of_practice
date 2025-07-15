@@ -1,5 +1,5 @@
 import { deleteEventSchema, toggleEventInterestSchema, voteOnScheduleSchema, removeVotesSchema } from '@/schemas/event';
-import type { EventWithAuthor, EventVote, ModerationInfo } from '@/types/types';
+import type { EventWithAuthor, EventVote, ModerationInfo, ContentWithCounter } from '@/types/types';
 import { handleFormAction } from '@/utils';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { setFlash } from 'sveltekit-flash-message/server';
@@ -87,6 +87,21 @@ export const load = async (event) => {
 		return { count: interested.count, userInterested: interested.has_interest };
 	}
 
+	async function getConnectedContents(eventId: number): Promise<ContentWithCounter[]> {
+		const { data: connectedContents, error: connectedContentsError } = await await event.locals.supabase
+			.from('event_contents')
+			.select('content:contents_view(*)')
+			.eq('event_id', eventId);
+
+		if (connectedContentsError) {
+			const errorMessage = 'Error fetching connected contents, please try again later.';
+			setFlash({ type: 'error', message: errorMessage }, event.cookies);
+			return error(500, errorMessage);
+		}
+
+		return connectedContents.map((row) => row.content);
+	}
+
 	let hasVoted = false;
 
 	if (user?.id) {
@@ -102,6 +117,7 @@ export const load = async (event) => {
 		votingOptions: await getVotingOptions(eventId),
 		hasVoted: hasVoted,
 		interestCount: interestCount.count,
+		connectedContents: await getConnectedContents(eventId),
 		deleteForm: await superValidate(zod(deleteEventSchema), {
 			id: 'delete-event',
 		}),

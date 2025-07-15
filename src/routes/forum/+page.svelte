@@ -23,7 +23,7 @@
 <MetaTags title="Forum" description="Find & share content with the community" />
 
 <PageHeader title="Forum" subtitle="Find & share content with the community" />
-<div class="container mx-auto max-w-3xl flex flex-row justify-between gap-x-2">
+<div class="container mx-auto max-w-4xl flex flex-row justify-between gap-x-2">
 	<div class="flex flex-1 flex-row gap-x-2 sm:gap-x-4 md:flex-auto">
 		<Input placeholder="Search..." class="flex-1 sm:max-w-64" bind:value={$search}></Input>
 		<TagFilterButton tags={data.tags} bind:filterValues={$tags} />
@@ -34,7 +34,7 @@
 		<span class="sr-only sm:not-sr-only">Create Thread</span>
 	</Button>
 </div>
-<div class="container mx-auto max-w-3xl flex flex-col gap-y-6 py-10">
+<div class="container mx-auto max-w-4xl flex flex-col gap-y-6 py-10">
 	{#each data.forum_threads_with_counters as thread}
 		<ThreadItem {thread} />
 	{/each}

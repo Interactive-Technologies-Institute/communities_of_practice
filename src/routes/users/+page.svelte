@@ -24,14 +24,14 @@
 <MetaTags title="Members" description="View all the members of the community" />
 
 <PageHeader title="Members" subtitle="View all the members of the community" />
-<div class="container mx-auto max-w-3xl flex flex-row justify-between gap-x-2">
+<div class="container mx-auto max-w-4xl flex flex-row justify-between gap-x-2">
 	<div class="flex flex-1 flex-row gap-x-2 sm:gap-x-4 md:flex-auto">
 		<Input placeholder="Search..." class="flex-1 sm:max-w-64" bind:value={$search}></Input>
 		<RoleFilterButton bind:filterValues={$roles} />
 		<SortButton bind:sortBy={$sortBy} bind:sortOrder={$sortOrder} section='members'/>
 	</div>
 </div>
-<div class="container mx-auto max-w-3xl flex flex-col gap-y-6 py-10">
+<div class="container mx-auto max-w-4xl flex flex-col gap-y-6 py-10">
 	{#each data.user_profiles as user}
 		<UserItem {user} />
 	{/each}

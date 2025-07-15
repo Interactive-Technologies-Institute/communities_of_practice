@@ -255,6 +255,6 @@ export const actions = {
                     throw new Error('Failed to connect events to thread');
                 }
             }
-            throw redirect(303, `/forum/${threadId}`);
+            throw redirect(303, `/forum/${threadId}/edit`);
         }),
 };

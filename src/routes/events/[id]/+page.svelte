@@ -5,8 +5,9 @@
 	import Card from '@/components/ui/card/card.svelte';
 	import { AspectRatio } from '@/components/ui/aspect-ratio';
 	import { Button } from '@/components/ui/button';
+	import ContentItem  from '@/components/content-item.svelte';
 	import dayjs from 'dayjs';
-	import { Calendar, MapPin, Pen, Tag, Trash, Text, Video } from 'lucide-svelte';
+	import { Calendar, MapPin, Pen, Tag, Trash, Text, Video, Link } from 'lucide-svelte';
 	import { MetaTags } from 'svelte-meta-tags';
 	import EventDeleteDialog from './_components/event-delete-dialog.svelte';
 	import EventInterestButton from './_components/event-interest-button.svelte';
@@ -15,6 +16,7 @@
 
 	export let data;
 
+	let showConnections = false;
 	let showSummary = false;
 	let showRecording = false;
 	let showTranscription = false;
@@ -47,17 +49,17 @@
 	}}
 />
 
-<div class="container mx-auto max-w-3xl mt-10 space-y-10 pb-10">
+<div class="container mx-auto max-w-4xl mt-10 space-y-6 pb-10">
 	{#if data.moderation[0].status !== 'approved'}
 		<ModerationBanner moderation={data.moderation} />
 	{/if}
-	<Card class="mx-auto p-2 space-y-4">
+	<Card class="mx-auto space-y-4">
 		<AspectRatio ratio={4 / 1}>
 			{#if data.event.image}
 				<img src={data.event.image} alt="Event Cover" class="h-full w-full object-cover" />
 			{/if}
 		</AspectRatio>
-		<div class="flex flex-1 flex-col px-4 py-3">
+		<div class="flex flex-1 flex-col px-4 py-2">
 			<h1 class="text-2xl font-bold tracking-tight text-foreground mb-3 break-words">{data.event.title}</h1>
 			<div class="flex flex-row gap-x-4">
 				<div class="flex flex-row items-center gap-x-2">
@@ -80,9 +82,6 @@
 					{data.event.location}
 				</div>
 			</div>
-			<!--{#if data.event.image !== null && data.event.image !== undefined}
-				<InteractableImage src={data.event.image} class="w-full object-contain rounded mb-3"/>
-			{/if}-->
 			<p class="whitespace-pre-wrap break-words mb-3 mt-3">{data.event.description}</p>
 			<div class="text-base text-muted-foreground flex flex-wrap items-center justify-between w-full">
 				<div class="flex items-center gap-5">
@@ -102,11 +101,11 @@
 			<div class="mt-4 flex items-center justify-between gap-4 border-t pt-4 text-sm text-muted-foreground">
 				<div class="flex gap-4">
 					<EventInterestButton data={data.toggleInterestForm} />
-					{#if data.event.summary}
-						<Button variant="ghost" size="sm" on:click={() => (showSummary = !showSummary)}
-							class={cn('flex items-center gap-2', { 'text-orange-500': showSummary })}>
-							<Text class="h-4 w-4" />
-							Summary
+					{#if data.connectedContents.length > 0}
+						<Button variant="ghost" size="sm" on:click={() => (showConnections = !showConnections)}
+							class={cn('flex items-center gap-2', { 'text-orange-500': showConnections })}>
+							<Link class="h-4 w-4" />
+							Connections
 						</Button>
 					{/if}
 					{#if data.event.recording_link}
@@ -116,8 +115,14 @@
 							Recording
 						</Button>
 					{/if}
+					{#if data.event.summary}
+						<Button variant="ghost" size="sm" on:click={() => (showSummary = !showSummary)}
+							class={cn('flex items-center gap-2', { 'text-orange-500': showSummary })}>
+							<Text class="h-4 w-4" />
+							Summary
+						</Button>
+					{/if}
 				</div>
-
 				{#if data.event.user_id === data.user?.id}
 					<div class="flex gap-2">
 						<Button variant="ghost" size="sm" href="/events/{data.event.id}/edit" class="text-blue-500 gap-2 hover:text-blue-600">
@@ -133,49 +138,55 @@
 			</div>
 		</div>
 	</Card>
-	{#if showSummary && data.event.summary}
-		<Card class="p-4 text-sm">
-			<h2 class="mb-2 text-base font-semibold text-foreground">Summary</h2>
-			<p class="whitespace-pre-wrap">{data.event.summary}</p>
-		</Card>
-	{/if}
-	{#if showRecording && (data.event.recording_link || data.event.transcription)}
-		<Card class="p-4 text-sm">
-			{#if data.event.recording_link}
-				<h2 class="text-base font-semibold text-foreground">Recording</h2>
-				<iframe
-					class="w-full aspect-video rounded"
-					src={getGoogleDriveEmbedUrl(data.event.recording_link)}
-					title={`Recording of event: ${data.event.title}`}
-					allowfullscreen
-				></iframe> 
-			{/if}
-			{#if data.event.transcription}
-				<div class="mt-2 flex justify-center">
-					<button on:click={() => (showTranscription = !showTranscription)}
-						class="mt-2 text-sm font-medium text-blue-600 hover:underline focus:outline-none">
-						{showTranscription ? 'Hide Transcription' : 'Show Transcription'}
-					</button>
-				</div>
-				{#if showTranscription}
-					<h2 class="mb-2 mt-2 text-base font-semibold text-foreground">Transcription</h2>
-					<p class="whitespace-pre-wrap">{data.event.transcription}</p>
+	<div class="mx-auto flex flex-col gap-y-6 mt-6">
+		{#if data.event.moderation_status === "approved" && data.event.allow_voting}
+			<Card class="mx-auto p-2 space-y-4">
+				<h2 class="text-lg font-semibold">Vote for Event Schedule</h2>
+				{#if data.votingOptions.length > 1}
+					<EventVoteSchedule event={data.event} voteOnSchedule={data.voteOnScheduleForm} removeVotes={data.removeVotesForm} votingOptions={data.votingOptions} hasVoted={data.hasVoted}/>
+				{:else}
+					<p class="text-muted-foreground">No voting options available.</p>
 				{/if}
-			{/if}
-		</Card>
-	{/if}
-	{#if data.event.moderation_status === "approved" && data.event.allow_voting}
-		<Card class="mx-auto p-2 space-y-4">
-			<h2 class="text-lg font-semibold">Vote for Event Schedule</h2>
-			{#if data.votingOptions.length > 1}
-				<EventVoteSchedule event={data.event} voteOnSchedule={data.voteOnScheduleForm} removeVotes={data.removeVotesForm} votingOptions={data.votingOptions} hasVoted={data.hasVoted}/>
-			{:else}
-				<p class="text-muted-foreground">No voting options available.</p>
-			{/if}
-		</Card>
-	{/if}
-	<div class="mx-auto flex flex-col gap-y-6 pb-6">
-		
+			</Card>
+		{/if}
+		{#if showConnections && data.connectedContents.length > 0}
+			{#each data.connectedContents as content}
+				<div class="text-sm">
+					<ContentItem {content} />
+				</div>
+			{/each}
+		{/if}
+		{#if showRecording && (data.event.recording_link || data.event.transcription)}
+			<Card class="p-4 text-sm">
+				{#if data.event.recording_link}
+					<h2 class="text-base font-semibold text-foreground">Recording</h2>
+					<iframe
+						class="w-full aspect-video rounded"
+						src={getGoogleDriveEmbedUrl(data.event.recording_link)}
+						title={`Recording of event: ${data.event.title}`}
+						allowfullscreen
+					></iframe> 
+				{/if}
+				{#if data.event.transcription}
+					<div class="mt-2 flex justify-center">
+						<button on:click={() => (showTranscription = !showTranscription)}
+							class="mt-2 text-sm font-medium text-blue-600 hover:underline focus:outline-none">
+							{showTranscription ? 'Hide Transcription' : 'Show Transcription'}
+						</button>
+					</div>
+					{#if showTranscription}
+						<h2 class="mb-2 mt-2 text-base font-semibold text-foreground">Transcription</h2>
+						<p class="whitespace-pre-wrap">{data.event.transcription}</p>
+					{/if}
+				{/if}
+			</Card>
+		{/if}
+		{#if showSummary && data.event.summary}
+			<Card class="p-4 text-sm">
+				<h2 class="mb-2 text-base font-semibold text-foreground">Summary</h2>
+				<p class="whitespace-pre-wrap">{data.event.summary}</p>
+			</Card>
+		{/if}
 	</div>
 </div>
 

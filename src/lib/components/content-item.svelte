@@ -5,6 +5,7 @@
 	import { Card } from '@/components/ui/card';
 	import type { ContentWithCounter } from '@/types/types';
 	import { Tag, FileImage, FileVideo, FileText, File, FileAudio, FileArchive, FileType2, Download } from 'lucide-svelte';
+	import dayjs from 'dayjs';
 
 	export let content: ContentWithCounter;
 
@@ -80,7 +81,9 @@
 		<div class="flex flex-1 flex-col px-4 py-3">
 			<div class="flex items-center justify-between">
 				<div class="flex items-center gap-2">
-					<svelte:component this={getFileIcon(content.mime_type)} class="h-8 w-8 text-muted-foreground" />
+					<div class="h-8 w-8 flex items-center justify-center text-muted-foreground">
+						<svelte:component this={getFileIcon(content.mime_type)} class="h-8 w-8" />
+					</div>
 					<p class="text-sm line-clamp-1 break-all font-medium">{content.title}</p>
 					<Badge class="text-[10px] font-normal px-1.5 py-0.5">
 						{fileTypeDisplay(content.mime_type)}
@@ -94,7 +97,11 @@
 					{/if}
 				</div>
 				<div class="flex items-center gap-2 ml-2">
-					<p class="text-xs text-muted-foreground">{new Date(content.inserted_at).toLocaleDateString()}</p>
+					<p class="text-xs text-muted-foreground whitespace-nowrap overflow-hidden text-ellipsis">{dayjs(`${content.inserted_at}`).format(
+							dayjs(content.inserted_at).year() === dayjs().year()
+								? 'DD/MM'
+								: 'DD/MM/YYYY'
+						)}</p>
 					<Button variant="ghost" size="sm" on:click={handleDownload} aria-label="Download">
 						<p class="text-xs mr-1">{content.downloads_count}</p>
 						<Download class="h-4 w-4" />

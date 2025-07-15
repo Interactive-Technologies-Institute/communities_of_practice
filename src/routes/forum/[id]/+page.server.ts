@@ -1,6 +1,6 @@
 import { deleteThreadSchema, toggleThreadLikeSchema } from '@/schemas/thread';
 import { createThreadCommentSchema, deleteThreadCommentSchema, toggleThreadCommentLikeSchema, updateThreadCommentSchema } from '@/schemas/thread-comment';
-import type { ThreadWithAuthor, ModerationInfo, ThreadCommentWithAuthorAndLikes } from '@/types/types';
+import type { ThreadWithAuthor, ModerationInfo, ThreadCommentWithAuthorAndLikes, Event, ContentWithCounter } from '@/types/types';
 import { handleFormAction } from '@/utils';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { setFlash } from 'sveltekit-flash-message/server';
@@ -151,6 +151,36 @@ export const load = async (event) => {
         );
 	    return commentsWithExtra;
     }
+
+    async function getConnectedContents(threadId: number): Promise<ContentWithCounter[]> {
+        const { data: connectedContents, error: connectedContentsError } = await await event.locals.supabase
+            .from('thread_contents')
+            .select('content:contents_view(*)')
+            .eq('thread_id', threadId);
+
+        if (connectedContentsError) {
+            const errorMessage = 'Error fetching connected contents, please try again later.';
+            setFlash({ type: 'error', message: errorMessage }, event.cookies);
+            return error(500, errorMessage);
+        }
+
+        return connectedContents.map((row) => row.content);
+    }
+
+    async function getConnectedEvents(threadId: number): Promise<Event[]> {
+        const { data: connectedEvents, error: connectedEventsError } = await await event.locals.supabase
+            .from('thread_events')
+            .select('event:events_view(*)')
+            .eq('thread_id', threadId);
+
+        if (connectedEventsError) {
+            const errorMessage = 'Error fetching connected events, please try again later.';
+            setFlash({ type: 'error', message: errorMessage }, event.cookies);
+            return error(500, errorMessage);
+        }
+
+        return connectedEvents.map((row) => row.event);
+    }
     
     const threadId = parseInt(event.params.id);
     if (isNaN(threadId)) throw error(400, 'Invalid thread ID');
@@ -191,6 +221,8 @@ export const load = async (event) => {
         moderation: await getThreadModeration(threadId),
         likesCount: likesCount.count,
         commentsCount,
+        connectedContents: await getConnectedContents(threadId),
+        connectedEvents: await getConnectedEvents(threadId),
         deleteForm: await superValidate(zod(deleteThreadSchema), {
             id: 'delete-thread',
         }),

@@ -4,9 +4,11 @@
 	import ModerationBanner from '@/components/moderation-banner.svelte';
 	import PageHeader from '@/components/page-header.svelte';
 	import { Button } from '@/components/ui/button';
+	import EventCompactItem from '@/components/event-compact-item.svelte';
+	import ContentItem from '@/components/content-item.svelte';
 	import Card from '@/components/ui/card/card.svelte';
 	import dayjs from 'dayjs';
-	import { ChartNoAxesColumn, Clock, Footprints, Pen, Tag, Trash, Text, MessageSquare, Pencil } from 'lucide-svelte';
+	import { Pen, Tag, Trash, Text, MessageSquare, Link } from 'lucide-svelte';
 	import { MetaTags } from 'svelte-meta-tags';
 	import ThreadDeleteDialog from './_components/thread-delete-dialog.svelte';
 	import ThreadLikeButton from '../_components/thread-like-button.svelte';
@@ -21,6 +23,7 @@
 
 	export let data;
 
+	let showConnections = false;
 	let showCommentForm = false;
 	let showSummary = false;
 	let openDeleteDialog = false;
@@ -49,12 +52,12 @@
 	}}
 />
 
-<div class="container mx-auto max-w-3xl mt-10 space-y-10 pb-10">
+<div class="container mx-auto max-w-4xl mt-10 space-y-6 pb-10">
 	{#if data.moderation[0].status !== 'approved'}
 		<ModerationBanner moderation={data.moderation} />
 	{/if}
 	<Card class="mx-auto p-2 space-y-4">
-		<div class="flex flex-1 flex-col px-4 py-3">
+		<div class="flex flex-1 flex-col px-2 py-3">
 			<div class="flex items-start mb-3 gap-2">
 				<Avatar.Root class="h-10 w-10">
 					<Avatar.Image src={avatarUrl} alt={data.thread.author.display_name} />
@@ -102,6 +105,13 @@
 						<MessageSquare class="h-4 w-4" />
 						Comment
 					</Button>
+					{#if data.connectedContents.length > 0 || data.connectedEvents.length > 0}
+						<Button variant="ghost" size="sm" on:click={() => (showConnections = !showConnections)}
+							class={cn('flex items-center gap-2', { 'text-orange-500': showConnections })}>
+							<Link class="h-4 w-4" />
+							Connections
+						</Button>
+					{/if}
 					{#if data.thread.summary}
 						<Button variant="ghost" size="sm" on:click={() => (showSummary = !showSummary)}
 							class={cn('flex items-center gap-2', { 'text-orange-500': showSummary })}>
@@ -126,18 +136,24 @@
 			</div>
 		</div>
 	</Card>
-	<div class="mx-auto flex flex-col gap-y-6 pb-6">
+	<div class="mx-auto flex flex-col gap-y-6 mt-6">
+		{#if showCommentForm}
+			<ThreadCommentForm data={data.createThreadCommentForm} />
+		{/if}
+		{#if showConnections && (data.connectedContents.length > 0 || data.connectedEvents.length > 0)}
+			{#each data.connectedEvents as event}
+				<EventCompactItem {event}></EventCompactItem>
+			{/each}
+			{#each data.connectedContents as content}
+				<ContentItem {content}></ContentItem>
+			{/each}
+		{/if}
 		{#if showSummary && data.thread.summary}
 			<Card class="p-4 text-sm">
 				<h2 class="mb-2 text-base font-semibold text-foreground">Summary</h2>
 				<p class="whitespace-pre-wrap">{data.thread.summary}</p>
 			</Card>
 		{/if}
-
-		{#if showCommentForm}
-			<ThreadCommentForm data={data.createThreadCommentForm} />
-		{/if}
-
 		<hr class="my-1 border-t border-muted" />
 		<SortButton bind:sortBy={$sortBy} bind:sortOrder={$sortOrder} section='comments'/>
 		{#each data.nestedComments as comment}

@@ -7,7 +7,7 @@
 	import { PlusCircle } from 'lucide-svelte';
 	import { MetaTags } from 'svelte-meta-tags';
 	import { queryParam } from 'sveltekit-search-params';
-	import ContentItem from './_components/content-item.svelte';
+	import ContentItem from '@/components/content-item.svelte';
 	import SortButton from '@/components/sort-button.svelte';
 	import ContentFilterButton from '@/components/content-filter-button.svelte';
 
@@ -25,7 +25,7 @@
 <MetaTags title="Contents" description="View all the contents of the community" />
 
 <PageHeader title="Contents" subtitle="View all the contents of the community" />
-<div class="container mx-auto max-w-5xl flex flex-row justify-between gap-x-2">
+<div class="container mx-auto max-w-4xl flex flex-row justify-between gap-x-2">
 	<div class="flex flex-1 flex-row gap-x-2 sm:gap-x-4 md:flex-auto">
 		<Input placeholder="Search..." class="flex-1 sm:max-w-64" bind:value={$search}></Input>
 		<ContentFilterButton tags={data.tags} bind:tagFilters={$tags} bind:typeFilters={$fileTypes} />
@@ -36,7 +36,7 @@
 		<span class="sr-only sm:not-sr-only">Create Content</span>
 	</Button>
 </div>
-<div class="container mx-auto max-w-5xl flex flex-col gap-y-6 py-10">
+<div class="container mx-auto max-w-4xl flex flex-col gap-y-6 py-10">
 	{#each data.contents as content}
 		<ContentItem {content} />
 	{/each}

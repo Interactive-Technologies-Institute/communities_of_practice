@@ -154,6 +154,6 @@ export const actions = {
 					throw new Error('Failed to connect contents to event');
 				}
 			}
-            throw redirect(303, `/events/${eventId}`);
+            throw redirect(303, `/events/${eventId}/edit`);
 		}),
 };

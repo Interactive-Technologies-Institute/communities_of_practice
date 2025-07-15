@@ -71,7 +71,7 @@
 	}}
 />
 
-<div class="container mx-auto max-w-3xl mt-10 space-y-10 pb-10">
+<div class="container mx-auto max-w-4xl mt-10 space-y-6 pb-10">
 	{#if data.moderation[0].status !== 'approved'}
 		<ModerationBanner moderation={data.moderation} />
 	{/if}
@@ -129,7 +129,7 @@
 			</div>
 		</div>
 	</Card>
-	<div class="mx-auto flex flex-col gap-y-6 pb-6">
+	<div class="mx-auto flex flex-col gap-y-6 mt-6">
 		
 	</div>
 </div>
