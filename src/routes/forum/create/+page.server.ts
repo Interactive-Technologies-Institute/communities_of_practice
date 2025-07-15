@@ -54,7 +54,7 @@ export const actions = {
 
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			const { imageUrl, ...data } = form.data;			
-			const { error: supabaseError } = await event.locals.supabase
+			const { data: insertedThread, error: supabaseError } = await event.locals.supabase
 				.from('forum_threads')
 				.insert({
 					title: form.data.title,
@@ -63,13 +63,15 @@ export const actions = {
 					image: imagePath,
 					summary: form.data.summary,
 					tags: form.data.tags
-				});
+				})
+				.select('id')
+				.single();
 
-			if (supabaseError) {
+			if (supabaseError || !insertedThread) {
 				setFlash({ type: 'error', message: supabaseError.message }, event.cookies);
 				return fail(500, { message: supabaseError.message, form });
 			}
 
-			return redirect(303, '/forum');
+			return redirect(303, `/forum/${insertedThread.id}/connections`);
 		}),
 };

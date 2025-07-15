@@ -24,6 +24,8 @@
 	import { OpenAI } from 'openai';
 
 	export let data: SuperValidated<Infer<CreateThreadSchema>>;
+	export let threadId: number = -1;
+	export let showConnectionsButton: boolean = false;
 
 	const form = superForm(data, {
 		validators: zodClient(createThreadSchema),
@@ -229,9 +231,14 @@
 		class="sticky bottom-0 flex w-full flex-row items-center justify-center gap-x-10 border-t bg-background/95 py-8 backdrop-blur supports-[backdrop-filter]:bg-background/60"
 	>
 		<Button variant="outline" href="/forum">Cancel</Button>
+		{#if showConnectionsButton}
+			<Button variant="outline" href={`/forum/${threadId}/connections`} target="_blank" rel="noopener noreferrer">
+				Connections
+			</Button>
+		{/if}
 		<Button type="submit" disabled={$submitting}>
 			{#if $submitting}
-				<Loader2 class="mr-2 h-4 w-4 animate-spin" />
+			<Loader2 class="mr-2 h-4 w-4 animate-spin" />
 			{/if}
 			Submit
 		</Button>

@@ -10,5 +10,5 @@
 
 <PageHeader title="Edit Thread" subtitle="Edit this thread" />
 <div class="container mx-auto mb-20">
-	<ThreadForm data={data.updateForm} />
+	<ThreadForm data={data.updateForm} threadId={data.threadId} showConnectionsButton={true}/>
 </div>

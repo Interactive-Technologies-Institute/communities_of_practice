@@ -69,6 +69,7 @@ export const load = async (event) => {
 			zod(editEventSchema),
 			{ id: 'update-event' }
 		),
+		eventId: eventId
 	};
 };
 

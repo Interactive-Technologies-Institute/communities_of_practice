@@ -24,6 +24,8 @@
 	import { OpenAI } from 'openai';
 
 	export let data: SuperValidated<Infer<EditEventSchema>>;
+	export let eventId: number;
+	export let showConnectionsButton: boolean = false;
 
 	const form = superForm(data, {
 		validators: zodClient(editEventSchema),
@@ -498,9 +500,14 @@
 
 
 		<Button variant="outline" href="/events">Cancel</Button>
+		{#if showConnectionsButton}
+			<Button variant="outline" href={`/events/${eventId}/connections`} target="_blank" rel="noopener noreferrer">
+				Connections
+			</Button>
+		{/if}
 		<Button type="submit" disabled={$submitting}>
 			{#if $submitting}
-				<Loader2 class="h-4 w-4 animate-spin" />
+			<Loader2 class="h-4 w-4 animate-spin" />
 			{/if}
 			Submit
 		</Button>

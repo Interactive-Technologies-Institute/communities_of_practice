@@ -36,6 +36,7 @@ export const load = async (event) => {
         updateForm: await superValidate(thread, zod(createThreadSchema), {
             id: 'update-thread',
         }),
+        threadId: threadId
     };
 };
 

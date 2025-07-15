@@ -10,5 +10,5 @@
 
 <PageHeader title="Edit Event" subtitle="Edit this event" />
 <div class="container mx-auto mb-20">
-	<EditEventForm data={data.updateForm} />
+	<EditEventForm data={data.updateForm} eventId={data.eventId} showConnectionsButton={true}/>
 </div>
