@@ -58,10 +58,10 @@
 	<!-- Left side: Main content -->
 	<div class="flex-1 flex max-w-3xl flex-col gap-6">
 		<!-- Interests -->
-		<div class="w-full flex items-center gap-4 text-gray-800">
-			<hr class="flex-grow border-t border-gray-800" />
+		<div class="w-full flex items-center gap-4 text-foreground">
+			<hr class="flex-grow border-t border-foreground" />
 			<span class="text-sm font-semibold uppercase">Interests</span>
-			<hr class="flex-grow border-t border-gray-800" />
+			<hr class="flex-grow border-t border-foreground" />
 		</div>
 		{#if data.userProfile.interests?.length}
 			<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -77,10 +77,10 @@
 			<p class="text-sm text-muted-foreground">Interests were not set yet.</p>
 		{/if}
 		<!-- Skills -->
-		<div class="w-full flex items-center gap-4 text-gray-800">
-			<hr class="flex-grow border-t border-gray-800" />
+		<div class="w-full flex items-center gap-4 text-foreground">
+			<hr class="flex-grow border-t border-foreground" />
 			<span class="text-sm font-semibold uppercase">Skills</span>
-			<hr class="flex-grow border-t border-gray-800" />
+			<hr class="flex-grow border-t border-foreground" />
 		</div>
 		{#if data.userProfile.skills?.length}
 			<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -96,10 +96,10 @@
 			<p class="text-sm text-muted-foreground">Skills were not set yet.</p>
 		{/if}
 		<!-- Education -->
-		<div class="w-full flex items-center gap-4 text-gray-800">
-			<hr class="flex-grow border-t border-gray-800" />
+		<div class="w-full flex items-center gap-4 text-foreground">
+			<hr class="flex-grow border-t border-foreground" />
 			<span class="text-sm font-semibold uppercase">Education</span>
-			<hr class="flex-grow border-t border-gray-800" />
+			<hr class="flex-grow border-t border-foreground" />
 		</div>
 		{#if data.userProfile.education?.length}
 			<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -115,10 +115,10 @@
 			<p class="text-sm text-muted-foreground">Educational experiences were not set yet.</p>
 		{/if}
 		<!-- Languages -->
-		<div class="w-full flex items-center gap-4 text-gray-800">
-			<hr class="flex-grow border-t border-gray-800" />
+		<div class="w-full flex items-center gap-4 text-foreground">
+			<hr class="flex-grow border-t border-foreground" />
 			<span class="text-sm font-semibold uppercase">Languages</span>
-			<hr class="flex-grow border-t border-gray-800" />
+			<hr class="flex-grow border-t border-foreground" />
 		</div>
 		{#if data.userProfile.languages?.length}
 			<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -134,10 +134,10 @@
 			<p class="text-sm text-muted-foreground">Languages were not set yet.</p>
 		{/if}
 		<!-- Threads -->
-		<div class="w-full flex items-center gap-4 text-gray-800">
-			<hr class="flex-grow border-t border-gray-800" />
+		<div class="w-full flex items-center gap-4 text-foreground">
+			<hr class="flex-grow border-t border-foreground" />
 			<span class="text-sm font-semibold uppercase">Threads</span>
-			<hr class="flex-grow border-t border-gray-800" />
+			<hr class="flex-grow border-t border-foreground" />
 		</div>
 		{#if data.forum_threads && data.forum_threads.length > 0}
 			{#each data.forum_threads as thread}

@@ -23,9 +23,9 @@
 
 	export let data;
 
-	let showConnections = false;
-	let showCommentForm = false;
-	let showSummary = false;
+	let showConnections = true;
+	let showCommentForm = true;
+	let showSummary = true;
 	let openDeleteDialog = false;
 
 	const sortBy = queryParam('sortBy', stringQueryParam());
@@ -52,10 +52,15 @@
 	}}
 />
 
-<div class="container mx-auto max-w-4xl mt-10 space-y-6 pb-10">
+<div class="container mx-auto max-w-4xl mt-10 space-y-2 pb-10">
 	{#if data.moderation[0].status !== 'approved'}
 		<ModerationBanner moderation={data.moderation} />
 	{/if}
+	<div class="w-full flex items-center gap-4 text-foreground">
+		<hr class="flex-grow border-t border-foreground" />
+		<span class="text-sm font-semibold uppercase">Thread</span>
+		<hr class="flex-grow border-t border-foreground" />
+	</div>
 	<Card class="mx-auto p-2 space-y-4">
 		<div class="flex flex-1 flex-col px-2 py-3">
 			<div class="flex items-start mb-3 gap-2">
@@ -136,11 +141,21 @@
 			</div>
 		</div>
 	</Card>
-	<div class="mx-auto flex flex-col gap-y-6 mt-6">
+	<div class="mx-auto flex flex-col space-y-2">
 		{#if showCommentForm}
+			<div class="w-full flex items-center gap-4 text-foreground">
+				<hr class="flex-grow border-t border-foreground" />
+				<span class="text-sm font-semibold uppercase">Comment Form</span>
+				<hr class="flex-grow border-t border-foreground" />
+			</div>
 			<ThreadCommentForm data={data.createThreadCommentForm} />
 		{/if}
 		{#if showConnections && (data.connectedContents.length > 0 || data.connectedEvents.length > 0)}
+			<div class="w-full flex items-center gap-4 text-foreground">
+				<hr class="flex-grow border-t border-foreground" />
+				<span class="text-sm font-semibold uppercase">Connections</span>
+				<hr class="flex-grow border-t border-foreground" />
+			</div>
 			{#each data.connectedEvents as event}
 				<EventCompactItem {event}></EventCompactItem>
 			{/each}
@@ -149,12 +164,20 @@
 			{/each}
 		{/if}
 		{#if showSummary && data.thread.summary}
+			<div class="w-full flex items-center gap-4 text-foreground">
+				<hr class="flex-grow border-t border-foreground" />
+				<span class="text-sm font-semibold uppercase">Summary</span>
+				<hr class="flex-grow border-t border-foreground" />
+			</div>
 			<Card class="p-4 text-sm">
-				<h2 class="mb-2 text-base font-semibold text-foreground">Summary</h2>
 				<p class="whitespace-pre-wrap">{data.thread.summary}</p>
 			</Card>
 		{/if}
-		<hr class="my-1 border-t border-muted" />
+		<div class="w-full flex items-center gap-4 text-foreground">
+			<hr class="flex-grow border-t border-foreground" />
+			<span class="text-sm font-semibold uppercase">Comments</span>
+			<hr class="flex-grow border-t border-foreground" />
+		</div>
 		<SortButton bind:sortBy={$sortBy} bind:sortOrder={$sortOrder} section='comments'/>
 		{#each data.nestedComments as comment}
 			<ThreadCommentItem comment={comment} createForm={data.createThreadCommentForm} deleteForm={data.deleteThreadCommentForm} 

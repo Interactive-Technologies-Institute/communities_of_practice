@@ -16,9 +16,9 @@
 
 	export let data;
 
-	let showConnections = false;
-	let showSummary = false;
-	let showRecording = false;
+	let showConnections = true;
+	let showSummary = true;
+	let showRecording = true;
 	let showTranscription = false;
 
 	function getGoogleDriveEmbedUrl(url: string): string | null {
@@ -49,17 +49,22 @@
 	}}
 />
 
-<div class="container mx-auto max-w-4xl mt-10 space-y-6 pb-10">
+<div class="container mx-auto max-w-4xl mt-10 space-y-2 pb-10">
 	{#if data.moderation[0].status !== 'approved'}
 		<ModerationBanner moderation={data.moderation} />
 	{/if}
-	<Card class="mx-auto space-y-4">
+	<div class="w-full flex items-center gap-4 text-foreground">
+		<hr class="flex-grow border-t border-foreground" />
+		<span class="text-sm font-semibold uppercase">Event</span>
+		<hr class="flex-grow border-t border-foreground" />
+	</div>
+	<Card class="mx-auto">
 		<AspectRatio ratio={4 / 1}>
 			{#if data.event.image}
 				<img src={data.event.image} alt="Event Cover" class="h-full w-full object-cover" />
 			{/if}
 		</AspectRatio>
-		<div class="flex flex-1 flex-col px-4 py-2">
+		<div class="flex flex-1 flex-col px-4 py-3">
 			<h1 class="text-2xl font-bold tracking-tight text-foreground mb-3 break-words">{data.event.title}</h1>
 			<div class="flex flex-row gap-x-4">
 				<div class="flex flex-row items-center gap-x-2">
@@ -68,8 +73,8 @@
 					{#if data.event.date}
 						{dayjs(`${data.event.date}T${data.event.start_time}`).format(
 							dayjs(data.event.date).year() === dayjs().year()
-							? 'ddd, MM/DD [at] HH:mm'
-							: 'ddd, MM/DD/YYYY [at] HH:mm'
+							? 'DD/MM [at] HH:mm'
+							: 'DD/MM/YYYY [at] HH:mm'
 							)}–{dayjs(`${data.event.date}T${data.event.end_time}`).format('HH:mm')}
 					<!-- Allow voting, voting open -->		
 					{:else}
@@ -138,10 +143,14 @@
 			</div>
 		</div>
 	</Card>
-	<div class="mx-auto flex flex-col gap-y-6 mt-6">
+	<div class="mx-auto flex flex-col space-y-2">
 		{#if data.event.moderation_status === "approved" && data.event.allow_voting}
+			<div class="w-full flex items-center gap-4 text-foreground">
+				<hr class="flex-grow border-t border-foreground" />
+				<span class="text-sm font-semibold uppercase">Vote Schedule</span>
+				<hr class="flex-grow border-t border-foreground" />
+			</div>
 			<Card class="mx-auto p-2 space-y-4">
-				<h2 class="text-lg font-semibold">Vote for Event Schedule</h2>
 				{#if data.votingOptions.length > 1}
 					<EventVoteSchedule event={data.event} voteOnSchedule={data.voteOnScheduleForm} removeVotes={data.removeVotesForm} votingOptions={data.votingOptions} hasVoted={data.hasVoted}/>
 				{:else}
@@ -150,6 +159,11 @@
 			</Card>
 		{/if}
 		{#if showConnections && data.connectedContents.length > 0}
+			<div class="w-full flex items-center gap-4 text-foreground">
+				<hr class="flex-grow border-t border-foreground" />
+				<span class="text-sm font-semibold uppercase">Connections</span>
+				<hr class="flex-grow border-t border-foreground" />
+			</div>
 			{#each data.connectedContents as content}
 				<div class="text-sm">
 					<ContentItem {content} />
@@ -157,9 +171,13 @@
 			{/each}
 		{/if}
 		{#if showRecording && (data.event.recording_link || data.event.transcription)}
+			<div class="w-full flex items-center gap-4 text-foreground">
+				<hr class="flex-grow border-t border-foreground" />
+				<span class="text-sm font-semibold uppercase">Recording</span>
+				<hr class="flex-grow border-t border-foreground" />
+			</div>
 			<Card class="p-4 text-sm">
 				{#if data.event.recording_link}
-					<h2 class="text-base font-semibold text-foreground">Recording</h2>
 					<iframe
 						class="w-full aspect-video rounded"
 						src={getGoogleDriveEmbedUrl(data.event.recording_link)}
@@ -175,15 +193,18 @@
 						</button>
 					</div>
 					{#if showTranscription}
-						<h2 class="mb-2 mt-2 text-base font-semibold text-foreground">Transcription</h2>
 						<p class="whitespace-pre-wrap">{data.event.transcription}</p>
 					{/if}
 				{/if}
 			</Card>
 		{/if}
 		{#if showSummary && data.event.summary}
+			<div class="w-full flex items-center gap-4 text-foreground">
+				<hr class="flex-grow border-t border-foreground" />
+				<span class="text-sm font-semibold uppercase">Summary</span>
+				<hr class="flex-grow border-t border-foreground" />
+			</div>
 			<Card class="p-4 text-sm">
-				<h2 class="mb-2 text-base font-semibold text-foreground">Summary</h2>
 				<p class="whitespace-pre-wrap">{data.event.summary}</p>
 			</Card>
 		{/if}

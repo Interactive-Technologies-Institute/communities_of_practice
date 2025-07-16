@@ -71,10 +71,15 @@
 	}}
 />
 
-<div class="container mx-auto max-w-4xl mt-10 space-y-6 pb-10">
+<div class="container mx-auto max-w-4xl mt-10 space-y-2 pb-10">
 	{#if data.moderation[0].status !== 'approved'}
 		<ModerationBanner moderation={data.moderation} />
 	{/if}
+	<div class="w-full flex items-center gap-4 text-foreground">
+		<hr class="flex-grow border-t border-foreground" />
+		<span class="text-sm font-semibold uppercase">Content</span>
+		<hr class="flex-grow border-t border-foreground" />
+	</div>
 	<Card class="mx-auto p-2 space-y-4">
 		<div class="flex flex-1 flex-col px-4 py-3">
 			<h1 class="text-2xl font-bold tracking-tight text-foreground mb-3 break-words">
@@ -129,7 +134,7 @@
 			</div>
 		</div>
 	</Card>
-	<div class="mx-auto flex flex-col gap-y-6 mt-6">
+	<div class="mx-auto flex flex-col space-y-2">
 		
 	</div>
 </div>
