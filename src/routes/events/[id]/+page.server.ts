@@ -1,5 +1,5 @@
 import { deleteEventSchema, toggleEventInterestSchema, voteOnScheduleSchema, removeVotesSchema } from '@/schemas/event';
-import type { EventWithAuthor, EventVote, ModerationInfo, ContentWithCounter } from '@/types/types';
+import type { EventWithAuthor, EventVote, ModerationInfo, ContentWithCounter, ThreadWithAuthorAndCounters } from '@/types/types';
 import { handleFormAction } from '@/utils';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { setFlash } from 'sveltekit-flash-message/server';
@@ -102,6 +102,21 @@ export const load = async (event) => {
 		return connectedContents.map((row) => row.content);
 	}
 
+	async function getConnectedThreads(contentId: number): Promise<ThreadWithAuthorAndCounters[]> {
+		const { data: connectedThreads, error: connectedThreadsError } = await await event.locals.supabase
+			.from('thread_events')
+			.select('forum_thread:forum_threads_view(*, author:profiles_view(*))')
+			.eq('event_id', eventId);
+
+		if (connectedThreadsError) {
+			const errorMessage = 'Error fetching connected forum threads, please try again later.';
+			setFlash({ type: 'error', message: errorMessage }, event.cookies);
+			return error(500, errorMessage);
+		}
+
+		return connectedThreads.map((row) => row.forum_thread);
+	}
+
 	let hasVoted = false;
 
 	if (user?.id) {
@@ -118,6 +133,7 @@ export const load = async (event) => {
 		hasVoted: hasVoted,
 		interestCount: interestCount.count,
 		connectedContents: await getConnectedContents(eventId),
+		connectedThreads: await getConnectedThreads(eventId),
 		deleteForm: await superValidate(zod(deleteEventSchema), {
 			id: 'delete-event',
 		}),

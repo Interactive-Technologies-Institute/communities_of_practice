@@ -105,11 +105,6 @@
 			<div class="mt-4 flex items-center justify-between gap-4 border-t pt-4 text-sm text-muted-foreground">
 				<div class="flex gap-4">
 					<ThreadLikeButton data={data.toggleLikeForm} />
-					<Button variant="ghost" size="sm" on:click={() => (showCommentForm = !showCommentForm)}
-						class={cn('flex items-center gap-2', { 'text-orange-500': showCommentForm })}>
-						<MessageSquare class="h-4 w-4" />
-						Comment
-					</Button>
 					{#if data.connectedContents.length > 0 || data.connectedEvents.length > 0}
 						<Button variant="ghost" size="sm" on:click={() => (showConnections = !showConnections)}
 							class={cn('flex items-center gap-2', { 'text-orange-500': showConnections })}>
@@ -124,6 +119,11 @@
 							Summary
 						</Button>
 					{/if}
+					<Button variant="ghost" size="sm" on:click={() => (showCommentForm = !showCommentForm)}
+						class={cn('flex items-center gap-2', { 'text-orange-500': showCommentForm })}>
+						<MessageSquare class="h-4 w-4" />
+						Comment
+					</Button>
 				</div>
 
 				{#if data.thread.user_id === data.user?.id}
@@ -142,14 +142,6 @@
 		</div>
 	</Card>
 	<div class="mx-auto flex flex-col space-y-2">
-		{#if showCommentForm}
-			<div class="w-full flex items-center gap-4 text-foreground">
-				<hr class="flex-grow border-t border-foreground" />
-				<span class="text-sm font-semibold uppercase">Comment Form</span>
-				<hr class="flex-grow border-t border-foreground" />
-			</div>
-			<ThreadCommentForm data={data.createThreadCommentForm} />
-		{/if}
 		{#if showConnections && (data.connectedContents.length > 0 || data.connectedEvents.length > 0)}
 			<div class="w-full flex items-center gap-4 text-foreground">
 				<hr class="flex-grow border-t border-foreground" />
@@ -173,13 +165,21 @@
 				<p class="whitespace-pre-wrap">{data.thread.summary}</p>
 			</Card>
 		{/if}
+		{#if showCommentForm}
+			<div class="w-full flex items-center gap-4 text-foreground">
+				<hr class="flex-grow border-t border-foreground" />
+				<span class="text-sm font-semibold uppercase">Comment Form</span>
+				<hr class="flex-grow border-t border-foreground" />
+			</div>
+			<ThreadCommentForm data={data.createThreadCommentForm} />
+		{/if}
 		<div class="w-full flex items-center gap-4 text-foreground">
 			<hr class="flex-grow border-t border-foreground" />
 			<span class="text-sm font-semibold uppercase">Comments</span>
 			<hr class="flex-grow border-t border-foreground" />
 		</div>
 		<SortButton bind:sortBy={$sortBy} bind:sortOrder={$sortOrder} section='comments'/>
-		{#each data.nestedComments as comment}
+		{#each data.nestedComments as comment(comment.id)}
 			<ThreadCommentItem comment={comment} createForm={data.createThreadCommentForm} deleteForm={data.deleteThreadCommentForm} 
 			toggleCommentLikeForms={data.toggleCommentLikeForms} currentUserId={data.user?.id} currentUserRole={data.user?.role}
 			level={0} editThreadCommentForms={data.editThreadCommentForms}/>

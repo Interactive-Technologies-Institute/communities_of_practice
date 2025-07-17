@@ -8,7 +8,7 @@ export const createContentSchema = z.object({
   description: z
     .string()
     .min(10, { message: 'Description must be at least 10 characters' })
-    .max(500, { message: 'Description must be less than 500 characters' }),
+    .max(5000, { message: 'Description must be less than 5000 characters' }),
   fileUrl: z.string().nullish(),
   file: z.instanceof(File, { message: 'A file must be selected before submitting.' }),
   mime_type: z.string().nullish(),
@@ -34,7 +34,7 @@ export const editContentSchema = z.object({
   description: z
     .string()
     .min(10, { message: 'Description must be at least 10 characters' })
-    .max(500, { message: 'Description must be less than 500 characters' }),
+    .max(5000, { message: 'Description must be less than 5000 characters' }),
   fileUrl: z.string().nullish(),
   file: z.instanceof(File).nullish(),
   mime_type: z.string().nullish(),

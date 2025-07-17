@@ -12,6 +12,8 @@
 	import { cn } from '@/utils';
     import { page } from '$app/stores';
 	import ContentDownloadButton from '../_components/content-download-button.svelte';
+	import EventCompactItem from '@/components/event-compact-item.svelte';
+	import ThreadCompactItem from '@/components/thread-compact-item.svelte';
 
 	export let data;
 
@@ -53,6 +55,8 @@
 				return 'File';
 		}
 	}
+
+	let showConnections = true;
 
 	let openDeleteDialog = false;
 </script>
@@ -135,7 +139,23 @@
 		</div>
 	</Card>
 	<div class="mx-auto flex flex-col space-y-2">
-		
+		{#if showConnections && (data.connectedEvents.length > 0 || data.connectedThreads.length > 0)}
+			<div class="w-full flex items-center gap-4 text-foreground">
+				<hr class="flex-grow border-t border-foreground" />
+				<span class="text-sm font-semibold uppercase">Connections</span>
+				<hr class="flex-grow border-t border-foreground" />
+			</div>
+			{#each data.connectedEvents as event}
+				<div class="text-sm">
+					<EventCompactItem {event} />
+				</div>
+			{/each}
+			{#each data.connectedThreads as thread}
+				<div class="text-sm">
+					<ThreadCompactItem {thread} />
+				</div>
+			{/each}
+		{/if}
 	</div>
 </div>
 

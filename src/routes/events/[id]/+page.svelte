@@ -6,6 +6,7 @@
 	import { AspectRatio } from '@/components/ui/aspect-ratio';
 	import { Button } from '@/components/ui/button';
 	import ContentItem  from '@/components/content-item.svelte';
+	import ThreadCompactItem  from '@/components/thread-compact-item.svelte';
 	import dayjs from 'dayjs';
 	import { Calendar, MapPin, Pen, Tag, Trash, Text, Video, Link } from 'lucide-svelte';
 	import { MetaTags } from 'svelte-meta-tags';
@@ -158,7 +159,7 @@
 				{/if}
 			</Card>
 		{/if}
-		{#if showConnections && data.connectedContents.length > 0}
+		{#if showConnections && (data.connectedContents.length > 0 || data.connectedThreads.length > 0)}
 			<div class="w-full flex items-center gap-4 text-foreground">
 				<hr class="flex-grow border-t border-foreground" />
 				<span class="text-sm font-semibold uppercase">Connections</span>
@@ -167,6 +168,11 @@
 			{#each data.connectedContents as content}
 				<div class="text-sm">
 					<ContentItem {content} />
+				</div>
+			{/each}
+			{#each data.connectedThreads as thread}
+				<div class="text-sm">
+					<ThreadCompactItem {thread} />
 				</div>
 			{/each}
 		{/if}

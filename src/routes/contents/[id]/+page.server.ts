@@ -1,5 +1,5 @@
 import { deleteContentSchema, downloadContentSchema } from '@/schemas/content';
-import type { Content, ModerationInfo } from '@/types/types';
+import type { Content, ModerationInfo, ThreadWithAuthorAndCounters, EventWithCounters } from '@/types/types';
 import { handleFormAction } from '@/utils';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { setFlash } from 'sveltekit-flash-message/server';
@@ -56,6 +56,36 @@ export const load = async (event) => {
         }
         return { count: downloaded.count, userDownloaded: downloaded.has_download };
     }
+
+    async function getConnectedEvents(contentId: number): Promise<EventWithCounters[]> {
+        const { data: connectedEvents, error: connectedEventsError } = await await event.locals.supabase
+            .from('event_contents')
+            .select('event:events_view(*)')
+            .eq('content_id', contentId);
+
+        if (connectedEventsError) {
+            const errorMessage = 'Error fetching connected events, please try again later.';
+            setFlash({ type: 'error', message: errorMessage }, event.cookies);
+            return error(500, errorMessage);
+        }
+
+        return connectedEvents.map((row) => row.event);
+    }
+
+    async function getConnectedThreads(contentId: number): Promise<ThreadWithAuthorAndCounters[]> {
+        const { data: connectedThreads, error: connectedThreadsError } = await await event.locals.supabase
+            .from('thread_contents')
+            .select('forum_thread:forum_threads_view(*, author:profiles_view(*))')
+            .eq('content_id', contentId);
+
+        if (connectedThreadsError) {
+            const errorMessage = 'Error fetching connected forum threads, please try again later.';
+            setFlash({ type: 'error', message: errorMessage }, event.cookies);
+            return error(500, errorMessage);
+        }
+
+        return connectedThreads.map((row) => row.forum_thread);
+    }
     
     const downloadCount = await getDownloadCount(event.params.id);
 
@@ -65,6 +95,8 @@ export const load = async (event) => {
         content: content,
         moderation: await getContentModeration(contentId),
         downloadCount: downloadCount.count,
+        connectedEvents: await getConnectedEvents(contentId),
+        connectedThreads: await getConnectedThreads(contentId),
         downloadForm: await superValidate(
                     { value: downloadCount.userDownloaded, file: content.file },
                     zod(downloadContentSchema),

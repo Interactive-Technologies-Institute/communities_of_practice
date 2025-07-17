@@ -1,6 +1,6 @@
 import { deleteThreadSchema, toggleThreadLikeSchema } from '@/schemas/thread';
 import { createThreadCommentSchema, deleteThreadCommentSchema, toggleThreadCommentLikeSchema, updateThreadCommentSchema } from '@/schemas/thread-comment';
-import type { ThreadWithAuthor, ModerationInfo, ThreadCommentWithAuthorAndLikes, Event, ContentWithCounter } from '@/types/types';
+import type { ThreadWithAuthor, ModerationInfo, ThreadCommentWithAuthorAndLikes, Event, ContentWithCounter, EventWithCounters } from '@/types/types';
 import { handleFormAction } from '@/utils';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { setFlash } from 'sveltekit-flash-message/server';
@@ -167,7 +167,7 @@ export const load = async (event) => {
         return connectedContents.map((row) => row.content);
     }
 
-    async function getConnectedEvents(threadId: number): Promise<Event[]> {
+    async function getConnectedEvents(threadId: number): Promise<EventWithCounters[]> {
         const { data: connectedEvents, error: connectedEventsError } = await await event.locals.supabase
             .from('thread_events')
             .select('event:events_view(*)')

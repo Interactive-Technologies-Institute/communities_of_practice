@@ -35,23 +35,24 @@
 
 <form method="POST" enctype="multipart/form-data" action="?/createThreadComment" use:enhance class="flex flex-col gap-y-10">
 	<Card.Root>
-		<Card.Content class="space-y-4">
+		<Card.Content class="space-y-2">
 			<Form.Field {form} name="content">
 				<Form.Control let:attrs>
-					<Form.Label>Write a comment</Form.Label>
-					<Textarea {...attrs} class="w-full rounded border px-3 py-2 text-sm max-h-48 overflow-auto" bind:value={$formData.content} />
+					<Textarea {...attrs} class="w-full rounded border mt-4 px-3 py-2 text-sm max-h-48 overflow-auto" bind:value={$formData.content} />
 					<p class="text-xs mt-1 text-muted-foreground">
 						{$formData.content.length} / 5000 characters
 					</p>
 					<Form.FieldErrors />
 				</Form.Control>
 			</Form.Field>
-			<Button type="submit" disabled={$submitting || !isSubmitEnabled}>
-				{#if $submitting}
-					<Loader2 class="h-4 w-4 animate-spin" />
-				{/if}
-				Submit
-			</Button>
+			<div class="flex justify-center">
+				<Button type="submit" disabled={$submitting || !isSubmitEnabled}>
+					{#if $submitting}
+						<Loader2 class="h-4 w-4 animate-spin mr-2" />
+					{/if}
+					Submit
+				</Button>
+			</div>
 		</Card.Content>
 	</Card.Root>
 </form>

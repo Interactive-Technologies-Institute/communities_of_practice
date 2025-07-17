@@ -96,16 +96,16 @@
 						</Badge>
 					{/if}
 				</div>
-				<div class="flex items-center gap-2 ml-2">
-					<p class="text-xs text-muted-foreground whitespace-nowrap overflow-hidden text-ellipsis">{dayjs(`${content.inserted_at}`).format(
+				<div class="flex text-muted-foreground items-center gap-2 ml-2">
+					<p class="text-xs whitespace-nowrap overflow-hidden text-ellipsis">{dayjs(`${content.inserted_at}`).format(
 							dayjs(content.inserted_at).year() === dayjs().year()
 								? 'DD/MM'
 								: 'DD/MM/YYYY'
 						)}</p>
-					<Button variant="ghost" size="sm" on:click={handleDownload} aria-label="Download">
-						<p class="text-xs mr-1">{content.downloads_count}</p>
-						<Download class="h-4 w-4" />
-					</Button>
+					<Download class="h-4 w-4" />
+					<p class="text-xs whitespace-nowrap overflow-hidden text-ellipsis">
+						{content.downloads_count}
+					</p>
 				</div>
 			</div>
 		</div>

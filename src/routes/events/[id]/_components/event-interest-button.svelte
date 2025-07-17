@@ -2,7 +2,7 @@
 	import { Button } from '@/components/ui/button';
 	import { toggleEventInterestSchema, type ToggleEventInterestSchema } from '@/schemas/event';
 	import { cn } from '@/utils';
-	import { Bookmark } from 'lucide-svelte';
+	import { ThumbsUp } from 'lucide-svelte';
 	import { tick } from 'svelte';
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
@@ -36,7 +36,7 @@
 		size="sm"
 		class={cn('flex items-center gap-2', $formData.value ? 'text-orange-500' : 'text-muted-foreground hover:text-foreground')}
 	>
-		<Bookmark/>
+		<ThumbsUp/>
 		{#if $formData.value}
 			Interested
 		{:else}
