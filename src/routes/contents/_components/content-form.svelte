@@ -8,11 +8,17 @@
 	import * as Card from '@/components/ui/card';
 	import { TagInput } from '@/components/ui/tag-input';
 	import { Loader2 } from 'lucide-svelte';
-	import { FileImage, FileVideo, FileText, File, FileAudio, FileArchive, FileType2, Eye} from 'lucide-svelte';
+	import { FileImage, FileVideo, FileText, File as FileIcon, FileAudio, FileArchive, FileType2, Eye} from 'lucide-svelte';
 	import { superForm, fileProxy, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient, type Infer } from 'sveltekit-superforms/adapters';
 	import type { CreateContentSchema, EditContentSchema } from '@/schemas/content';
 	import type { ZodSchema } from 'zod';
+	import { PUBLIC_OPENAI_API_KEY } from '$env/static/public';
+	import { OpenAI } from 'openai';
+	import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist/legacy/build/pdf.mjs';
+	import workerUrl from 'pdfjs-dist/legacy/build/pdf.worker.mjs?url';
+
+	GlobalWorkerOptions.workerSrc = workerUrl;
 
 	export let contentForm: SuperValidated<Infer<CreateContentSchema>> | SuperValidated<Infer<EditContentSchema>>;
 	export let schema: ZodSchema;
@@ -28,6 +34,9 @@
 	const currentFileUrl = $formData.fileUrl??'';
 	const isEdit = !!$formData.fileUrl;
 
+	let loadingDescription = false;
+	let loadingTags = false;
+	const openai = new OpenAI({ apiKey: PUBLIC_OPENAI_API_KEY, dangerouslyAllowBrowser: true});
 	const file = fileProxy(form, 'file');
 
 	$: if ($file.length > 0) {
@@ -38,7 +47,7 @@
 	}
 
 	function getFileIcon(mimeType: string | null) {
-		if (!mimeType) return File;
+		if (!mimeType) return FileIcon;
 		if (mimeType.startsWith('image/')) return FileImage;
 		if (mimeType.startsWith('video/')) return FileVideo;
 		if (mimeType === 'application/pdf') return FileText;
@@ -75,6 +84,137 @@
 				return 'File';
 		}
 	}
+
+	async function extractPdfText(file: File): Promise<string> {
+		const arrayBuffer = await file.arrayBuffer();
+		const pdf = await getDocument({ data: arrayBuffer }).promise;
+
+		let text = '';
+		for (let i = 1; i <= pdf.numPages; i++) {
+			const page = await pdf.getPage(i);
+			const content = await page.getTextContent();
+			text += content.items.map((item: any) => item.str).join(' ') + '\n\n';
+		}
+		return text;
+	}
+
+	async function getFileContent(file: File): Promise<[string, string] | null> {
+		const mimeType = file.type;
+
+		// PDF
+		if (mimeType === 'application/pdf') {
+			const text = await extractPdfText(file);
+			if (text.length < 5) return null; // When extraction does not work properly
+			return [text, "PDF"];
+		}
+
+		// Unknown
+		return null;
+	}
+
+	async function generateFileDescription(content: string, type: string): Promise<string | null> {
+		try {
+			const response = await openai.chat.completions.create({
+				model: 'gpt-4',
+				messages: [
+					{
+						role: 'system',
+						content: `You are a helpful assistant describing the contents of user-uploaded ${type} files. Be clear and concise.`
+					},
+					{
+						role: 'user',
+						content: `Please describe the following ${type}:\n\n${content}`
+					}
+				],
+				temperature: 0.6,
+				max_tokens: 400
+			});
+
+			return response.choices[0]?.message?.content?.trim() ?? null;
+		} catch (error) {
+			console.error('Error generating description:', error);
+			return null;
+		}
+	}
+
+	async function generateTags(content: string, type: string): Promise<string[] | null> {
+		try {
+			const response = await openai.chat.completions.create({
+				model: 'gpt-3.5-turbo',
+				messages: [
+					{
+						role: 'system',
+						content: `You are an assistant that suggests useful tags for ${type}.`
+					},
+					{
+						role: 'user',
+						content: `Return a maximum of 5 unique tags (each between 3 and 30 characters, including spaces) that represent the following ${type} as a JSON array of strings. Example: ["tag1", "tag2"]\n\nContent:\n${content}`
+					}
+				],
+				temperature: 0.7,
+				max_tokens: 100
+			});
+
+			const generated = response.choices[0]?.message?.content?.trim();
+			if (!generated) return null;
+
+			const tags: string[] = JSON.parse(generated);
+			if (Array.isArray(tags)) return tags;
+
+			return null;
+		} catch (error) {
+			console.error('Error generating tags:', error);
+			return null;
+		}
+	}
+
+	async function handleGenerateDescription() {
+		loadingDescription = true;
+		const fileToDescribe = $file.item(0);
+
+		if (fileToDescribe) {
+			const content = await getFileContent(fileToDescribe);
+			if (!content) {
+				console.warn('Unsupported file type.');
+				$formData.description = 'Unsupported file.';
+				loadingDescription = false;
+				return;
+			}
+			const description = await generateFileDescription(content[0], content[1]);
+			$formData.description = description ?? '';
+			console.log('Description result:', description);
+		} else {
+			console.warn('No file provided to generate description.');
+		}
+		loadingDescription = false;
+	}
+
+	async function handleGenerateTags() {
+		loadingTags = true;
+
+		const fileToDescribe = $file.item(0);
+
+		if (fileToDescribe) {
+			const content = await getFileContent(fileToDescribe);
+			if (!content) {
+				console.warn('Unsupported file.');
+				$formData.tags = ['unsupported-file-type'];
+				loadingTags = false;
+				return;
+			}
+			const tags = await generateTags(content[0], content[1]);
+			if (tags) {
+				$formData = {
+					...$formData,
+					tags
+				};
+			}
+		} else {
+			console.warn('No file provided to generate description.');
+		}
+
+		loadingTags = false;
+	}
 </script>
 
 <form method="POST" enctype="multipart/form-data" use:enhance class="flex flex-col gap-y-10">
@@ -91,16 +231,53 @@
 					<Form.FieldErrors />
 				</Form.Control>
 			</Form.Field>
+			<Form.Field {form} name="file">
+				<Form.Control let:attrs>
+					<Form.Label>{isEdit ? 'Upload New File' : 'Upload File*'}</Form.Label>
+					<FileInput {...attrs} bind:files={$file} />
+					<input hidden value={$formData.fileUrl} name="fileUrl" />
+					<input hidden value={$formData.mime_type} name="mime_type" />
+					<Form.FieldErrors />
+				</Form.Control>
+			</Form.Field>
 			<Form.Field {form} name="description">
 				<Form.Control let:attrs>
-					<Form.Label>Description*</Form.Label>
+					<Form.Label class="flex items-center justify-between"
+						>Description*
+						<Button
+							type="button"
+							size="sm"
+							on:click={handleGenerateDescription}
+							disabled={loadingDescription || !$file.length}
+						>
+							{#if loadingDescription}
+								<Loader2 class="h-4 w-4 animate-spin" />
+							{:else}
+								Generate Description
+							{/if}
+						</Button>
+					</Form.Label>
 					<Textarea {...attrs} bind:value={$formData.description} />
 					<Form.FieldErrors />
 				</Form.Control>
 			</Form.Field>
 			<Form.Field {form} name="tags">
 				<Form.Control let:attrs>
-					<Form.Label>Tags*</Form.Label>
+					<Form.Label class="flex justify-between items-center">
+						Tags*
+						<Button
+							type="button"
+							size="sm"
+							on:click={handleGenerateTags}
+							disabled={loadingTags || !$file.length}
+						>
+							{#if loadingTags}
+								<Loader2 class="h-4 w-4 animate-spin" />
+							{:else}
+								Generate Tags
+							{/if}
+						</Button>
+					</Form.Label>
 					<TagInput {...attrs} bind:value={$formData.tags} />
 					<Form.FieldErrors />
 				</Form.Control>
@@ -114,7 +291,7 @@
 								this={getFileIcon(currentMimeType)}
 								class="h-10 w-10 text-muted-foreground"
 							/>
-							<Badge class="mt-1 text-[10px] font-normal px-1.5 py-0.5">
+							<Badge class="mt-1 px-1.5 py-0.5 text-[10px] font-normal">
 								{fileTypeDisplay(currentMimeType)}
 							</Badge>
 						</div>
@@ -123,29 +300,21 @@
 							size="sm"
 							aria-label="View file"
 							on:click={() => window.open(currentFileUrl, '_blank')}
-							class="self-start mt-1"
+							class="mt-1 self-start"
 						>
-							<Eye class="h-4 w-4 mr-1" />
+							<Eye class="mr-1 h-4 w-4" />
 							View
 						</Button>
 					</div>
 				</div>
 			{/if}
-			<Form.Field {form} name="file">
-				<Form.Control let:attrs>
-					<Form.Label>{isEdit ? 'Upload New File' : 'Upload File*'}</Form.Label>
-					<FileInput {...attrs} bind:files={$file} />
-                    <input hidden value={$formData.fileUrl} name="fileUrl" />
-					<input hidden value={$formData.mime_type} name="mime_type" />
-					<Form.FieldErrors />
-				</Form.Control>
-			</Form.Field>
 		</Card.Content>
 	</Card.Root>
 
-    <div
+	<div
 		class="sticky bottom-0 flex w-full flex-row items-center justify-center gap-x-10 border-t bg-background/95 py-8 backdrop-blur supports-[backdrop-filter]:bg-background/60"
-	>		<Button variant="outline" href="/contents">Cancel</Button>
+	>
+		<Button variant="outline" href="/contents">Cancel</Button>
 		<Button type="submit" disabled={$submitting}>
 			{#if $submitting}
 				<Loader2 class="mr-2 h-4 w-4 animate-spin" />

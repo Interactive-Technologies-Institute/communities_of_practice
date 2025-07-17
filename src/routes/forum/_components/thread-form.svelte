@@ -81,35 +81,35 @@
 	}
 
 	async function generateTags(content: string): Promise<string[] | null> {
-	try {
-		const response = await openai.chat.completions.create({
-			model: 'gpt-3.5-turbo',
-			messages: [
-				{
-					role: 'system',
-					content: 'You are an assistant that suggests useful tags for discussion forum threads.'
-				},
-				{
-					role: 'user',
-					content: `Return a maximum of 5 unique tags (each between 3 and 30 characters, including spaces) that represent the following thread content as a JSON array of strings. Example: ["tag1", "tag2"]\n\nContent:\n${content}`
-				}
-			],
-			temperature: 0.7,
-			max_tokens: 100
-		});
+		try {
+			const response = await openai.chat.completions.create({
+				model: 'gpt-3.5-turbo',
+				messages: [
+					{
+						role: 'system',
+						content: 'You are an assistant that suggests useful tags for discussion forum threads.'
+					},
+					{
+						role: 'user',
+						content: `Return a maximum of 5 unique tags (each between 3 and 30 characters, including spaces) that represent the following thread content as a JSON array of strings. Example: ["tag1", "tag2"]\n\nContent:\n${content}`
+					}
+				],
+				temperature: 0.7,
+				max_tokens: 100
+			});
 
-		const generated = response.choices[0]?.message?.content?.trim();
-		if (!generated) return null;
+			const generated = response.choices[0]?.message?.content?.trim();
+			if (!generated) return null;
 
-		const tags: string[] = JSON.parse(generated);
-		if (Array.isArray(tags)) return tags;
+			const tags: string[] = JSON.parse(generated);
+			if (Array.isArray(tags)) return tags;
 
-		return null;
-	} catch (error) {
-		console.error('Error generating tags:', error);
-		return null;
+			return null;
+		} catch (error) {
+			console.error('Error generating tags:', error);
+			return null;
+		}
 	}
-}
 
 	async function handleGenerateSummary() {
 		loadingSummary = true;
@@ -175,7 +175,7 @@
 							disabled={loadingTags}
 						>
 							{#if loadingTags}
-								<Loader2 class="mr-2 h-4 w-4 animate-spin" />
+								<Loader2 class="h-4 w-4 animate-spin" />
 							{:else}
 								Generate Tags
 							{/if}
@@ -196,7 +196,7 @@
 							disabled={loadingSummary}
 						>
 							{#if loadingSummary}
-								<Loader2 class="mr-2 h-4 w-4 animate-spin" />
+								<Loader2 class="h-4 w-4 animate-spin" />
 							{:else}
 								Generate Summary
 							{/if}
