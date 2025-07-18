@@ -153,10 +153,11 @@ export const load = async (event) => {
     }
 
     async function getConnectedContents(threadId: number): Promise<ContentWithCounter[]> {
-        const { data: connectedContents, error: connectedContentsError } = await await event.locals.supabase
-            .from('thread_contents')
-            .select('content:contents_view(*)')
-            .eq('thread_id', threadId);
+        const { data: connectedContents, error: connectedContentsError } = await event.locals.supabase
+            .from('contents_view')
+            .select('*, thread_contents!inner(thread_id)')
+            .eq('thread_contents.thread_id', threadId)
+            .eq('moderation_status', 'approved');
 
         if (connectedContentsError) {
             const errorMessage = 'Error fetching connected contents, please try again later.';
@@ -164,14 +165,15 @@ export const load = async (event) => {
             return error(500, errorMessage);
         }
 
-        return connectedContents.map((row) => row.content);
+        return connectedContents;
     }
 
     async function getConnectedEvents(threadId: number): Promise<EventWithCounters[]> {
-        const { data: connectedEvents, error: connectedEventsError } = await await event.locals.supabase
-            .from('thread_events')
-            .select('event:events_view(*)')
-            .eq('thread_id', threadId);
+        const { data: connectedEvents, error: connectedEventsError } = await event.locals.supabase
+            .from('events_view')
+            .select('*, thread_events!inner(thread_id)')
+            .eq('thread_events.thread_id', threadId)
+            .eq('moderation_status', 'approved');
 
         if (connectedEventsError) {
             const errorMessage = 'Error fetching connected events, please try again later.';
@@ -179,7 +181,7 @@ export const load = async (event) => {
             return error(500, errorMessage);
         }
 
-        return connectedEvents.map((row) => row.event);
+        return connectedEvents;
     }
     
     const threadId = parseInt(event.params.id);

@@ -1,5 +1,5 @@
 import { deleteContentSchema, downloadContentSchema } from '@/schemas/content';
-import type { Content, ModerationInfo, ThreadWithAuthorAndCounters, EventWithCounters } from '@/types/types';
+import type { Content, ModerationInfo, ThreadWithCounters, EventWithCounters } from '@/types/types';
 import { handleFormAction } from '@/utils';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { setFlash } from 'sveltekit-flash-message/server';
@@ -58,10 +58,11 @@ export const load = async (event) => {
     }
 
     async function getConnectedEvents(contentId: number): Promise<EventWithCounters[]> {
-        const { data: connectedEvents, error: connectedEventsError } = await await event.locals.supabase
-            .from('event_contents')
-            .select('event:events_view(*)')
-            .eq('content_id', contentId);
+        const { data: connectedEvents, error: connectedEventsError } = await event.locals.supabase
+            .from('events_view')
+            .select('*, event_contents!inner(content_id)')
+            .eq('event_contents.content_id', contentId)
+            .eq('moderation_status', 'approved');
 
         if (connectedEventsError) {
             const errorMessage = 'Error fetching connected events, please try again later.';
@@ -69,14 +70,15 @@ export const load = async (event) => {
             return error(500, errorMessage);
         }
 
-        return connectedEvents.map((row) => row.event);
+        return connectedEvents;
     }
 
-    async function getConnectedThreads(contentId: number): Promise<ThreadWithAuthorAndCounters[]> {
-        const { data: connectedThreads, error: connectedThreadsError } = await await event.locals.supabase
-            .from('thread_contents')
-            .select('forum_thread:forum_threads_view(*, author:profiles_view(*))')
-            .eq('content_id', contentId);
+    async function getConnectedThreads(contentId: number): Promise<ThreadWithCounters[]> {
+        const { data: connectedThreads, error: connectedThreadsError } = await event.locals.supabase
+            .from('forum_threads_view')
+            .select('*, thread_contents!inner(content_id)')
+            .eq('thread_contents.content_id', contentId)
+            .eq('moderation_status', 'approved');
 
         if (connectedThreadsError) {
             const errorMessage = 'Error fetching connected forum threads, please try again later.';
@@ -84,7 +86,7 @@ export const load = async (event) => {
             return error(500, errorMessage);
         }
 
-        return connectedThreads.map((row) => row.forum_thread);
+        return connectedThreads;
     }
     
     const downloadCount = await getDownloadCount(event.params.id);
