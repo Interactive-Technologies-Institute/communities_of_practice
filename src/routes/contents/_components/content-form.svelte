@@ -8,7 +8,7 @@
 	import * as Card from '@/components/ui/card';
 	import { TagInput } from '@/components/ui/tag-input';
 	import { Loader2 } from 'lucide-svelte';
-	import { FileImage, FileVideo, FileText, File as FileIcon, FileAudio, FileArchive, FileType2, Eye} from 'lucide-svelte';
+	import { FileImage, FileVideo, FileJson, FileText, File as FileIcon, FileAudio, FileArchive, FileType2, Presentation, Eye} from 'lucide-svelte';
 	import { superForm, fileProxy, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient, type Infer } from 'sveltekit-superforms/adapters';
 	import type { CreateContentSchema, EditContentSchema } from '@/schemas/content';
@@ -17,6 +17,7 @@
 	import { OpenAI } from 'openai';
 	import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist/legacy/build/pdf.mjs';
 	import workerUrl from 'pdfjs-dist/legacy/build/pdf.worker.mjs?url';
+	import * as mammoth from "mammoth";
 
 	GlobalWorkerOptions.workerSrc = workerUrl;
 
@@ -50,10 +51,16 @@
 		if (!mimeType) return FileIcon;
 		if (mimeType.startsWith('image/')) return FileImage;
 		if (mimeType.startsWith('video/')) return FileVideo;
-		if (mimeType === 'application/pdf') return FileText;
+		if (mimeType === 'application/pdf' || mimeType === 'application/msword' ||
+			mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
+			mimeType === 'text/plain') return FileText;
+		if (mimeType === 'application/json') return FileJson;
 		if (mimeType.startsWith('audio/')) return FileAudio;
-		if (mimeType.includes('zip') || mimeType.includes('compressed')) return FileArchive;
-		if (mimeType === 'text/plain') return FileText;
+		if (mimeType.includes('zip') || mimeType === 'application/x-tar' ||
+			mimeType.includes('compressed')) return FileArchive;
+		if (mimeType === 'application/vnd.openxmlformats-officedocument.presentationml.presentation')
+			return Presentation;
+
 		return FileType2;
 	}
 
@@ -80,10 +87,17 @@
 			case 'application/vnd.ms-excel':
 			case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
 				return 'Spreadsheet';
+			case 'application/vnd.openxmlformats-officedocument.presentationml.presentation':
+				return 'Presentation';
+			case 'text/csv':
+				return 'CSV';
+			case 'text/markdown':
+				return 'Markdown';
 			default:
 				return 'File';
 		}
 	}
+
 
 	async function extractPdfText(file: File): Promise<string> {
 		const arrayBuffer = await file.arrayBuffer();
@@ -97,7 +111,17 @@
 		}
 		return text;
 	}
+	
+	async function extractDocxText(file: File): Promise<string> {
+		const arrayBuffer = await file.arrayBuffer();
+		const { value } = await mammoth.extractRawText({ arrayBuffer });
+		return value;
+	}
 
+	async function extractPlainText(file: File): Promise<string> {
+		return await file.text();
+	}
+	
 	async function getFileContent(file: File): Promise<[string, string] | null> {
 		const mimeType = file.type;
 
@@ -106,6 +130,21 @@
 			const text = await extractPdfText(file);
 			if (text.length < 5) return null; // When extraction does not work properly
 			return [text, "PDF"];
+		}
+
+		// DOCX
+		if (mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+			const text = await extractDocxText(file);
+			console.log('DOCX extracted text:', text);
+			if (text.length < 5) return null; // When extraction does not work properly
+			return [text, "DOCX"];
+		}
+
+		// Plain Text
+		if (mimeType === 'text/plain') {
+			const text = await extractPlainText(file);
+			if (text.length < 5) return null; // When extraction does not work properly
+			return [text, "Plain Text"];
 		}
 
 		// Unknown
@@ -175,7 +214,7 @@
 		if (fileToDescribe) {
 			const content = await getFileContent(fileToDescribe);
 			if (!content) {
-				console.warn('Unsupported file type.');
+				console.warn('Unsupported file.');
 				$formData.description = 'Unsupported file.';
 				loadingDescription = false;
 				return;
@@ -198,7 +237,7 @@
 			const content = await getFileContent(fileToDescribe);
 			if (!content) {
 				console.warn('Unsupported file.');
-				$formData.tags = ['unsupported-file-type'];
+				$formData.tags = ['unsupported-file'];
 				loadingTags = false;
 				return;
 			}

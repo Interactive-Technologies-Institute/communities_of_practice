@@ -8,7 +8,7 @@ create table public.contents (
     description text not null,
     file text not null,
     mime_type text not null,
-    tags text [] not null default '{}',
+    tags text [] not null default '{}'
 );
 alter table public.contents
 add column fts tsvector generated always as (
@@ -114,7 +114,24 @@ values (
         'contents',
         'Contents',
         true,
-        '{"image/*", "application/pdf", "application/zip", "application/msword", "application/vnd.*", "text/*"}'
+        array[
+            'image/*',
+            'application/pdf',
+            'application/zip',
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'application/vnd.ms-excel',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+            'application/json',
+            'application/x-tar',
+            'application/x-7z-compressed',
+            'application/x-rar-compressed',
+            'text/plain',
+            'text/csv',
+            'text/markdown',
+            'text/*'
+        ]
     );
 alter table public.contents enable row level security;
 alter table public.contents_moderation enable row level security;

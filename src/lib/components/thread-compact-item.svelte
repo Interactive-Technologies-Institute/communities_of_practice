@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { Card } from '@/components/ui/card';
-	import type { ThreadWithAuthorAndCounters } from '@/types/types';
+	import type { ThreadWithCounters } from '@/types/types';
 	import { Calendar, ThumbsUp, MessageSquare, MessagesSquare } from 'lucide-svelte';
     import dayjs from 'dayjs';
 
-	export let thread: ThreadWithAuthorAndCounters;
+	export let thread: ThreadWithCounters;
 </script>
 
 <a href="/forum/{thread.id}" class="h-full">
