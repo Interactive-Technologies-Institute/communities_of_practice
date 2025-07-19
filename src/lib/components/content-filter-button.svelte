@@ -11,16 +11,19 @@
 
 	let open = false;
 
-    const types: { label: string; value: string }[] = [
+	const types: { label: string; value: string }[] = [
 		{ label: 'Image',        value: 'Image' },
 		{ label: 'Video',        value: 'Video' },
 		{ label: 'Audio',        value: 'Audio' },
 		{ label: 'PDF',          value: 'PDF' },
 		{ label: 'Text',         value: 'Text' },
+		{ label: 'CSV',          value: 'CSV' },
+		{ label: 'Markdown',     value: 'Markdown' },
 		{ label: 'Archive',      value: 'Archive' },
 		{ label: 'JSON',         value: 'JSON' },
 		{ label: 'Spreadsheet',  value: 'Spreadsheet' },
 		{ label: 'Word Doc',     value: 'Word Doc' },
+		{ label: 'Presentation', value: 'Presentation' },
 		{ label: 'Other',        value: 'File' }
 	];
 

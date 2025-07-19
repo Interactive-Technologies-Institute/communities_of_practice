@@ -73,6 +73,8 @@ select
         when c.mime_type like 'image/%' then 'Image'
         when c.mime_type like 'video/%' then 'Video'
         when c.mime_type like 'audio/%' then 'Audio'
+        when c.mime_type = 'text/csv' then 'CSV'
+        when c.mime_type = 'text/markdown' then 'Markdown'
         when c.mime_type like 'text/%' then 'Text'
         when c.mime_type = 'application/pdf' then 'PDF'
         when c.mime_type in (
@@ -90,6 +92,8 @@ select
             'application/msword',
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
         ) then 'Word Doc'
+        when c.mime_type = 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+            then 'Presentation'
         else 'File'
     end as file_type,
     m.status as moderation_status,

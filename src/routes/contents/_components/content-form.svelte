@@ -18,6 +18,7 @@
 	import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist/legacy/build/pdf.mjs';
 	import workerUrl from 'pdfjs-dist/legacy/build/pdf.worker.mjs?url';
 	import * as mammoth from "mammoth";
+	import * as XLSX from 'xlsx';
 
 	GlobalWorkerOptions.workerSrc = workerUrl;
 
@@ -118,8 +119,17 @@
 		return value;
 	}
 
-	async function extractPlainText(file: File): Promise<string> {
-		return await file.text();
+	async function extractSpreadsheetText(file: File): Promise<string> {
+		const arrayBuffer = await file.arrayBuffer();
+		const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+		let text = '';
+
+		workbook.SheetNames.forEach(name => {
+			const sheet = workbook.Sheets[name];
+			text += XLSX.utils.sheet_to_txt(sheet) + '\n';
+		});
+
+		return text;
 	}
 	
 	async function getFileContent(file: File): Promise<[string, string] | null> {
@@ -135,18 +145,27 @@
 		// DOCX
 		if (mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
 			const text = await extractDocxText(file);
-			console.log('DOCX extracted text:', text);
 			if (text.length < 5) return null; // When extraction does not work properly
 			return [text, "DOCX"];
 		}
 
-		// Plain Text
-		if (mimeType === 'text/plain') {
-			const text = await extractPlainText(file);
+		// Plain Text / CSV / Markdown / JSON
+		if (mimeType === 'text/plain' || mimeType === 'text/csv' || mimeType === 'text/markdown' || mimeType === 'application/json') {
+			const text = await file.text();
 			if (text.length < 5) return null; // When extraction does not work properly
+			if (mimeType === 'text/markdown') return [text, "Markdown"];
+			if (mimeType === 'text/csv') return [text, "CSV"];
+			if (mimeType === 'application/json') return [text, "JSON"];
 			return [text, "Plain Text"];
 		}
 
+		// EXCEL
+		if (mimeType === 'application/vnd.ms-excel' ||
+			mimeType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
+			const text = await extractSpreadsheetText(file);
+			if (text.length < 5) return null; // When extraction does not work properly
+			return [text, "Excel"];
+		}
 		// Unknown
 		return null;
 	}
@@ -220,7 +239,12 @@
 				return;
 			}
 			const description = await generateFileDescription(content[0], content[1]);
-			$formData.description = description ?? '';
+			if (!description) {
+				$formData.description = 'Failed to generate description. File may be too large or unsupported.';
+			} else {
+				$formData.description = description;
+			}
+
 			console.log('Description result:', description);
 		} else {
 			console.warn('No file provided to generate description.');

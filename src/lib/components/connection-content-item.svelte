@@ -4,7 +4,7 @@
 	import { Button } from '@/components/ui/button';
 	import { Card } from '@/components/ui/card';
 	import type { ContentWithCounter } from '@/types/types';
-	import { Tag, FileImage, FileVideo, FileText, File, FileAudio, FileArchive, FileType2, Download } from 'lucide-svelte';
+	import { Tag, FileImage, FileVideo, Presentation, FileJson, FileText, File as FileIcon, FileAudio, FileArchive, FileType2, Download } from 'lucide-svelte';
 
 	export let content: ContentWithCounter;
     export let selectedContentIds: number[];
@@ -29,13 +29,19 @@
 	};
 
 	function getFileIcon(mimeType: string | null) {
-		if (!mimeType) return File;
+		if (!mimeType) return FileIcon;
 		if (mimeType.startsWith('image/')) return FileImage;
 		if (mimeType.startsWith('video/')) return FileVideo;
-		if (mimeType === 'application/pdf') return FileText;
+		if (mimeType === 'application/pdf' || mimeType === 'application/msword' ||
+			mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
+			mimeType === 'text/plain') return FileText;
+		if (mimeType === 'application/json') return FileJson;
 		if (mimeType.startsWith('audio/')) return FileAudio;
-		if (mimeType.includes('zip') || mimeType.includes('compressed')) return FileArchive;
-		if (mimeType === 'text/plain') return FileText;
+		if (mimeType.includes('zip') || mimeType === 'application/x-tar' ||
+			mimeType.includes('compressed')) return FileArchive;
+		if (mimeType === 'application/vnd.openxmlformats-officedocument.presentationml.presentation')
+			return Presentation;
+
 		return FileType2;
 	}
 
@@ -62,6 +68,12 @@
 			case 'application/vnd.ms-excel':
 			case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
 				return 'Spreadsheet';
+			case 'application/vnd.openxmlformats-officedocument.presentationml.presentation':
+				return 'Presentation';
+			case 'text/csv':
+				return 'CSV';
+			case 'text/markdown':
+				return 'Markdown';
 			default:
 				return 'File';
 		}

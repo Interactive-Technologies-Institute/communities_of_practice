@@ -46,10 +46,13 @@ export const load = async (event) => {
                 'Audio',
                 'PDF',
                 'Text',
+                'CSV',
+                'Markdown',
                 'Archive',
                 'JSON',
                 'Spreadsheet',
                 'Word Doc',
+                'Presentation',
                 'File'
             ];
             const allValid = fileTypes.every((r) => validTypes.includes(r));
