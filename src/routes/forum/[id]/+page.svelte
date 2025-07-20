@@ -83,17 +83,13 @@
 			{#if data.thread.image !== null && data.thread.image !== undefined}
 				<InteractableImage src={data.thread.image} class="w-full object-contain rounded mb-3"/>
 			{/if}
-			<p class="whitespace-pre-wrap break-words mb-3">{data.thread.content}</p>
-			<div class="text-base text-muted-foreground flex flex-wrap items-center justify-between w-full">
-				<div class="flex items-center gap-5">
-					<div class="flex items-center gap-1">
-						<span>{data.likesCount} {data.likesCount === 1 ? 'like' : 'likes'}</span>
-					</div>
-					<div class="flex items-center gap-1">
-						<span>{data.commentsCount} {data.commentsCount === 1 ? 'comment' : 'comments'}</span>
-					</div>
+			<p class="whitespace-pre-wrap break-words">{data.thread.content}</p>
+			<div class="flex w-full justify-between items-end mt-4 text-sm text-muted-foreground">
+				<div class="flex gap-3">
+					<span>{data.likesCount} {data.likesCount === 1 ? 'like' : 'likes'}</span>
+					<span>{data.commentsCount} {data.commentsCount === 1 ? 'comment' : 'comments'}</span>
 				</div>
-				<div class="flex items-center gap-3 flex-wrap">
+				<div class="flex flex-wrap justify-end gap-x-3 max-w-[70%]">
 					{#each data.thread.tags as tag}
 						<a href={`/forum?tags=${tag}`} class="flex items-center gap-1 hover:underline">
 							<Tag class="h-4 w-4" />

@@ -7,8 +7,19 @@
 	import dayjs from 'dayjs';
 	import { Tag, ThumbsUp } from 'lucide-svelte';
 	import type { EventWithCounters } from '@/types/types';
+	import { onMount } from 'svelte';
 
 	export let event: EventWithCounters;
+
+	let visibleTagIndex = 0;
+	const totalTags = event.tags.length;
+
+	onMount(() => {
+		const interval = setInterval(() => {
+			visibleTagIndex = (visibleTagIndex + 1) % totalTags;
+		}, 3000);
+		return () => clearInterval(interval);
+	});
 
 	const moderationStatusLabels = {
 		pending: 'Pending',
@@ -61,7 +72,7 @@
 		<div class="flex flex-1 flex-col px-4 py-3">
 			<div class="mb-5">
 				{#if event.date && event.start_time && event.end_time}
-					<p class="font-medium leading-none">
+					<p class="font-medium line-clamp-1 leading-none">
 						{dayjs(`${event.date}T${event.start_time}`).format(
 							dayjs(event.date).year() === dayjs().year()
 								? 'ddd, MM/DD [at] HH:mm'
@@ -73,23 +84,26 @@
 				{:else}
 					<p class="font-medium leading-none">Date not decided yet • {event.location}</p>
 				{/if}
-				<h2 class="line-clamp-2 text-lg font-medium mt-2">{event.title}</h2>
-				<p class="line-clamp-2 text-muted-foreground">{event.description}</p>
+				<h2 class="line-clamp-1 text-lg font-medium mt-2">{event.title}</h2>
+				<p class="line-clamp-1 text-muted-foreground">{event.description}</p>
 			</div>
-			<div class="text-base text-muted-foreground flex flex-wrap items-center justify-between w-full mt-auto">
+			<div class="flex w-full justify-between items-end mt-4 text-sm text-muted-foreground">
 				<div class="flex items-center gap-5">
 					<div class="flex items-center gap-1">
 						<ThumbsUp class="h-4 w-4" />
 						<span>{event.interests_count}</span>
 					</div>
 				</div>
-				<div class="flex items-center gap-3 flex-wrap">
-					{#each event.tags as tag}
-						<a href={`/events?tags=${tag}`} class="flex items-center gap-1 hover:underline">
+				<div class="flex flex-wrap justify-end gap-x-3 max-w-[68%]">
+					{#if event.tags.length > 0}
+						<a
+							href={`/events?tags=${event.tags[visibleTagIndex]}`}
+							class="flex items-center gap-1 hover:underline"
+						>
 							<Tag class="h-4 w-4" />
-							<span>{tag}</span>
+							<span>{event.tags[visibleTagIndex]}</span>
 						</a>
-					{/each}
+					{/if}
 				</div>
 			</div>
 		</div>

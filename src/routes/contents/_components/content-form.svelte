@@ -19,6 +19,8 @@
 	import workerUrl from 'pdfjs-dist/legacy/build/pdf.worker.mjs?url';
 	import * as mammoth from "mammoth";
 	import * as XLSX from 'xlsx';
+	import JSZip from 'jszip';
+
 
 	GlobalWorkerOptions.workerSrc = workerUrl;
 
@@ -131,6 +133,43 @@
 
 		return text;
 	}
+
+	function getTextFromNodes(node: Document, tagName: string, namespaceURI: string): string {
+		let text = '';
+		const textNodes = node.getElementsByTagNameNS(namespaceURI, tagName);
+		for (let i = 0; i < textNodes.length; i++) {
+			text += textNodes[i].textContent + ' ';
+		}
+		return text.trim();
+	}
+
+	async function extractPptxText(file: File): Promise<string> {
+		try {
+			const arrayBuffer = await file.arrayBuffer();
+			const zip = await JSZip.loadAsync(arrayBuffer);
+			const aNamespace = "http://schemas.openxmlformats.org/drawingml/2006/main";
+
+			let text = '';
+			let slideIndex = 1;
+
+			while (true) {
+				const slideFile = zip.file(`ppt/slides/slide${slideIndex}.xml`);
+				if (!slideFile) break;
+
+				const xmlStr = await slideFile.async('text');
+				const parser = new DOMParser();
+				const xmlDoc = parser.parseFromString(xmlStr, 'application/xml');
+
+				text += getTextFromNodes(xmlDoc, "t", aNamespace) + '\n\n';
+				slideIndex++;
+			}
+
+			return text.trim();
+		} catch (err) {
+			console.error('Error extracting text from PPTX:', err);
+			return '';
+		}
+	}
 	
 	async function getFileContent(file: File): Promise<[string, string] | null> {
 		const mimeType = file.type;
@@ -165,6 +204,13 @@
 			const text = await extractSpreadsheetText(file);
 			if (text.length < 5) return null; // When extraction does not work properly
 			return [text, "Excel"];
+		}
+
+		// PPTX
+		if (mimeType === 'application/vnd.openxmlformats-officedocument.presentationml.presentation') {
+			const text = await extractPptxText(file);
+			if (text.length < 5) return null; // When extraction does not work properly
+			return [text, "PowerPoint"];
 		}
 		// Unknown
 		return null;

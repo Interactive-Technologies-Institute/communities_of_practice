@@ -67,7 +67,7 @@
 		</AspectRatio>
 		<div class="flex flex-1 flex-col px-4 py-3">
 			<h1 class="text-2xl font-bold tracking-tight text-foreground mb-3 break-words">{data.event.title}</h1>
-			<div class="flex flex-row gap-x-4">
+			<div class="flex flex-col gap-y-2">
 				<div class="flex flex-row items-center gap-x-2">
 					<Calendar class="text-muted-foreground" />
 					<!-- Fixed date / Voting ended-->
@@ -83,19 +83,15 @@
 					{/if}
 				</div>
 
-				<div class="flex flex-row items-center gap-x-2">
+				<div class="flex flex-row items-center break-all gap-x-2">
 					<MapPin class="text-muted-foreground" />
 					{data.event.location}
 				</div>
 			</div>
 			<p class="whitespace-pre-wrap break-words mb-3 mt-3">{data.event.description}</p>
-			<div class="text-base text-muted-foreground flex flex-wrap items-center justify-between w-full">
-				<div class="flex items-center gap-5">
-					<div class="flex items-center gap-1">
-						<span>{data.interestCount + ' members interested'}</span>
-					</div>
-				</div>
-				<div class="flex items-center gap-3 flex-wrap">
+			<div class="flex w-full justify-between items-end mt-4 text-sm text-muted-foreground">
+				<span>{data.interestCount + ' members interested'}</span>
+				<div class="flex flex-wrap justify-end gap-x-3 max-w-[70%]">
 					{#each data.event.tags as tag}
 						<a href={`/forum?tags=${tag}`} class="flex items-center gap-1 hover:underline">
 							<Tag class="h-4 w-4" />

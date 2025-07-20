@@ -58,7 +58,7 @@
 				{/if}
 				<p class="line-clamp-2 whitespace-pre-wrap break-words">{thread.content}</p>
 			</div>
-			<div class="text-base text-muted-foreground flex flex-wrap items-center justify-between w-full">
+			<div class="flex w-full justify-between items-end mt-4 text-sm text-muted-foreground">
 				<div class="flex items-center gap-5">
 					<div class="flex items-center gap-1">
 						<ThumbsUp class="h-4 w-4" />
@@ -69,7 +69,7 @@
 						<span>{thread.comments_count}</span>
 					</div>
 				</div>
-				<div class="flex items-center gap-3 flex-wrap">
+				<div class="flex flex-wrap justify-end gap-x-3 max-w-[75%]">
 					{#each thread.tags as tag}
 						<a href={`/forum?tags=${tag}`} class="flex items-center gap-1 hover:underline">
 							<Tag class="h-4 w-4" />

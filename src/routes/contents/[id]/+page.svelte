@@ -115,16 +115,16 @@
 					</Badge>
 				</div>
 			</div>
-			{#if data.downloadForm.data.value}
-				<div class="text-base text-muted-foreground">
-					<span>You’ve already downloaded this file.</span>
+			<div class="flex w-full justify-between items-end mt-4 text-sm text-muted-foreground">
+				<div class="flex flex-col">
+					{#if data.downloadForm.data.value}
+						<span>You’ve already downloaded this file.</span>
+					{/if}
+					<span>{data.downloadCount + ' members downloaded'}</span>
 				</div>
-			{/if}
-			<div class="text-base text-muted-foreground flex flex-wrap items-center justify-between w-full">
-				<span>{data.downloadCount + ' members downloaded'}</span>
-				<div class="flex items-center gap-3 flex-wrap">
+				<div class="flex flex-wrap justify-end gap-x-3 max-w-[68%]">
 					{#each data.content.tags as tag}
-						<a href={`/contents?tags=${tag}`} class="flex items-center gap-1 hover:underline">
+						<a href={`/contents?tags=${tag}`} class="flex items-end gap-1 hover:underline">
 							<Tag class="h-4 w-4" />
 							<span>{tag}</span>
 						</a>
