@@ -58,7 +58,7 @@
 				{/if}
 				<p class="line-clamp-2 whitespace-pre-wrap break-words">{thread.content}</p>
 			</div>
-			<div class="flex w-full justify-between items-end mt-4 text-sm text-muted-foreground">
+			<div class="flex w-full justify-between items-end text-sm text-muted-foreground">
 				<div class="flex items-center gap-5">
 					<div class="flex items-center gap-1">
 						<ThumbsUp class="h-4 w-4" />

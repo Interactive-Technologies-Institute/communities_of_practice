@@ -91,7 +91,7 @@
 					},
 					{
 						role: 'user',
-						content: `Return a maximum of 5 unique tags (each between 3 and 30 characters, including spaces) that represent the following thread content as a JSON array of strings. Example: ["tag1", "tag2"]\n\nContent:\n${content}`
+						content: `Return a maximum of 4 unique tags (each between 3 and 30 characters, including spaces) that represent the following thread content as a JSON array of strings. Example: ["tag1", "tag2"]\n\nContent:\n${content}`
 					}
 				],
 				temperature: 0.7,

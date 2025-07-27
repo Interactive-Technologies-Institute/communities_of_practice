@@ -16,8 +16,8 @@ export const createThreadSchema = z
         summary: z.string().nullish(),
         tags: z
             .array(z.string())
-            .refine((tags) => tags.length <= 5, {
-                message: 'Must be less than 5 tags',
+            .refine((tags) => tags.length <= 4, {
+                message: 'Maximum of 4 tags',
             })
             .refine((tags) => {
                 return new Set(tags).size === tags.length;

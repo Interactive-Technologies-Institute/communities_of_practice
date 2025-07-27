@@ -6,7 +6,7 @@
 	import { Badge } from '@/components/ui/badge';
 	import { Button } from '@/components/ui/button';
 	import dayjs from 'dayjs';
-	import { Tag, FileImage, FileVideo, FileText, FileJson, File as FileIcon, FileAudio, FileArchive, FileType2, Presentation, Pen, Trash } from 'lucide-svelte';
+	import { Tag, FileImage, FileSpreadsheet, FileVideo, FileText, FileJson, File as FileIcon, FileAudio, FileArchive, FileType2, Presentation, Pen, Trash } from 'lucide-svelte';
 	import { MetaTags } from 'svelte-meta-tags';
 	import ContentDeleteDialog from './_components/content-delete-dialog.svelte';
 	import { cn } from '@/utils';
@@ -28,6 +28,8 @@
 		if (mimeType.startsWith('audio/')) return FileAudio;
 		if (mimeType.includes('zip') || mimeType === 'application/x-tar' ||
 			mimeType.includes('compressed')) return FileArchive;
+		if (mimeType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+			return FileSpreadsheet;
 		if (mimeType === 'application/vnd.openxmlformats-officedocument.presentationml.presentation')
 			return Presentation;
 

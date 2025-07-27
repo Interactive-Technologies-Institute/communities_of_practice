@@ -8,7 +8,7 @@
 	import * as Card from '@/components/ui/card';
 	import { TagInput } from '@/components/ui/tag-input';
 	import { Loader2 } from 'lucide-svelte';
-	import { FileImage, FileVideo, FileJson, FileText, File as FileIcon, FileAudio, FileArchive, FileType2, Presentation, Eye} from 'lucide-svelte';
+	import { FileImage, FileSpreadsheet, FileVideo, FileJson, FileText, File as FileIcon, FileAudio, FileArchive, FileType2, Presentation, Eye} from 'lucide-svelte';
 	import { superForm, fileProxy, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient, type Infer } from 'sveltekit-superforms/adapters';
 	import type { CreateContentSchema, EditContentSchema } from '@/schemas/content';
@@ -61,6 +61,8 @@
 		if (mimeType.startsWith('audio/')) return FileAudio;
 		if (mimeType.includes('zip') || mimeType === 'application/x-tar' ||
 			mimeType.includes('compressed')) return FileArchive;
+		if (mimeType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+			return FileSpreadsheet;
 		if (mimeType === 'application/vnd.openxmlformats-officedocument.presentationml.presentation')
 			return Presentation;
 

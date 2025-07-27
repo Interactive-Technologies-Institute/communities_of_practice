@@ -147,7 +147,7 @@
 				<span class="text-sm font-semibold uppercase">Vote Schedule</span>
 				<hr class="flex-grow border-t border-foreground" />
 			</div>
-			<Card class="mx-auto p-2 space-y-4">
+			<Card class="w-full mx-auto p-2 space-y-4">
 				{#if data.votingOptions.length > 1}
 					<EventVoteSchedule event={data.event} voteOnSchedule={data.voteOnScheduleForm} removeVotes={data.removeVotesForm} votingOptions={data.votingOptions} hasVoted={data.hasVoted}/>
 				{:else}

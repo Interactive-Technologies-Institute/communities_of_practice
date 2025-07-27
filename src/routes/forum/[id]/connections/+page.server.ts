@@ -44,7 +44,7 @@ export const load = async (event) => {
         }
 
         if (contentsTags && contentsTags.length) {
-            query = query.overlaps('contentsTags', contentsTags);
+            query = query.overlaps('tags', contentsTags);
         }
         
         if (fileTypes && fileTypes.length) {
@@ -132,7 +132,7 @@ export const load = async (event) => {
         }
 
         if (eventsTags && eventsTags.length) {
-            query = query.overlaps('eventsTags', eventsTags);
+            query = query.overlaps('tags', eventsTags);
         }
 
         if (statuses && statuses.length) {

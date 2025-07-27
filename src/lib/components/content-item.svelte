@@ -4,7 +4,7 @@
 	import { Button } from '@/components/ui/button';
 	import { Card } from '@/components/ui/card';
 	import type { ContentWithCounter } from '@/types/types';
-	import { Tag, FileImage, FileVideo, FileText, Presentation, FileJson, File as FileIcon, FileAudio, FileArchive, FileType2, Download } from 'lucide-svelte';
+	import { FileSpreadsheet, FileImage, FileVideo, FileText, Presentation, FileJson, File as FileIcon, FileAudio, FileArchive, FileType2, Download } from 'lucide-svelte';
 	import dayjs from 'dayjs';
 
 	export let content: ContentWithCounter;
@@ -27,6 +27,8 @@
 		if (mimeType.startsWith('audio/')) return FileAudio;
 		if (mimeType.includes('zip') || mimeType === 'application/x-tar' ||
 			mimeType.includes('compressed')) return FileArchive;
+		if (mimeType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+			return FileSpreadsheet;
 		if (mimeType === 'application/vnd.openxmlformats-officedocument.presentationml.presentation')
 			return Presentation;
 
