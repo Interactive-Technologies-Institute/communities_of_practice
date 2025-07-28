@@ -1,4 +1,4 @@
-import type { Branding, Feature, Notification, UserProfile } from '@/types/types';
+import type { Branding, Feature, Notification, UserProfile, Conversation } from '@/types/types';
 import { loadFlash } from 'sveltekit-flash-message/server';
 
 export const load = loadFlash(async ({ locals: { supabase, safeGetSession }, cookies }) => {
@@ -9,11 +9,7 @@ export const load = loadFlash(async ({ locals: { supabase, safeGetSession }, coo
 		const { data } = await supabase.from('profiles_view').select().eq('id', user.id).single();
 		if (data) {
 			profile = {
-				...data,
-				interests: data.interests ?? [],
-				education: data.education ?? [],
-				languages: data.languages ?? [],
-				skills: data.skills ?? [],
+				...data
 			};
 			if (profile.avatar) {
 				profile.avatar = supabase.storage.from('users').getPublicUrl(profile.avatar).data.publicUrl;
@@ -38,6 +34,17 @@ export const load = loadFlash(async ({ locals: { supabase, safeGetSession }, coo
 		.eq('enabled', true);
 	if (featuresData) features = featuresData.map((f: { id: Feature }) => f.id);
 
+	let conversations: Conversation[] = [];
+	if (user) {
+		const { data } = await supabase
+			.from('conversations')
+			.select()
+			.eq('user_id', user.id)
+			.order('inserted_at', { ascending: true });
+		console.log('conversations', data);
+		if (data) conversations = data;
+	}
+
 	let branding: Branding = {
 		name: 'KCIDADE',
 		slogan: 'A community for everyone',
@@ -59,5 +66,6 @@ export const load = loadFlash(async ({ locals: { supabase, safeGetSession }, coo
 		user,
 		profile,
 		notifications,
+		conversations,
 	};
 });

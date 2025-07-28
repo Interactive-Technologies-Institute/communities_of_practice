@@ -61,7 +61,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
-          description?: string
+          description: string
           file: string
           fts?: unknown | null
           id?: number
@@ -206,6 +206,63 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      conversations: {
+        Row: {
+          entry: string
+          id: number
+          inserted_at: string
+          speaker: Database["public"]["Enums"]["speaker"]
+          user_id: string
+        }
+        Insert: {
+          entry: string
+          id?: number
+          inserted_at?: string
+          speaker: Database["public"]["Enums"]["speaker"]
+          user_id: string
+        }
+        Update: {
+          entry?: string
+          id?: number
+          inserted_at?: string
+          speaker?: Database["public"]["Enums"]["speaker"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_view"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      documents: {
+        Row: {
+          content: string | null
+          embedding: string | null
+          id: number
+        }
+        Insert: {
+          content?: string | null
+          embedding?: string | null
+          id?: number
+        }
+        Update: {
+          content?: string | null
+          embedding?: string | null
+          id?: number
+        }
+        Relationships: []
       }
       event_contents: {
         Row: {
@@ -2124,6 +2181,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      binary_quantize: {
+        Args: { "": string } | { "": unknown }
+        Returns: unknown
+      }
       custom_access_token_hook: {
         Args: { event: Json }
         Returns: Json
@@ -2213,6 +2274,82 @@ export type Database = {
           has_voted: boolean
         }[]
       }
+      halfvec_avg: {
+        Args: { "": number[] }
+        Returns: unknown
+      }
+      halfvec_out: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      halfvec_send: {
+        Args: { "": unknown }
+        Returns: string
+      }
+      halfvec_typmod_in: {
+        Args: { "": unknown[] }
+        Returns: number
+      }
+      hnsw_bit_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      hnsw_halfvec_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      hnsw_sparsevec_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      hnswhandler: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      ivfflat_bit_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      ivfflat_halfvec_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      ivfflathandler: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      l2_norm: {
+        Args: { "": unknown } | { "": unknown }
+        Returns: number
+      }
+      l2_normalize: {
+        Args: { "": string } | { "": unknown } | { "": unknown }
+        Returns: string
+      }
+      match_documents: {
+        Args: {
+          query_embedding: string
+          match_threshold: number
+          match_count: number
+        }
+        Returns: {
+          id: number
+          content: string
+          similarity: number
+        }[]
+      }
+      sparsevec_out: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      sparsevec_send: {
+        Args: { "": unknown }
+        Returns: string
+      }
+      sparsevec_typmod_in: {
+        Args: { "": unknown[] }
+        Returns: number
+      }
       update_event_statuses: {
         Args: Record<PropertyKey, never>
         Returns: undefined
@@ -2220,6 +2357,30 @@ export type Database = {
       update_user_types: {
         Args: { types: Database["public"]["CompositeTypes"]["user_type"][] }
         Returns: undefined
+      }
+      vector_avg: {
+        Args: { "": number[] }
+        Returns: string
+      }
+      vector_dims: {
+        Args: { "": string } | { "": unknown }
+        Returns: number
+      }
+      vector_norm: {
+        Args: { "": string }
+        Returns: number
+      }
+      vector_out: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      vector_send: {
+        Args: { "": string }
+        Returns: string
+      }
+      vector_typmod_in: {
+        Args: { "": unknown[] }
+        Returns: number
       }
       verify_user_password: {
         Args: { password: string }
@@ -2277,6 +2438,7 @@ export type Database = {
         | "content_approved"
         | "content_rejected"
         | "content_announcement"
+      speaker: "user" | "ai"
       user_permission:
         | "user_roles.update"
         | "user_types.update"
@@ -2498,6 +2660,7 @@ export const Constants = {
         "content_rejected",
         "content_announcement",
       ],
+      speaker: ["user", "ai"],
       user_permission: [
         "user_roles.update",
         "user_types.update",

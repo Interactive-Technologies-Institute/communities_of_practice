@@ -6,6 +6,7 @@
 	import Header from '@/components/header.svelte';
 	import NavigatingIndicator from '@/components/navigating-indicator.svelte';
 	import TailwindIndicator from '@/components/tailwind-indicator.svelte';
+	import ChatbotButton from '@/components/chatbot-button.svelte';
 	import { Toaster } from '@/components/ui/sonner';
 	import dayjs from 'dayjs';
 	import relativeTime from 'dayjs/plugin/relativeTime';
@@ -19,7 +20,7 @@
 
 	export let data;
 
-	$: ({ supabase, session, user, profile, notifications, branding } = data);
+	$: ({ supabase, session, user, profile, notifications, conversations, branding } = data);
 
 	const flash = getFlash(page);
 	$: if ($flash) {
@@ -53,6 +54,11 @@
 	<div class="flex-1">
 		<slot />
 	</div>
+	{#if profile && user}
+		<div class="fixed bottom-4 right-4 z-50">
+			<ChatbotButton {conversations} />
+		</div>
+	{/if}
 	<Footer />
 	{#if dev}
 		<TailwindIndicator />

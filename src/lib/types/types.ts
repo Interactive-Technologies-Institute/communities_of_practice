@@ -256,3 +256,13 @@ export type Notification = {
 	data: Record<string, string>;
 	read: boolean;
 };
+
+export type Speaker = 'user' | 'ai';
+
+export type Conversation = {
+	id: number;
+	inserted_at: string;
+	user_id: string;
+	entry: string;
+	speaker: Speaker;
+};

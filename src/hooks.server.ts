@@ -59,7 +59,7 @@ const sessionHandle: Handle = async ({ event, resolve }) => {
 
 	return resolve(event, {
 		filterSerializedResponseHeaders(name) {
-			return name === 'content-range' || name === 'x-supabase-api-version';
+			return name === 'content-range' || name === 'x-supabase-api-version' || name === 'content-type';
 		},
 	});
 };

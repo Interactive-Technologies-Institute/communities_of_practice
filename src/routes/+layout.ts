@@ -31,6 +31,7 @@ export const load = async ({ fetch, data, depends }) => {
 		user: data.user,
 		profile: data.profile,
 		notifications: data.notifications,
+		conversations: data.conversations,
 		features: data.features,
 		branding: data.branding,
 	};
