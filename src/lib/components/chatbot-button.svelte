@@ -85,7 +85,7 @@
 			</div>
 		</Button>
 	</Popover.Trigger>
-	<Popover.Content class="w-80 max-h-[85vh] overflow-hidden p-0 flex flex-col" align="end">
+	<Popover.Content class="w-[28rem] max-h-[85vh] overflow-hidden p-0 flex flex-col" align="end">
 		<div class="p-2 border-b">
 			AI Assistant
 		</div>
@@ -117,6 +117,7 @@
 				placeholder="Type your question..."
 				class="flex-1"
 				bind:value={message}
+				disabled={loadingAI}
 			/>
 			<Button type="button" on:click={askQuestion} disabled={message.trim().length <= 0 || loadingAI} size="icon-lg">
 				{#if loadingAI}

@@ -6,6 +6,8 @@ import { setFlash } from 'sveltekit-flash-message/server';
 import { superValidate, withFiles} from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { v4 as uuidv4 } from 'uuid';
+import { OpenAI } from 'openai';
+import { OPENAI_API_KEY } from '$env/static/private';
 
 export const load = async (event) => {
     const { session } = await event.locals.safeGetSession();
@@ -72,20 +74,47 @@ export const actions = {
             }
 
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const { fileUrl, file, ...data } = form.data;			
+            const { fileUrl, file, ...data } = form.data;	
+            const contentId = parseInt(event.params.id);		
             const { error: supabaseError } = await event.locals.supabase
                 .from('contents')
                 .update({
                     ...data,
                     user_id: userId,
                     file: filePath})
-                .eq('id', parseInt(event.params.id));
+                .eq('id', contentId);
 
             if (supabaseError) {
                 setFlash({ type: 'error', message: supabaseError.message }, event.cookies);
                 return fail(500, withFiles({ message: supabaseError.message, form }));
             }
 
-            return redirect(303, `/contents/${event.params.id}`);
+            // Update knowledge in chatbot
+            const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+
+			const embeddingText = `[Content] ${form.data.title}
+                Tags: ${form.data.tags.join(', ')}
+                Description: ${form.data.description.slice(0, 300)}
+                Link: /content/${contentId}`;
+
+			try {
+				const embeddingResponse = await openai.embeddings.create({
+					model: 'text-embedding-ada-002',
+					input: embeddingText
+				});
+
+				const embedding = embeddingResponse.data[0].embedding;
+
+				await event.locals.supabase.from('documents').upsert({
+					content: embeddingText,
+					embedding: embedding,
+					type: 'content',
+					source_id: contentId
+				} as any, { onConflict: 'type, source_id' });
+			} catch (e) {
+				console.error('Embedding error:', e);
+			}
+
+            return redirect(303, `/contents/${contentId}`);
         }),
 };

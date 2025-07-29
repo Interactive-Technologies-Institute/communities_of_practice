@@ -6,6 +6,8 @@ import { setFlash } from 'sveltekit-flash-message/server';
 import { superValidate, withFiles } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { v4 as uuidv4 } from 'uuid';
+import { OpenAI } from 'openai';
+import { OPENAI_API_KEY } from '$env/static/private';
 
 export const load = async (event) => {
 	const { session } = await event.locals.safeGetSession();
@@ -87,6 +89,35 @@ export const actions = {
 					setFlash({ type: 'error', message: votingError.message }, event.cookies);
 					return fail(500, withFiles({ message: votingError.message, form }));
 				}
+			}
+
+			// Add knowledge to chatbot
+			const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+
+			const embeddingText = `[Event] ${form.data.title}
+				Tags: ${form.data.tags.join(', ')}
+				Date: ${form.data.date} | ${form.data.start_time}–${form.data.end_time}
+				Location: ${form.data.location}
+				Description: ${form.data.description}
+				Link: /events/${insertedEvent.id}`;
+
+			try {
+				const embeddingResponse = await openai.embeddings.create({
+					model: 'text-embedding-ada-002',
+					input: embeddingText
+				});
+
+				const embedding = embeddingResponse.data[0].embedding;
+
+				await event.locals.supabase.from('documents').upsert({
+					content: embeddingText,
+					embedding: embedding,
+					type: 'event',
+					source_id: insertedEvent.id
+				} as any, { onConflict: 'type, source_id' });
+				
+			} catch (e) {
+				console.error('Embedding error (event):', e);
 			}
 
 			return redirect(303, `/events/${insertedEvent.id}/connections`);

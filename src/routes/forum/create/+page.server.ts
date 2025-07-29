@@ -6,6 +6,8 @@ import { setFlash } from 'sveltekit-flash-message/server';
 import { superValidate, withFiles} from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { v4 as uuidv4 } from 'uuid';
+import { OpenAI } from 'openai';
+import { OPENAI_API_KEY } from '$env/static/private';
 
 export const load = async (event) => {
 	const { session } = await event.locals.safeGetSession();
@@ -71,7 +73,32 @@ export const actions = {
 				setFlash({ type: 'error', message: supabaseError.message }, event.cookies);
 				return fail(500, { message: supabaseError.message, form });
 			}
+			
+			// Add knowledge to chatbot
+			const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+			
+			const embeddingText = `[Thread] ${form.data.title}
+				Tags: ${form.data.tags.join(', ')}
+				Content: ${form.data.content}
+				Link: /forum/${insertedThread.id}`;
+			try {
+				const embeddingResponse = await openai.embeddings.create({
+					model: 'text-embedding-ada-002',
+					input: embeddingText
+				});
 
+				const embedding = embeddingResponse.data[0].embedding;
+
+				await event.locals.supabase.from('documents').upsert({
+					content: embeddingText,
+					embedding: embedding,
+					type: 'thread',
+					source_id: insertedThread.id
+				} as any, { onConflict: 'type, source_id' });  // TODO: As any
+
+			} catch (e) {
+				console.error('Embedding error:', e);
+			}
 			return redirect(303, `/forum/${insertedThread.id}/connections`);
 		}),
 };
