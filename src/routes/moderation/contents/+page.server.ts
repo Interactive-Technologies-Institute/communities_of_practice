@@ -5,6 +5,8 @@ import { error, fail } from '@sveltejs/kit';
 import { setFlash } from 'sveltekit-flash-message/server';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
+import { OpenAI } from 'openai';
+import { OPENAI_API_KEY } from '$env/static/private';
 
 export const load = async (event) => {
     const search = stringQueryParam().decode(event.url.searchParams.get('s'));
@@ -125,6 +127,47 @@ export const actions = {
                     setFlash({ type: 'error', message: supabaseError.message }, event.cookies);
                     return fail(500, { message: supabaseError.message, form });
                 }
+
+                // Add knowledge to chatbot if content is approved
+                if (form.data.status === 'approved') {
+					const { data: approvedContent, error: contentError } = await event.locals.supabase
+						.from('contents')
+						.select('id, title, tags, description')
+						.eq('id', form.data.ref_id)
+						.single();
+
+					if (contentError || !approvedContent) {
+						console.error('Could not fetch content for embedding:', contentError?.message);
+					} else {
+						const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+
+						const embeddingText = `[Content] ${approvedContent.title}
+                            Tags: ${approvedContent.tags.join(', ')}
+                            Description: ${approvedContent.description}
+                            Link: /content/${approvedContent.id}`;
+
+						try {
+							const embeddingResponse = await openai.embeddings.create({
+								model: 'text-embedding-ada-002',
+								input: embeddingText
+							});
+
+							const embedding = embeddingResponse.data[0].embedding;
+
+							await event.locals.supabase.from('documents').upsert({
+								content: embeddingText,
+								embedding: embedding,
+								type: 'content',
+								source_id: approvedContent.id
+							} as any, {
+								onConflict: 'type, source_id'  // TODO: As any
+							});
+						} catch (e) {
+							console.error('Embedding error (content approval):', e);
+						}
+					}
+				}
+                    
 
                 return { form };
             }

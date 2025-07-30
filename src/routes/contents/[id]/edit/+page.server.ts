@@ -88,33 +88,44 @@ export const actions = {
                 setFlash({ type: 'error', message: supabaseError.message }, event.cookies);
                 return fail(500, withFiles({ message: supabaseError.message, form }));
             }
+            
+            // Check if the content is approved before embedding
+            const { data: moderationStatus, error: moderationError } = await event.locals.supabase
+                .from('latest_contents_moderation') // assumes you use this view
+                .select('status')
+                .eq('content_id', contentId)
+                .single();
 
-            // Update knowledge in chatbot
-            const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+            if (moderationError) {
+	            console.error('Error checking moderation status for thread', moderationError.message);
+            }
+            else if (moderationStatus.status === 'approved') {
+                // Update knowledge in chatbot
+                const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
-			const embeddingText = `[Content] ${form.data.title}
-                Tags: ${form.data.tags.join(', ')}
-                Description: ${form.data.description.slice(0, 300)}
-                Link: /content/${contentId}`;
+                const embeddingText = `[Content] ${form.data.title}
+                    Tags: ${form.data.tags.join(', ')}
+                    Description: ${form.data.description}
+                    Link: /content/${contentId}`;
 
-			try {
-				const embeddingResponse = await openai.embeddings.create({
-					model: 'text-embedding-ada-002',
-					input: embeddingText
-				});
+                try {
+                    const embeddingResponse = await openai.embeddings.create({
+                        model: 'text-embedding-ada-002',
+                        input: embeddingText
+                    });
 
-				const embedding = embeddingResponse.data[0].embedding;
+                    const embedding = embeddingResponse.data[0].embedding;
 
-				await event.locals.supabase.from('documents').upsert({
-					content: embeddingText,
-					embedding: embedding,
-					type: 'content',
-					source_id: contentId
-				} as any, { onConflict: 'type, source_id' });
-			} catch (e) {
-				console.error('Embedding error:', e);
-			}
-
+                    await event.locals.supabase.from('documents').upsert({
+                        content: embeddingText,
+                        embedding: embedding,
+                        type: 'content',
+                        source_id: contentId
+                    } as any, { onConflict: 'type, source_id' });
+                } catch (e) {
+                    console.error('Embedding error:', e);
+                }
+            }
             return redirect(303, `/contents/${contentId}`);
         }),
 };

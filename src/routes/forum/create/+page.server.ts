@@ -74,7 +74,7 @@ export const actions = {
 				return fail(500, { message: supabaseError.message, form });
 			}
 			
-			// Add knowledge to chatbot
+			// Add knowledge to chatbot, here because threads are auto-approved
 			const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 			
 			const embeddingText = `[Thread] ${form.data.title}

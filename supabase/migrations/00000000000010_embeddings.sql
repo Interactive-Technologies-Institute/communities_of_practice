@@ -79,6 +79,52 @@ create table conversations (
     constraint conversations_pkey primary key (id)
 );
 
+create or replace function delete_event_document_on_unapprove()
+returns trigger as $$
+begin
+  if new.status is distinct from 'approved' then
+    delete from documents
+    where type = 'event' and source_id = new.event_id;
+  end if;
+
+  return new;
+end;
+$$ language plpgsql;
+create trigger trigger_delete_event_document_on_unapprove
+after insert on public.events_moderation
+for each row execute function delete_event_document_on_unapprove();
+
+create or replace function delete_content_document_on_unapprove()
+returns trigger as $$
+begin
+  if new.status is distinct from 'approved' then
+    delete from documents
+    where type = 'content' and source_id = new.content_id;
+  end if;
+
+  return new;
+end;
+$$ language plpgsql;
+create trigger trigger_delete_content_document_on_unapprove
+after insert on public.contents_moderation
+for each row execute function delete_content_document_on_unapprove();
+
+create or replace function delete_thread_document_on_unapprove()
+returns trigger as $$
+begin
+  if new.status is distinct from 'approved' then
+    delete from documents
+    where type = 'thread' and source_id = new.thread_id;
+  end if;
+
+  return new;
+end;
+$$ language plpgsql;
+create trigger trigger_delete_thread_document_on_unapprove
+after insert on public.forum_threads_moderation
+for each row execute function delete_thread_document_on_unapprove();
+
+
 alter table documents enable row level security;
 alter table conversations enable row level security;
 
@@ -98,6 +144,12 @@ with check (true);
 create policy "Allow all read access to documents"
 on documents
 for select
+using (true);
+
+create policy "Allow users to delete own documents"
+on public.documents
+for delete
+to authenticated
 using (true);
 
 create policy "Allow users to access to own conversations" on public.conversations

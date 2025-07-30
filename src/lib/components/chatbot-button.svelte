@@ -85,20 +85,20 @@
 			</div>
 		</Button>
 	</Popover.Trigger>
-	<Popover.Content class="w-[28rem] max-h-[85vh] overflow-hidden p-0 flex flex-col" align="end">
+	<Popover.Content class="w-[28rem] max-h-[85vh] p-0 flex flex-col" align="end">
 		<div class="p-2 border-b">
 			AI Assistant
 		</div>
 		<Separator />
-		<div class="flex-1 overflow-y-auto">
-			<ScrollArea class="flex flex-col gap-y-2 p-2">
+		<div class="overflow-y-auto">
+			<ScrollArea class="flex flex-col p-2">
 				{#if conversations?.length}
 					{#each conversations as conversation (conversation.id)}
-						<div class="flex flex-col gap-1">
+						<div class="flex flex-col">
 							<p class="text-xs font-medium text-muted-foreground">
 								{conversation.speaker === 'user' ? 'You' : 'AI'} · {dayjs(conversation.inserted_at).fromNow()}
 							</p>
-							<p class="text-sm text-foreground whitespace-pre-line">
+							<p class="text-sm text-foreground mb-2 whitespace-pre-line break-normal" style="overflow-wrap:anywhere">
 								{conversation.entry}
 							</p>
 						</div>

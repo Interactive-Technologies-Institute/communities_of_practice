@@ -5,6 +5,8 @@ import { error, fail } from '@sveltejs/kit';
 import { setFlash } from 'sveltekit-flash-message/server';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
+import { OpenAI } from 'openai';
+import { OPENAI_API_KEY } from '$env/static/private';
 
 export const load = async (event) => {
 	const search = stringQueryParam().decode(event.url.searchParams.get('s'));
@@ -96,6 +98,48 @@ export const actions = {
 				if (supabaseError) {
 					setFlash({ type: 'error', message: supabaseError.message }, event.cookies);
 					return fail(500, { message: supabaseError.message, form });
+				}
+
+				// Add knowledge to chatbot if event is approved
+				if (form.data.status === 'approved') {
+					const { data: approvedEvent, error: eventError } = await event.locals.supabase
+						.from('events')
+						.select('id, title, tags, description, location, date, start_time, end_time')
+						.eq('id', form.data.ref_id)
+						.single();
+
+					if (eventError || !approvedEvent) {
+						console.error('Could not fetch event for embedding:', eventError?.message);
+					} else {
+						const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+
+						const embeddingText = `[Event] ${approvedEvent.title}
+							Tags: ${approvedEvent.tags.join(', ')}
+							Date: ${approvedEvent.date ?? 'TBD'} | ${approvedEvent.start_time ?? '?'}–${approvedEvent.end_time ?? '?'}
+							Location: ${approvedEvent.location ?? 'Unspecified'}
+							Description: ${approvedEvent.description ?? ''}
+							Link: /events/${approvedEvent.id}`;
+
+						try {
+							const embeddingResponse = await openai.embeddings.create({
+								model: 'text-embedding-ada-002',
+								input: embeddingText
+							});
+
+							const embedding = embeddingResponse.data[0].embedding;
+
+							await event.locals.supabase.from('documents').upsert({
+								content: embeddingText,
+								embedding: embedding,
+								type: 'event',
+								source_id: approvedEvent.id
+							} as any, {
+								onConflict: 'type, source_id'  // TODO: As any
+							});
+						} catch (e) {
+							console.error('Embedding error (event approval):', e);
+						}
+					}
 				}
 
 				return { form };

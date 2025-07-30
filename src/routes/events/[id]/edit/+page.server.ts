@@ -120,33 +120,45 @@ export const actions = {
 				return fail(500, withFiles({ message: supabaseError.message, form }));
 			}
 
-			// Update knowledge in chatbot
-			const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+			// Check if the event is approved before embedding
+			const { data: moderationStatus, error: moderationError } = await event.locals.supabase
+				.from('latest_events_moderation')
+				.select('status')
+				.eq('event_id', eventId)
+				.single();
+				
+			if (moderationError) {
+				console.error('Error checking moderation status for event', moderationError.message);
+			}
+			else if (moderationStatus.status === 'approved') {
+				// Update knowledge in chatbot
+				const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
-			const embeddingText = `[Event] ${form.data.title}
-				Tags: ${form.data.tags.join(', ')}
-				Date: ${form.data.date} | ${form.data.start_time}–${form.data.end_time}
-				Location: ${form.data.location}
-				Description: ${form.data.description}
-				Link: /events/${eventId}`;
+				const embeddingText = `[Event] ${form.data.title}
+					Tags: ${form.data.tags.join(', ')}
+					Date: ${form.data.date} | ${form.data.start_time}–${form.data.end_time}
+					Location: ${form.data.location}
+					Description: ${form.data.description}
+					Link: /events/${eventId}`;
 
-			try {
-				const embeddingResponse = await openai.embeddings.create({
-					model: 'text-embedding-ada-002',
-					input: embeddingText
-				});
+				try {
+					const embeddingResponse = await openai.embeddings.create({
+						model: 'text-embedding-ada-002',
+						input: embeddingText
+					});
 
-				const embedding = embeddingResponse.data[0].embedding;
+					const embedding = embeddingResponse.data[0].embedding;
 
-				await event.locals.supabase.from('documents').upsert({
-					content: embeddingText,
-					embedding: embedding,
-					type: 'event',
-					source_id: eventId
-				} as any, { onConflict: 'type, source_id' });
+					await event.locals.supabase.from('documents').upsert({
+						content: embeddingText,
+						embedding: embedding,
+						type: 'event',
+						source_id: eventId
+					} as any, { onConflict: 'type, source_id' });
 
-			} catch (e) {
-				console.error('Embedding error (edit event):', e);
+				} catch (e) {
+					console.error('Embedding error (edit event):', e);
+				}
 			}
 
 			return redirect(303, `/events/${eventId}`);

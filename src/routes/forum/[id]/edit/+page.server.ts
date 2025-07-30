@@ -87,33 +87,44 @@ export const actions = {
                 return fail(500, withFiles({ message: supabaseError.message, form }));
             }
 
-            // Update knowledge in chatbot
-            const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+            // Check if the thread is approved before embedding
+            const { data: moderationStatus, error: moderationError } = await event.locals.supabase
+                .from('latest_forum_threads_moderation') // use your view if you have one
+                .select('status')
+                .eq('thread_id', threadId)
+                .single();
 
-			const embeddingText = `[Thread] ${form.data.title}
-				Tags: ${form.data.tags.join(', ')}
-				Content: ${form.data.content}
-				Link: /forum/${threadId}`;
+            if (moderationError) {
+	            console.error('Error checking moderation status for thread', moderationError.message);
+            }
+            else if (moderationStatus.status === 'approved') {
+                // Update knowledge in chatbot
+                const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
-			try {
-				const embeddingResponse = await openai.embeddings.create({
-					model: 'text-embedding-ada-002',
-					input: embeddingText
-				});
+                const embeddingText = `[Thread] ${form.data.title}
+                    Tags: ${form.data.tags.join(', ')}
+                    Content: ${form.data.content}
+                    Link: /forum/${threadId}`;
 
-				const embedding = embeddingResponse.data[0].embedding;
+                try {
+                    const embeddingResponse = await openai.embeddings.create({
+                        model: 'text-embedding-ada-002',
+                        input: embeddingText
+                    });
 
-                await event.locals.supabase.from('documents').upsert({
-					content: embeddingText,
-					embedding: embedding,
-					type: 'thread',
-					source_id: threadId
-				} as any, { onConflict: 'type, source_id' });  // TODO: As any
+                    const embedding = embeddingResponse.data[0].embedding;
 
-			} catch (e) {
-				console.error('Embedding error:', e);
-			}
+                    await event.locals.supabase.from('documents').upsert({
+                        content: embeddingText,
+                        embedding: embedding,
+                        type: 'thread',
+                        source_id: threadId
+                    } as any, { onConflict: 'type, source_id' });  // TODO: As any
 
+                } catch (e) {
+                    console.error('Embedding error:', e);
+                }
+            }
             return redirect(303, `/forum/${threadId}`);
         }),
 };
