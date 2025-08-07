@@ -1,6 +1,6 @@
 import { deleteThreadSchema, toggleThreadLikeSchema } from '@/schemas/thread';
 import { createThreadCommentSchema, deleteThreadCommentSchema, toggleThreadCommentLikeSchema, updateThreadCommentSchema } from '@/schemas/thread-comment';
-import type { ThreadWithAuthor, ModerationInfo, ThreadCommentWithAuthorAndLikes, Event, ContentWithCounter, EventWithCounters } from '@/types/types';
+import type { ThreadWithAuthor, ModerationInfo, ThreadCommentWithAuthorAndLikes, ContentWithCounter, EventWithCounters, ThreadWithCounters } from '@/types/types';
 import { handleFormAction } from '@/utils';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { setFlash } from 'sveltekit-flash-message/server';
@@ -183,6 +183,31 @@ export const load = async (event) => {
 
         return connectedEvents;
     }
+
+    async function getConnectedThreads(threadId: number): Promise<ThreadWithCounters[]> {
+        const { data: connectedThreadIds, error: threadsError } = await event.locals.supabase
+            .from('thread_threads')
+            .select('annexed_id')
+            .eq('thread_id', threadId);
+
+        if (threadsError) {
+            throw error(500, 'Error fetching connected thread IDs');
+        }
+
+        const ids = connectedThreadIds?.map(row => row.annexed_id) ?? [];
+
+        const { data: connectedThreads, error: connectedThreadsError } = await event.locals.supabase
+            .from('forum_threads_view')
+            .select('*')
+            .in('id', ids)
+            .eq('moderation_status', 'approved');
+
+        if (connectedThreadsError) {
+            throw error(500, 'Error fetching connected threads');
+        }
+
+        return connectedThreads;
+    }
     
     const threadId = parseInt(event.params.id);
     if (isNaN(threadId)) throw error(400, 'Invalid thread ID');
@@ -225,6 +250,7 @@ export const load = async (event) => {
         commentsCount,
         connectedContents: await getConnectedContents(threadId),
         connectedEvents: await getConnectedEvents(threadId),
+        connectedThreads: await getConnectedThreads(threadId),
         deleteForm: await superValidate(zod(deleteThreadSchema), {
             id: 'delete-thread',
         }),

@@ -5,6 +5,7 @@
 	import PageHeader from '@/components/page-header.svelte';
 	import { Button } from '@/components/ui/button';
 	import EventCompactItem from '@/components/event-compact-item.svelte';
+	import ThreadCompactItem from '@/components/thread-compact-item.svelte';
 	import ContentItem from '@/components/content-item.svelte';
 	import Card from '@/components/ui/card/card.svelte';
 	import dayjs from 'dayjs';
@@ -101,7 +102,7 @@
 			<div class="mt-4 flex items-center justify-between gap-4 border-t pt-4 text-sm text-muted-foreground">
 				<div class="flex gap-4">
 					<ThreadLikeButton data={data.toggleLikeForm} />
-					{#if data.connectedContents.length > 0 || data.connectedEvents.length > 0}
+					{#if data.connectedContents.length > 0 || data.connectedEvents.length > 0 || data.connectedThreads.length > 0}
 						<Button variant="ghost" size="sm" on:click={() => (showConnections = !showConnections)}
 							class={cn('flex items-center gap-2', { 'text-orange-500': showConnections })}>
 							<Link class="h-4 w-4" />
@@ -138,7 +139,7 @@
 		</div>
 	</Card>
 	<div class="mx-auto flex flex-col space-y-2">
-		{#if showConnections && (data.connectedContents.length > 0 || data.connectedEvents.length > 0)}
+		{#if showConnections && (data.connectedContents.length > 0 || data.connectedEvents.length > 0 || data.connectedThreads.length > 0)}
 			<div class="w-full flex items-center gap-4 text-foreground">
 				<hr class="flex-grow border-t border-foreground" />
 				<span class="text-sm font-semibold uppercase">Connections</span>
@@ -146,6 +147,9 @@
 			</div>
 			{#each data.connectedEvents as event}
 				<EventCompactItem {event}></EventCompactItem>
+			{/each}
+			{#each data.connectedThreads as thread}
+				<ThreadCompactItem {thread}></ThreadCompactItem>
 			{/each}
 			{#each data.connectedContents as content}
 				<ContentItem {content}></ContentItem>

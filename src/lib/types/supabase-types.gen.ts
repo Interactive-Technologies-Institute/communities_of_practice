@@ -251,16 +251,22 @@ export type Database = {
           content: string | null
           embedding: string | null
           id: number
+          source_id: number | null
+          type: string | null
         }
         Insert: {
           content?: string | null
           embedding?: string | null
           id?: number
+          source_id?: number | null
+          type?: string | null
         }
         Update: {
           content?: string | null
           embedding?: string | null
           id?: number
+          source_id?: number | null
+          type?: string | null
         }
         Relationships: []
       }
@@ -1440,34 +1446,34 @@ export type Database = {
       }
       thread_contents: {
         Row: {
-          content_id: number
+          annexed_id: number
           inserted_at: string
           thread_id: number
           user_id: string
         }
         Insert: {
-          content_id: number
+          annexed_id: number
           inserted_at?: string
           thread_id: number
           user_id: string
         }
         Update: {
-          content_id?: number
+          annexed_id?: number
           inserted_at?: string
           thread_id?: number
           user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "thread_contents_content_id_fkey"
-            columns: ["content_id"]
+            foreignKeyName: "thread_contents_annexed_id_fkey"
+            columns: ["annexed_id"]
             isOneToOne: false
             referencedRelation: "contents"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "thread_contents_content_id_fkey"
-            columns: ["content_id"]
+            foreignKeyName: "thread_contents_annexed_id_fkey"
+            columns: ["annexed_id"]
             isOneToOne: false
             referencedRelation: "contents_view"
             referencedColumns: ["id"]
@@ -1504,34 +1510,34 @@ export type Database = {
       }
       thread_events: {
         Row: {
-          event_id: number
+          annexed_id: number
           inserted_at: string
           thread_id: number
           user_id: string
         }
         Insert: {
-          event_id: number
+          annexed_id: number
           inserted_at?: string
           thread_id: number
           user_id: string
         }
         Update: {
-          event_id?: number
+          annexed_id?: number
           inserted_at?: string
           thread_id?: number
           user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "thread_events_event_id_fkey"
-            columns: ["event_id"]
+            foreignKeyName: "thread_events_annexed_id_fkey"
+            columns: ["annexed_id"]
             isOneToOne: false
             referencedRelation: "events"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "thread_events_event_id_fkey"
-            columns: ["event_id"]
+            foreignKeyName: "thread_events_annexed_id_fkey"
+            columns: ["annexed_id"]
             isOneToOne: false
             referencedRelation: "events_view"
             referencedColumns: ["id"]
@@ -1559,6 +1565,70 @@ export type Database = {
           },
           {
             foreignKeyName: "thread_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_view"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      thread_threads: {
+        Row: {
+          annexed_id: number
+          inserted_at: string
+          thread_id: number
+          user_id: string
+        }
+        Insert: {
+          annexed_id: number
+          inserted_at?: string
+          thread_id: number
+          user_id: string
+        }
+        Update: {
+          annexed_id?: number
+          inserted_at?: string
+          thread_id?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "thread_threads_annexed_id_fkey"
+            columns: ["annexed_id"]
+            isOneToOne: false
+            referencedRelation: "forum_threads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "thread_threads_annexed_id_fkey"
+            columns: ["annexed_id"]
+            isOneToOne: false
+            referencedRelation: "forum_threads_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "thread_threads_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "forum_threads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "thread_threads_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "forum_threads_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "thread_threads_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "thread_threads_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles_view"
@@ -2474,6 +2544,8 @@ export type Database = {
         | "thread_events.delete"
         | "event_contents.create"
         | "event_contents.delete"
+        | "thread_threads.create"
+        | "thread_threads.delete"
       user_role: "user" | "moderator" | "admin"
     }
     CompositeTypes: {
@@ -2696,6 +2768,8 @@ export const Constants = {
         "thread_events.delete",
         "event_contents.create",
         "event_contents.delete",
+        "thread_threads.create",
+        "thread_threads.delete",
       ],
       user_role: ["user", "moderator", "admin"],
     },

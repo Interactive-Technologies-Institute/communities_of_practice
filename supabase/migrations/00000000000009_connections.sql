@@ -71,6 +71,8 @@ alter type public.user_permission add value if not exists 'thread_contents.creat
 alter type public.user_permission add value if not exists 'thread_contents.delete';
 alter type public.user_permission add value if not exists 'thread_events.create';
 alter type public.user_permission add value if not exists 'thread_events.delete';
+alter type public.user_permission add value if not exists 'thread_threads.create';
+alter type public.user_permission add value if not exists 'thread_threads.delete';
 alter type public.user_permission add value if not exists 'event_contents.create';
 alter type public.user_permission add value if not exists 'event_contents.delete';
 insert into public.role_permissions (role, permission)
@@ -79,6 +81,8 @@ values
 ('user', 'thread_contents.delete'),
 ('user', 'thread_events.create'),
 ('user', 'thread_events.delete'),
+('user', 'thread_threads.create'),
+('user', 'thread_threads.delete'),
 ('user', 'event_contents.create'),
 ('user', 'event_contents.delete');
 insert into public.role_permissions (role, permission)
@@ -87,6 +91,8 @@ values
 ('moderator', 'thread_contents.delete'),
 ('moderator', 'thread_events.create'),
 ('moderator', 'thread_events.delete'),
+('moderator', 'thread_threads.create'),
+('moderator', 'thread_threads.delete'),
 ('moderator', 'event_contents.create'),
 ('moderator', 'event_contents.delete');
 
@@ -96,10 +102,13 @@ values
 ('admin', 'thread_contents.delete'),
 ('admin', 'thread_events.create'),
 ('admin', 'thread_events.delete'),
+('admin', 'thread_threads.create'),
+('admin', 'thread_threads.delete'),
 ('admin', 'event_contents.create'),
 ('admin', 'event_contents.delete');
 alter table public.thread_contents enable row level security;
 alter table public.thread_events enable row level security;
+alter table public.thread_threads enable row level security;
 alter table public.event_contents enable row level security;
 create policy "Allow read access to thread-content links"
 on public.thread_contents
@@ -136,6 +145,24 @@ for delete
 using (
   auth.uid() = user_id
   and (select authorize('thread_events.delete'))
+);
+create policy "Allow read access to thread-thread links"
+on public.thread_threads
+for select
+using (true);
+create policy "Allow users to create thread-thread links"
+on public.thread_threads
+for insert
+with check (
+  auth.uid() = user_id
+  and (select authorize('thread_threads.create'))
+);
+create policy "Allow users to delete their thread-thread links"
+on public.thread_threads
+for delete
+using (
+  auth.uid() = user_id
+  and (select authorize('thread_threads.delete'))
 );
 create policy "Allow read access to event-content links"
 on public.event_contents

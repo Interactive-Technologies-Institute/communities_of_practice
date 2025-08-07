@@ -6,14 +6,14 @@
 	import { PlusCircle, Loader2 } from 'lucide-svelte';
 	import { MetaTags } from 'svelte-meta-tags';
 	import { queryParam } from 'sveltekit-search-params';
-	import ConnectionContentItem from '@/components/connection-content-item.svelte';
 	import SortButton from '@/components/sort-button.svelte';
-	import ContentFilterButton from '@/components/content-filter-button.svelte';
 	import { superForm } from 'sveltekit-superforms/client';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { createThreadConnectionsSchema } from '@/schemas/connection';
 	import ConnectionsFilterButton from '@/components/connections-filter-button.svelte';
+	import ConnectionContentItem from '@/components/connection-content-item.svelte';
 	import ConnectionEventItem from '@/components/connection-event-item.svelte';
+	import ConnectionThreadItem from '@/components/connection-thread-item.svelte';
 
 	export let data;
 
@@ -35,9 +35,9 @@
 
 </script>
 
-<MetaTags title="Thread Connections" description="Connect the thread with contents and events" />
+<MetaTags title="Thread Connections" description="Connect the thread with contents, events and other threads" />
 
-<PageHeader title="Thread Connections" subtitle="Connect the thread with contents and events" />
+<PageHeader title="Thread Connections" subtitle="Connect the thread with contents, events and other threads" />
 <form method="POST" use:enhance>
 	<div class="container mx-auto max-w-4xl flex flex-row justify-between gap-x-2">
 		<div class="flex flex-1 flex-row gap-x-2 sm:gap-x-4 md:flex-auto">
@@ -67,6 +67,8 @@
 				<ConnectionContentItem content={item} bind:selectedItems />
 			{:else if item.type === 'event'}
 				<ConnectionEventItem event={item} bind:selectedItems />
+			{:else if item.type === 'thread'}
+				<ConnectionThreadItem thread={item} bind:selectedItems />
 			{/if}
 		{/each}
 	</div>

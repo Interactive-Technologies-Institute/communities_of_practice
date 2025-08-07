@@ -2,12 +2,11 @@ import { arrayQueryParam, stringQueryParam } from '@/utils';
 import { error } from '@sveltejs/kit';
 import { setFlash } from 'sveltekit-flash-message/server';
 import { handleFormAction, handleSignInRedirect } from '@/utils';
-import type { ContentWithCounter, EventWithCounters, SelectableItem } from '@/types/types';
+import type { ContentWithCounter, EventWithCounters, ThreadWithCounters, SelectableItem } from '@/types/types';
 import { createThreadConnectionsSchema } from '@/schemas/connection';
 import { superValidate } from 'sveltekit-superforms/server';
 import { zod } from 'sveltekit-superforms/adapters';
 import { redirect } from '@sveltejs/kit';
-
 
 export const load = async (event) => {
     const search = stringQueryParam().decode(event.url.searchParams.get('search'));
@@ -37,34 +36,10 @@ export const load = async (event) => {
         return contents;
     }
 
-    async function getContentsTags(): Promise<Map<string, number>> {
-        const { data: contentsTags, error: contentsTagsError } = await event.locals.supabase
-            .from('contents_tags')
-            .select();
-
-        if (contentsTagsError) {
-            const errorMessage = 'Error fetching contentsTags, please try again later.';
-            setFlash({ type: 'error', message: errorMessage }, event.cookies);
-            return error(500, errorMessage);
-        }
-
-        const tagMap = new Map<string, number>();
-        if (contentsTags) {
-            contentsTags.forEach((tag) => {
-                const { count, tag: tagName } = tag;
-                if (count !== null && tagName !== null) {
-                    tagMap.set(tagName, count);
-                }
-            });
-        }
-
-        return tagMap;
-    }
-
     async function getConnectedContentIds(threadId: number): Promise<number[]> {
         const { data: connectedContents, error: connectedContentsError } = await event.locals.supabase
             .from('thread_contents')
-            .select('content_id')
+            .select('annexed_id')
             .eq('thread_id', threadId);
 
         if (connectedContentsError) {
@@ -73,7 +48,7 @@ export const load = async (event) => {
             return error(500, errorMessage);
         }
 
-        return connectedContents?.map((row) => row.content_id) ?? [];
+        return connectedContents?.map((row) => row.annexed_id) ?? [];
     }
 
     async function getEvents(): Promise<EventWithCounters[]> {
@@ -99,34 +74,10 @@ export const load = async (event) => {
         return events;
     }
 
-    async function getEventsTags(): Promise<Map<string, number>> {
-        const { data: eventsTags, error: tagsError } = await event.locals.supabase
-            .from('events_tags')
-            .select();
-
-        if (tagsError) {
-            const errorMessage = 'Error fetching eventsTags, please try again later.';
-            setFlash({ type: 'error', message: errorMessage }, event.cookies);
-            return error(500, errorMessage);
-        }
-
-        const tagMap = new Map<string, number>();
-        if (eventsTags) {
-            eventsTags.forEach((tag) => {
-                const { count, tag: tagName } = tag;
-                if (count !== null && tagName !== null) {
-                    tagMap.set(tagName, count);
-                }
-            });
-        }
-
-        return tagMap;
-    }
-
     async function getConnectedEventIds(threadId: number): Promise<number[]> {
         const { data: connectedEvents, error: connectedEventsError } = await event.locals.supabase
             .from('thread_events')
-            .select('event_id')
+            .select('annexed_id')
             .eq('thread_id', threadId);
 
         if (connectedEventsError) {
@@ -135,14 +86,54 @@ export const load = async (event) => {
             return error(500, errorMessage);
         }
 
-        return connectedEvents?.map((row) => row.event_id) ?? [];
+        return connectedEvents?.map((row) => row.annexed_id) ?? [];
     }
 
+    async function getThreads(): Promise<ThreadWithCounters[]> {
+        let query = event.locals.supabase
+            .from('forum_threads_view')
+            .select('*')
+            .eq('moderation_status', 'approved')
+            .neq('id', threadId)
+            .order('moderation_status', { ascending: true });
+
+        if (search?.trim()) {
+            query = query.ilike('title', `%${search.trim()}%`);
+        }
+
+        const { data: threads, error: threadsError } = await query;
+
+        if (threadsError) {
+            const errorMessage = 'Error fetching threads, please try again later.';
+            setFlash({ type: 'error', message: errorMessage }, event.cookies);
+            return error(500, errorMessage);
+        }
+
+        return threads;
+    }
+
+    async function getConnectedThreadIds(threadId: number): Promise<number[]> {
+        const { data: connectedThreads, error: connectedThreadsError } = await event.locals.supabase
+            .from('thread_threads')
+            .select('annexed_id')
+            .eq('thread_id', threadId);
+
+        if (connectedThreadsError) {
+            const errorMessage = 'Error fetching connected threads, please try again later.';
+            setFlash({ type: 'error', message: errorMessage }, event.cookies);
+            return error(500, errorMessage);
+        }
+
+        return connectedThreads?.map((row) => row.annexed_id) ?? [];
+    }
+
+    const threadId = parseInt(event.params.id);
     const contents = (await getContents()).map((c) => ({ ...c, type: 'content' as const}));
     const events = (await getEvents()).map((e) => ({ ...e, type: 'event' as const}));
+    const threads = (await getThreads()).map((e) => ({ ...e, type: 'thread' as const}));
     
     // Combine and sort
-    let items: SelectableItem[] = [...contents, ...events];
+    let items: SelectableItem[] = [...contents, ...events, ...threads];
     
     items.sort((a, b) => {
         const order = sortOrder === 'asc' ? 1 : -1;
@@ -160,18 +151,17 @@ export const load = async (event) => {
         items = items.filter((item) => types.includes(item.type));
     }
     
-    const threadId = parseInt(event.params.id);
     const connectedContentIds = await getConnectedContentIds(threadId);
     const connectedEventIds = await getConnectedEventIds(threadId);
+    const connectedThreadIds = await getConnectedThreadIds(threadId);
     const connectedItems = [
         ...connectedContentIds.map((id) => ({ id, type: 'content' as const })),
         ...connectedEventIds.map((id) => ({ id, type: 'event' as const })),
+        ...connectedThreadIds.map((id) => ({ id, type: 'thread' as const })),
     ];
 
     return {
         items,
-        contentsTags: await getContentsTags(),
-        eventsTags: await getEventsTags(),
         connectedItems,
         connectForm: await superValidate(
             { selectedItems: connectedItems },
@@ -197,12 +187,17 @@ export const actions = {
                 .delete()
                 .eq('thread_id', threadId);
 
+            await event.locals.supabase
+                .from('thread_threads')
+                .delete()
+                .eq('thread_id', threadId);
+
             // Insert new connections
             const contentsToInsert = form.data.selectedItems
                 .filter((item) => item.type === 'content')
                 .map((item) => ({
                     thread_id: threadId,
-                    content_id: item.id,
+                    annexed_id: item.id,
                     user_id: userId
                 }));
 
@@ -210,7 +205,15 @@ export const actions = {
                 .filter((item) => item.type === 'event')
                 .map((item) => ({
                     thread_id: threadId,
-                    event_id: item.id,
+                    annexed_id: item.id,
+                    user_id: userId
+                }));
+
+            const threadsToInsert = form.data.selectedItems
+                .filter((item) => item.type === 'thread')
+                .map((item) => ({
+                    thread_id: threadId,
+                    annexed_id: item.id,
                     user_id: userId
                 }));
 
@@ -219,6 +222,9 @@ export const actions = {
             }
             if (eventsToInsert.length) {
                 await event.locals.supabase.from('thread_events').insert(eventsToInsert);
+            }
+            if (threadsToInsert.length) {
+                await event.locals.supabase.from('thread_threads').insert(threadsToInsert);
             }
             throw redirect(303, `/forum/${threadId}`);
         }),
