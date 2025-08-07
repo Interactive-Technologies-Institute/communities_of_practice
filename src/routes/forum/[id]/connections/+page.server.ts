@@ -2,7 +2,7 @@ import { arrayQueryParam, stringQueryParam } from '@/utils';
 import { error } from '@sveltejs/kit';
 import { setFlash } from 'sveltekit-flash-message/server';
 import { handleFormAction, handleSignInRedirect } from '@/utils';
-import type { ContentWithCounter, EventWithCounters } from '@/types/types';
+import type { ContentWithCounter, EventWithCounters, SelectableItem } from '@/types/types';
 import { createThreadConnectionsSchema } from '@/schemas/connection';
 import { superValidate } from 'sveltekit-superforms/server';
 import { zod } from 'sveltekit-superforms/adapters';
@@ -10,14 +10,10 @@ import { redirect } from '@sveltejs/kit';
 
 
 export const load = async (event) => {
-    const contentsSearch = stringQueryParam().decode(event.url.searchParams.get('cs'));
-    const contentsTags = arrayQueryParam().decode(event.url.searchParams.get('contentsTags'));
-    const contentsSortBy = stringQueryParam().decode(event.url.searchParams.get('contentsSortBy'));
-    const contentsSortOrder = stringQueryParam().decode(event.url.searchParams.get('contentsSortOrder'));
-    const fileTypes = arrayQueryParam().decode(event.url.searchParams.get('fileTypes'));
-    const eventsSearch = stringQueryParam().decode(event.url.searchParams.get('es'));
-    const eventsTags = arrayQueryParam().decode(event.url.searchParams.get('eventsTags'));
-    const statuses = arrayQueryParam().decode(event.url.searchParams.get('statuses'));
+    const search = stringQueryParam().decode(event.url.searchParams.get('search'));
+    const types = arrayQueryParam().decode(event.url.searchParams.get('types'));
+    const sortBy = stringQueryParam().decode(event.url.searchParams.get('sortBy'));
+    const sortOrder = stringQueryParam().decode(event.url.searchParams.get('sortOrder'));
 
     async function getContents(): Promise<ContentWithCounter[]> {
         let query = event.locals.supabase
@@ -26,47 +22,8 @@ export const load = async (event) => {
             .eq('moderation_status', 'approved')
             .order('moderation_status', { ascending: true });
 
-        if (contentsSortBy === 'date_inserted') {
-            query = query.order('inserted_at', { ascending: contentsSortOrder === 'asc' });
-        }
-        else if (contentsSortBy === 'downloads') {
-            query = query.order('downloads_count', { ascending: contentsSortOrder === 'asc' });
-        } 
-        else if (contentsSortBy === 'title') {
-            query = query.order('title', { ascending: contentsSortOrder === 'asc' });
-        }
-        else {
-            query = query.order('inserted_at', { ascending: false });
-        }
-
-        if (contentsSearch?.trim()) {
-            query = query.ilike('title', `%${contentsSearch.trim()}%`);
-        }
-
-        if (contentsTags && contentsTags.length) {
-            query = query.overlaps('tags', contentsTags);
-        }
-        
-        if (fileTypes && fileTypes.length) {
-            const validTypes = [
-                'Image',
-                'Video',
-                'Audio',
-                'PDF',
-                'Text',
-                'CSV',
-                'Markdown',
-                'Archive',
-                'JSON',
-                'Spreadsheet',
-                'Word Doc',
-                'Presentation',
-                'File'
-            ];
-            const allValid = fileTypes.every((r) => validTypes.includes(r));
-            if (allValid) {
-                query = query.in('file_type', fileTypes); 
-            }
+        if (search?.trim()) {
+            query = query.ilike('title', `%${search.trim()}%`);
         }
 
         const { data: contents, error: contentsError } = await query;
@@ -127,20 +84,8 @@ export const load = async (event) => {
             .order('moderation_status', { ascending: true })
             .order('inserted_at', { ascending: false });
 
-        if (eventsSearch) {
-            query = query.textSearch('fts', eventsSearch, { config: 'simple', type: 'websearch' });
-        }
-
-        if (eventsTags && eventsTags.length) {
-            query = query.overlaps('tags', eventsTags);
-        }
-
-        if (statuses && statuses.length) {
-            const validStatuses = ['voting_open', 'no_one_voted', 'scheduled', 'ongoing', 'completed'];
-            const allValid = statuses.every((s) => validStatuses.includes(s));
-            if (allValid) {
-                query = query.in('status', statuses as ('voting_open' | 'no_one_voted' | 'scheduled' | 'ongoing' | 'completed')[]);
-            }
+        if (search?.trim()) {
+            query = query.ilike('title', `%${search.trim()}%`);
         }
 
         const { data: events, error: eventsError } = await query;
@@ -193,20 +138,46 @@ export const load = async (event) => {
         return connectedEvents?.map((row) => row.event_id) ?? [];
     }
 
+    const contents = (await getContents()).map((c) => ({ ...c, type: 'content' as const}));
+    const events = (await getEvents()).map((e) => ({ ...e, type: 'event' as const}));
+    
+    // Combine and sort
+    let items: SelectableItem[] = [...contents, ...events];
+    
+    items.sort((a, b) => {
+        const order = sortOrder === 'asc' ? 1 : -1;
+        
+        if (sortBy === 'title') {
+            return order * a.title.localeCompare(b.title);
+        }
+        if (sortBy === 'date_inserted') {
+            return order * (new Date(a.inserted_at).getTime() - new Date(b.inserted_at).getTime());
+        }
+        return (new Date(a.inserted_at).getTime() - new Date(b.inserted_at).getTime());
+    });
+    
+    if (types?.length) {
+        items = items.filter((item) => types.includes(item.type));
+    }
+    
     const threadId = parseInt(event.params.id);
+    const connectedContentIds = await getConnectedContentIds(threadId);
+    const connectedEventIds = await getConnectedEventIds(threadId);
+    const connectedItems = [
+        ...connectedContentIds.map((id) => ({ id, type: 'content' as const })),
+        ...connectedEventIds.map((id) => ({ id, type: 'event' as const })),
+    ];
 
     return {
-        contents: await getContents(),
+        items,
         contentsTags: await getContentsTags(),
-        events: await getEvents(),
         eventsTags: await getEventsTags(),
-        connectedContentIds: await getConnectedContentIds(threadId),
-        connectedEventIds: await getConnectedEventIds(threadId),
+        connectedItems,
         connectForm: await superValidate(
-                    { contentIds: [] },
-                    zod(createThreadConnectionsSchema),
-                    { id: 'create-thread-connections' }
-                ),
+            { selectedItems: connectedItems },
+            zod(createThreadConnectionsSchema),
+            { id: 'create-thread-connections' }
+        ),
     };
 };
 
@@ -227,36 +198,27 @@ export const actions = {
                 .eq('thread_id', threadId);
 
             // Insert new connections
-            if (form.data.contentIds.length > 0) {
-                const connections = form.data.contentIds.map((content_id) => ({
+            const contentsToInsert = form.data.selectedItems
+                .filter((item) => item.type === 'content')
+                .map((item) => ({
                     thread_id: threadId,
-                    content_id,
+                    content_id: item.id,
                     user_id: userId
                 }));
 
-                const { error } = await event.locals.supabase
-                    .from('thread_contents')
-                    .insert(connections);
+            const eventsToInsert = form.data.selectedItems
+                .filter((item) => item.type === 'event')
+                .map((item) => ({
+                    thread_id: threadId,
+                    event_id: item.id,
+                    user_id: userId
+                }));
 
-                if (error) {
-                    throw new Error('Failed to connect contents to thread');
-                }
+            if (contentsToInsert.length) {
+                await event.locals.supabase.from('thread_contents').insert(contentsToInsert);
             }
-
-            if (form.data.eventIds.length > 0) {
-                const connections = form.data.eventIds.map((event_id) => ({
-                    thread_id: threadId,
-                    event_id,
-                    user_id: userId
-                }));
-
-                const { error } = await event.locals.supabase
-                    .from('thread_events')
-                    .insert(connections);
-
-                if (error) {
-                    throw new Error('Failed to connect events to thread');
-                }
+            if (eventsToInsert.length) {
+                await event.locals.supabase.from('thread_events').insert(eventsToInsert);
             }
             throw redirect(303, `/forum/${threadId}`);
         }),

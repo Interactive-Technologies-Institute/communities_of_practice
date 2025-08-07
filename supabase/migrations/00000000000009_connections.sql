@@ -1,24 +1,72 @@
 create table public.thread_contents (
     thread_id bigint references public.forum_threads on delete cascade not null,
-    content_id bigint references public.contents on delete cascade not null,
+    annexed_id bigint references public.contents on delete cascade not null,
     user_id uuid references public.profiles not null,
     inserted_at timestamptz not null default timezone('utc', now()),
-    primary key (thread_id, content_id)
+    primary key (thread_id, annexed_id)
 );
 create table public.thread_events (
     thread_id bigint references public.forum_threads on delete cascade not null,
-    event_id bigint references public.events on delete cascade not null,
+    annexed_id bigint references public.events on delete cascade not null,
     user_id uuid references public.profiles not null,
     inserted_at timestamptz not null default timezone('utc', now()),
-    primary key (thread_id, event_id)
+    primary key (thread_id, annexed_id)
 );
+create table public.thread_threads (
+    thread_id bigint references public.forum_threads on delete cascade not null,
+    annexed_id bigint references public.forum_threads on delete cascade not null,
+    user_id uuid references public.profiles not null,
+    inserted_at timestamptz not null default timezone('utc', now()),
+    primary key (thread_id, annexed_id)
+);
+create table public.event_threads (
+    event_id bigint references public.events on delete cascade not null,
+    annexed_id bigint references public.forum_threads on delete cascade not null,
+    user_id uuid references public.profiles not null,
+    inserted_at timestamptz not null default timezone('utc', now()),
+    primary key (event_id, annexed_id)
+);
+
 create table public.event_contents (
     event_id bigint references public.events on delete cascade not null,
-    content_id bigint references public.contents on delete cascade not null,
+    annexed_id bigint references public.contents on delete cascade not null,
     user_id uuid references public.profiles not null,
     inserted_at timestamptz not null default timezone('utc', now()),
-    primary key (event_id, content_id)
+    primary key (event_id, annexed_id)
 );
+
+create table public.event_events (
+    event_id bigint references public.events on delete cascade not null,
+    annexed_id bigint references public.events on delete cascade not null,
+    user_id uuid references public.profiles not null,
+    inserted_at timestamptz not null default timezone('utc', now()),
+    primary key (event_id, annexed_id)
+);
+
+create table public.content_threads (
+    content_id bigint references public.contents on delete cascade not null,
+    annexed_id bigint references public.forum_threads on delete cascade not null,
+    user_id uuid references public.profiles not null,
+    inserted_at timestamptz not null default timezone('utc', now()),
+    primary key (content_id, annexed_id)
+);
+
+create table public.content_events (
+    content_id bigint references public.contents on delete cascade not null,
+    annexed_id bigint references public.events on delete cascade not null,
+    user_id uuid references public.profiles not null,
+    inserted_at timestamptz not null default timezone('utc', now()),
+    primary key (content_id, annexed_id)
+);
+
+create table public.content_contents (
+    content_id bigint references public.contents on delete cascade not null,
+    annexed_id bigint references public.contents on delete cascade not null,
+    user_id uuid references public.profiles not null,
+    inserted_at timestamptz not null default timezone('utc', now()),
+    primary key (content_id, annexed_id)
+);
+
 alter type public.user_permission add value if not exists 'thread_contents.create';
 alter type public.user_permission add value if not exists 'thread_contents.delete';
 alter type public.user_permission add value if not exists 'thread_events.create';

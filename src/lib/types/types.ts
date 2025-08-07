@@ -266,3 +266,8 @@ export type Conversation = {
 	entry: string;
 	speaker: Speaker;
 };
+
+export type SelectableItem =
+  | (ContentWithCounter & { type: 'content' })
+  | (EventWithCounters & { type: 'event' })
+  | (ThreadWithCounters & { type: 'thread' });

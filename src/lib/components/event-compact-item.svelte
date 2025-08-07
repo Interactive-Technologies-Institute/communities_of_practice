@@ -1,10 +1,34 @@
 <script lang="ts">
+	import { Badge } from '@/components/ui/badge';
 	import { Card } from '@/components/ui/card';
 	import type { EventWithCounters } from '@/types/types';
 	import { Calendar, ThumbsUp } from 'lucide-svelte';
     import dayjs from 'dayjs';
 
 	export let event: EventWithCounters;
+
+	const moderationStatusLabels = {
+		pending: 'Pending',
+		approved: 'Approved',
+		changes_requested: 'Changes Requested',
+		rejected: 'Rejected',
+	};
+
+	const eventStatusLabels = {
+		voting_open: 'Voting Open',
+		no_one_voted: 'No One Voted',
+		scheduled: 'Scheduled',
+		ongoing: 'Ongoing',
+		completed: 'Completed',
+	};
+
+	const eventStatusVariants: Record<string, 'default' | 'secondary' | 'destructive' | 'warning' | 'success'> = {
+		voting_open: 'default',
+		no_one_voted: 'destructive',
+		scheduled: 'default',
+		ongoing: 'warning',
+		completed: 'success',
+	};
 </script>
 
 <a href="/events/{event.id}" class="h-full">
@@ -16,6 +40,21 @@
                         <Calendar class="h-8 w-8" />
                     </div>
 					<p class="text-sm line-clamp-1 break-all font-medium">{event.title}</p>
+					{#if event.moderation_status !== 'approved'}
+						<Badge
+							class="text-[10px] font-normal px-1.5 py-0.5"
+							variant={event.moderation_status === 'rejected' ? 'destructive' : 'secondary'}
+						>
+							{moderationStatusLabels[event.moderation_status]}
+						</Badge>
+					{:else if event.status !== null && event.status !== undefined}
+						<Badge
+							class="text-[10px] font-normal px-1.5 py-0.5"
+							variant={eventStatusVariants[event.status] ?? 'default'}
+						>
+							{eventStatusLabels[event.status]}
+						</Badge>
+					{/if}
 				</div>
 				<div class="flex text-muted-foreground items-center gap-2 ml-2">
                     {#if event.date && event.start_time && event.end_time}

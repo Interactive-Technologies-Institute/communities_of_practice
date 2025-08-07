@@ -1,23 +1,22 @@
 <script lang="ts">
-	import { page } from '$app/stores';
 	import { Badge } from '@/components/ui/badge';
-	import { Button } from '@/components/ui/button';
 	import { Card } from '@/components/ui/card';
 	import type { ContentWithCounter } from '@/types/types';
+	import dayjs from 'dayjs';
 	import { FileSpreadsheet, FileImage, FileVideo, Presentation, FileJson, FileText, File as FileIcon, FileAudio, FileArchive, FileType2, Download } from 'lucide-svelte';
 
-	export let content: ContentWithCounter;
-    export let selectedContentIds: number[];
+	export let content: ContentWithCounter & { type: 'content' };
+	export let selectedItems: { id: number; type: 'content' | 'event' | 'thread' }[];
 
-    $: checked = selectedContentIds.includes(content.id);
+	$: checked = selectedItems.some(s => s.id === content.id && s.type === 'content');
 
 	function toggleCheckbox(event: Event) {
 		event.stopPropagation();
 		event.preventDefault();
 		if (checked) {
-			selectedContentIds = selectedContentIds.filter(id => id !== content.id);
+			selectedItems = selectedItems.filter(s => !(s.id === content.id && s.type === 'content'));
 		} else {
-			selectedContentIds = [...selectedContentIds, content.id];
+			selectedItems = [...selectedItems, { id: content.id, type: 'content' }];
 		}
 	}
 
@@ -80,26 +79,6 @@
 				return 'File';
 		}
 	}
-
-	async function handleDownload(event: MouseEvent) {
-		event.stopPropagation();
-		event.preventDefault();
-		const { data, error } = await $page.data.supabase.storage.from('contents').download(content.file);
-
-		if (error) {
-			console.error('Download failed:', error.message);
-			alert('Could not download file.');
-			return;
-		}
-		const url = URL.createObjectURL(data);
-		const a = Object.assign(document.createElement('a'), {
-			href: url,
-			download: content.file
-		});
-		a.click();
-		URL.revokeObjectURL(url);
-	}
-
 </script>
 
 <a href="/contents/{content.id}" target="_blank" rel="noopener noreferrer" class="h-full">
@@ -120,12 +99,16 @@
 						</Badge>
 					{/if}
 				</div>
-				<div class="flex items-center gap-2 ml-2">
-					<p class="text-xs text-muted-foreground">{new Date(content.inserted_at).toLocaleDateString()}</p>
-					<Button variant="ghost" size="sm" on:click={handleDownload} aria-label="Download">
-						<p class="text-xs mr-1">{content.downloads_count}</p>
-						<Download class="h-4 w-4" />
-					</Button>
+				<div class="flex text-muted-foreground items-center gap-2 ml-2">
+					<p class="text-xs whitespace-nowrap overflow-hidden text-ellipsis">{dayjs(`${content.inserted_at}`).format(
+							dayjs(content.inserted_at).year() === dayjs().year()
+								? 'DD/MM'
+								: 'DD/MM/YYYY'
+						)}</p>
+					<Download class="h-4 w-4" />
+					<p class="text-xs whitespace-nowrap overflow-hidden text-ellipsis">
+						{content.downloads_count}
+					</p>
                     <input
                         type="checkbox"
                         name="contentIds"

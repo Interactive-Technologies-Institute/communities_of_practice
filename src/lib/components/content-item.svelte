@@ -1,7 +1,5 @@
 <script lang="ts">
-	import { page } from '$app/stores';
 	import { Badge } from '@/components/ui/badge';
-	import { Button } from '@/components/ui/button';
 	import { Card } from '@/components/ui/card';
 	import type { ContentWithCounter } from '@/types/types';
 	import { FileSpreadsheet, FileImage, FileVideo, FileText, Presentation, FileJson, File as FileIcon, FileAudio, FileArchive, FileType2, Download } from 'lucide-svelte';
@@ -68,26 +66,6 @@
 				return 'File';
 		}
 	}
-
-	async function handleDownload(event: MouseEvent) {
-		event.stopPropagation();
-		event.preventDefault();
-		const { data, error } = await $page.data.supabase.storage.from('contents').download(content.file);
-
-		if (error) {
-			console.error('Download failed:', error.message);
-			alert('Could not download file.');
-			return;
-		}
-		const url = URL.createObjectURL(data);
-		const a = Object.assign(document.createElement('a'), {
-			href: url,
-			download: content.file
-		});
-		a.click();
-		URL.revokeObjectURL(url);
-	}
-
 </script>
 
 <a href="/contents/{content.id}" class="h-full">
