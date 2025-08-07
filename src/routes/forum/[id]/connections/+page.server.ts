@@ -3,7 +3,7 @@ import { error } from '@sveltejs/kit';
 import { setFlash } from 'sveltekit-flash-message/server';
 import { handleFormAction, handleSignInRedirect } from '@/utils';
 import type { ContentWithCounter, EventWithCounters, ThreadWithCounters, SelectableItem } from '@/types/types';
-import { createThreadConnectionsSchema } from '@/schemas/connection';
+import { createConnectionsSchema } from '@/schemas/connection';
 import { superValidate } from 'sveltekit-superforms/server';
 import { zod } from 'sveltekit-superforms/adapters';
 import { redirect } from '@sveltejs/kit';
@@ -55,9 +55,7 @@ export const load = async (event) => {
         let query = event.locals.supabase
             .from('events_view')
             .select('*')
-            .not('moderation_status', 'in', '("pending","rejected")')
-            .order('moderation_status', { ascending: true })
-            .order('inserted_at', { ascending: false });
+            .eq('moderation_status', 'approved');
 
         if (search?.trim()) {
             query = query.ilike('title', `%${search.trim()}%`);
@@ -94,8 +92,7 @@ export const load = async (event) => {
             .from('forum_threads_view')
             .select('*')
             .eq('moderation_status', 'approved')
-            .neq('id', threadId)
-            .order('moderation_status', { ascending: true });
+            .neq('id', threadId);
 
         if (search?.trim()) {
             query = query.ilike('title', `%${search.trim()}%`);
@@ -165,7 +162,7 @@ export const load = async (event) => {
         connectedItems,
         connectForm: await superValidate(
             { selectedItems: connectedItems },
-            zod(createThreadConnectionsSchema),
+            zod(createConnectionsSchema),
             { id: 'create-thread-connections' }
         ),
     };
@@ -173,7 +170,7 @@ export const load = async (event) => {
 
 export const actions = {
     default: async (event) =>
-        handleFormAction(event, createThreadConnectionsSchema, 'create-thread-connections', async (event, userId, form) => {
+        handleFormAction(event, createConnectionsSchema, 'create-thread-connections', async (event, userId, form) => {
             const threadId = parseInt(event.params.id);
             
             // Delete existing connections

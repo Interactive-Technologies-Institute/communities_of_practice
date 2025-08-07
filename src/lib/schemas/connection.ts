@@ -1,13 +1,6 @@
 import { z } from 'zod';
 
-export const createEventConnectionsSchema = z
-    .object({
-        contentIds: z.array(z.number()).default([]),
-    });
-
-export type CreateEventConnectionsSchema = typeof createEventConnectionsSchema;
-
-export const createThreadConnectionsSchema = z.object({
+export const createConnectionsSchema = z.object({
 	selectedItems: z.array(
 		z.object({
 			id: z.number(),
@@ -16,4 +9,4 @@ export const createThreadConnectionsSchema = z.object({
 	),
 });
 
-export type CreateThreadConnectionsSchema = typeof createThreadConnectionsSchema;
+export type CreateConnectionsSchema = typeof createConnectionsSchema;

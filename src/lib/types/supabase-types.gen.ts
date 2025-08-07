@@ -272,34 +272,34 @@ export type Database = {
       }
       event_contents: {
         Row: {
-          content_id: number
+          annexed_id: number
           event_id: number
           inserted_at: string
           user_id: string
         }
         Insert: {
-          content_id: number
+          annexed_id: number
           event_id: number
           inserted_at?: string
           user_id: string
         }
         Update: {
-          content_id?: number
+          annexed_id?: number
           event_id?: number
           inserted_at?: string
           user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "event_contents_content_id_fkey"
-            columns: ["content_id"]
+            foreignKeyName: "event_contents_annexed_id_fkey"
+            columns: ["annexed_id"]
             isOneToOne: false
             referencedRelation: "contents"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "event_contents_content_id_fkey"
-            columns: ["content_id"]
+            foreignKeyName: "event_contents_annexed_id_fkey"
+            columns: ["annexed_id"]
             isOneToOne: false
             referencedRelation: "contents_view"
             referencedColumns: ["id"]
@@ -327,6 +327,134 @@ export type Database = {
           },
           {
             foreignKeyName: "event_contents_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_view"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_events: {
+        Row: {
+          annexed_id: number
+          event_id: number
+          inserted_at: string
+          user_id: string
+        }
+        Insert: {
+          annexed_id: number
+          event_id: number
+          inserted_at?: string
+          user_id: string
+        }
+        Update: {
+          annexed_id?: number
+          event_id?: number
+          inserted_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_events_annexed_id_fkey"
+            columns: ["annexed_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_events_annexed_id_fkey"
+            columns: ["annexed_id"]
+            isOneToOne: false
+            referencedRelation: "events_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_events_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_events_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_view"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_threads: {
+        Row: {
+          annexed_id: number
+          event_id: number
+          inserted_at: string
+          user_id: string
+        }
+        Insert: {
+          annexed_id: number
+          event_id: number
+          inserted_at?: string
+          user_id: string
+        }
+        Update: {
+          annexed_id?: number
+          event_id?: number
+          inserted_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_threads_annexed_id_fkey"
+            columns: ["annexed_id"]
+            isOneToOne: false
+            referencedRelation: "forum_threads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_threads_annexed_id_fkey"
+            columns: ["annexed_id"]
+            isOneToOne: false
+            referencedRelation: "forum_threads_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_threads_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_threads_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_threads_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_threads_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles_view"
@@ -2546,6 +2674,10 @@ export type Database = {
         | "event_contents.delete"
         | "thread_threads.create"
         | "thread_threads.delete"
+        | "event_events.create"
+        | "event_events.delete"
+        | "event_threads.create"
+        | "event_threads.delete"
       user_role: "user" | "moderator" | "admin"
     }
     CompositeTypes: {
@@ -2770,6 +2902,10 @@ export const Constants = {
         "event_contents.delete",
         "thread_threads.create",
         "thread_threads.delete",
+        "event_events.create",
+        "event_events.delete",
+        "event_threads.create",
+        "event_threads.delete",
       ],
       user_role: ["user", "moderator", "admin"],
     },

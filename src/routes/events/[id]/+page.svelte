@@ -6,6 +6,7 @@
 	import { AspectRatio } from '@/components/ui/aspect-ratio';
 	import { Button } from '@/components/ui/button';
 	import ContentItem  from '@/components/content-item.svelte';
+	import EventCompactItem from '@/components/event-compact-item.svelte';
 	import ThreadCompactItem  from '@/components/thread-compact-item.svelte';
 	import dayjs from 'dayjs';
 	import { Calendar, MapPin, Pen, Tag, Trash, Text, Video, Link } from 'lucide-svelte';
@@ -161,15 +162,14 @@
 				<span class="text-sm font-semibold uppercase">Connections</span>
 				<hr class="flex-grow border-t border-foreground" />
 			</div>
-			{#each data.connectedContents as content}
-				<div class="text-sm">
-					<ContentItem {content} />
-				</div>
+			{#each data.connectedEvents as event}
+				<EventCompactItem {event} />
 			{/each}
 			{#each data.connectedThreads as thread}
-				<div class="text-sm">
-					<ThreadCompactItem {thread} />
-				</div>
+				<ThreadCompactItem {thread} />
+			{/each}
+			{#each data.connectedContents as content}
+				<ContentItem {content} />
 			{/each}
 		{/if}
 		{#if showRecording && (data.event.recording_link || data.event.transcription)}

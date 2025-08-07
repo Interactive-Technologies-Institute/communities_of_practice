@@ -157,7 +157,8 @@ export const load = async (event) => {
             .from('contents_view')
             .select('*, thread_contents!inner(thread_id)')
             .eq('thread_contents.thread_id', threadId)
-            .eq('moderation_status', 'approved');
+            .eq('moderation_status', 'approved')
+            .order('title', { ascending: true });
 
         if (connectedContentsError) {
             const errorMessage = 'Error fetching connected contents, please try again later.';
@@ -173,7 +174,8 @@ export const load = async (event) => {
             .from('events_view')
             .select('*, thread_events!inner(thread_id)')
             .eq('thread_events.thread_id', threadId)
-            .eq('moderation_status', 'approved');
+            .eq('moderation_status', 'approved')
+            .order('title', { ascending: true });
 
         if (connectedEventsError) {
             const errorMessage = 'Error fetching connected events, please try again later.';
@@ -200,7 +202,8 @@ export const load = async (event) => {
             .from('forum_threads_view')
             .select('*')
             .in('id', ids)
-            .eq('moderation_status', 'approved');
+            .eq('moderation_status', 'approved')
+            .order('title', { ascending: true });
 
         if (connectedThreadsError) {
             throw error(500, 'Error fetching connected threads');

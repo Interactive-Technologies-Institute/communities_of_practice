@@ -9,7 +9,7 @@
 	import SortButton from '@/components/sort-button.svelte';
 	import { superForm } from 'sveltekit-superforms/client';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import { createThreadConnectionsSchema } from '@/schemas/connection';
+	import { createConnectionsSchema } from '@/schemas/connection';
 	import ConnectionsFilterButton from '@/components/connections-filter-button.svelte';
 	import ConnectionContentItem from '@/components/connection-content-item.svelte';
 	import ConnectionEventItem from '@/components/connection-event-item.svelte';
@@ -18,7 +18,7 @@
 	export let data;
 
 	const form = superForm(data.connectForm, {
-		validators: zodClient(createThreadConnectionsSchema),
+		validators: zodClient(createConnectionsSchema),
 		taintedMessage: false,
 		dataType: 'json'
 	});
@@ -32,7 +32,6 @@
 	const typeFilters = queryParam('types', arrayQueryParam());
 	const sortBy = queryParam('sortBy', stringQueryParam());
 	const sortOrder = queryParam('sortOrder', stringQueryParam());
-
 </script>
 
 <MetaTags title="Thread Connections" description="Connect the thread with contents, events and other threads" />
@@ -41,17 +40,9 @@
 <form method="POST" use:enhance>
 	<div class="container mx-auto max-w-4xl flex flex-row justify-between gap-x-2">
 		<div class="flex flex-1 flex-row gap-x-2 sm:gap-x-4 md:flex-auto">
-			<Input
-				placeholder="Search..."
-				class="flex-1 sm:max-w-64"
-				bind:value={$search}
-			/>
+			<Input placeholder="Search..." class="flex-1 sm:max-w-64" bind:value={$search} />
 			<ConnectionsFilterButton bind:typeFilters={$typeFilters} />
-			<SortButton
-					bind:sortBy={$sortBy}
-					bind:sortOrder={$sortOrder}
-					section="connections"
-				/>
+			<SortButton bind:sortBy={$sortBy} bind:sortOrder={$sortOrder} section='connections'/>
 		</div>
 		<Button type="submit" disabled={$submitting} class="w-10 p-0 sm:w-auto sm:px-4 sm:py-2">
 			{#if $submitting}

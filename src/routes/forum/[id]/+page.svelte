@@ -146,13 +146,13 @@
 				<hr class="flex-grow border-t border-foreground" />
 			</div>
 			{#each data.connectedEvents as event}
-				<EventCompactItem {event}></EventCompactItem>
+				<EventCompactItem {event} />
 			{/each}
 			{#each data.connectedThreads as thread}
-				<ThreadCompactItem {thread}></ThreadCompactItem>
+				<ThreadCompactItem {thread} />
 			{/each}
 			{#each data.connectedContents as content}
-				<ContentItem {content}></ContentItem>
+				<ContentItem {content} />
 			{/each}
 		{/if}
 		{#if showSummary && data.thread.summary}

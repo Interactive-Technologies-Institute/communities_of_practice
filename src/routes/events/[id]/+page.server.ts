@@ -1,5 +1,5 @@
 import { deleteEventSchema, toggleEventInterestSchema, voteOnScheduleSchema, removeVotesSchema } from '@/schemas/event';
-import type { EventWithAuthor, EventVote, ModerationInfo, ContentWithCounter, ThreadWithCounters } from '@/types/types';
+import type { EventWithAuthor, EventVote, ModerationInfo, ContentWithCounter, EventWithCounters, ThreadWithCounters } from '@/types/types';
 import { handleFormAction } from '@/utils';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { setFlash } from 'sveltekit-flash-message/server';
@@ -92,7 +92,8 @@ export const load = async (event) => {
 			.from('contents_view')
 			.select('*, event_contents!inner(event_id)')
 			.eq('event_contents.event_id', eventId)
-			.eq('moderation_status', 'approved');
+			.eq('moderation_status', 'approved')
+			.order('title', { ascending: true });
 
 		if (connectedContentsError) {
 			const errorMessage = 'Error fetching connected contents, please try again later.';
@@ -103,12 +104,39 @@ export const load = async (event) => {
 		return connectedContents;
 	}
 
+	async function getConnectedEvents(eventId: number): Promise<EventWithCounters[]> {
+		const { data: connectedEventIds, error: eventsError } = await event.locals.supabase
+            .from('event_events')
+            .select('annexed_id')
+            .eq('event_id', eventId);
+
+        if (eventsError) {
+            throw error(500, 'Error fetching connected event IDs');
+        }
+
+        const ids = connectedEventIds?.map(row => row.annexed_id) ?? [];
+
+        const { data: connectedEvents, error: connectedEventsError } = await event.locals.supabase
+            .from('events_view')
+            .select('*')
+            .in('id', ids)
+            .eq('moderation_status', 'approved')
+			.order('title', { ascending: true });
+
+        if (connectedEventsError) {
+            throw error(500, 'Error fetching connected events');
+        }
+
+        return connectedEvents;
+	}
+
 	async function getConnectedThreads(eventId: number): Promise<ThreadWithCounters[]> {
 		const { data: connectedThreads, error: connectedThreadsError } = await event.locals.supabase
 			.from('forum_threads_view')
-			.select('*, thread_events!inner(event_id)')
-			.eq('thread_events.event_id', eventId)
-			.eq('moderation_status', 'approved');
+			.select('*, event_threads!inner(event_id)')
+			.eq('event_threads.event_id', eventId)
+			.eq('moderation_status', 'approved')
+			.order('title', { ascending: true });
 
 		if (connectedThreadsError) {
 			const errorMessage = 'Error fetching connected forum threads, please try again later.';
@@ -135,6 +163,7 @@ export const load = async (event) => {
 		hasVoted: hasVoted,
 		interestCount: interestCount.count,
 		connectedContents: await getConnectedContents(eventId),
+		connectedEvents: await getConnectedEvents(eventId),
 		connectedThreads: await getConnectedThreads(eventId),
 		deleteForm: await superValidate(zod(deleteEventSchema), {
 			id: 'delete-event',

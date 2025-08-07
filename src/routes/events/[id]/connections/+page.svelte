@@ -6,44 +6,43 @@
 	import { PlusCircle, Loader2 } from 'lucide-svelte';
 	import { MetaTags } from 'svelte-meta-tags';
 	import { queryParam } from 'sveltekit-search-params';
-	import EventContentItem from '@/components/connection-content-item.svelte';
 	import SortButton from '@/components/sort-button.svelte';
-	import ContentFilterButton from '@/components/content-filter-button.svelte';
 	import { superForm } from 'sveltekit-superforms/client';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import { createEventConnectionsSchema } from '@/schemas/connection';
+	import { createConnectionsSchema } from '@/schemas/connection';
+	import ConnectionsFilterButton from '@/components/connections-filter-button.svelte';
+	import ConnectionContentItem from '@/components/connection-content-item.svelte';
+	import ConnectionEventItem from '@/components/connection-event-item.svelte';
+	import ConnectionThreadItem from '@/components/connection-thread-item.svelte';
 
 	export let data;
 
 	const form = superForm(data.connectForm, {
-		validators: zodClient(createEventConnectionsSchema),
-		taintedMessage: false
+		validators: zodClient(createConnectionsSchema),
+		taintedMessage: false,
+		dataType: 'json'
 	});
 
 	const { form: formData, enhance, submitting } = form;
 	
-	let selectedContentIds: number[] = data.connectedContentIds;
+	let selectedItems = data.connectedItems;
+	$: $formData.selectedItems = selectedItems;
 
-	$: $formData.contentIds = selectedContentIds;
-
-	const search = queryParam('s', stringQueryParam(), {
-		debounceHistory: 500,
-	});
-	const fileTypes = queryParam('fileTypes', arrayQueryParam());
+	const search = queryParam('search', stringQueryParam(), { debounceHistory: 500 });
+	const typeFilters = queryParam('types', arrayQueryParam());
 	const sortBy = queryParam('sortBy', stringQueryParam());
 	const sortOrder = queryParam('sortOrder', stringQueryParam());
-	const tags = queryParam('tags', arrayQueryParam());
 </script>
 
 <MetaTags title="Event-Contents Connection" description="Connect the event with contents" />
 
 <PageHeader title="Event-Contents Connection" subtitle="Connect the event with contents" />
 <form method="POST" use:enhance>
-    <div class="container mx-auto max-w-5xl flex flex-row justify-between gap-x-2">
+    <div class="container mx-auto max-w-4xl flex flex-row justify-between gap-x-2">
         <div class="flex flex-1 flex-row gap-x-2 sm:gap-x-4 md:flex-auto">
-            <Input placeholder="Search..." class="flex-1 sm:max-w-64" bind:value={$search}></Input>
-            <ContentFilterButton tags={data.tags} bind:tagFilters={$tags} bind:typeFilters={$fileTypes} />
-            <SortButton bind:sortBy={$sortBy} bind:sortOrder={$sortOrder} section='contents'/>
+            <Input placeholder="Search..." class="flex-1 sm:max-w-64" bind:value={$search} />
+            <ConnectionsFilterButton bind:typeFilters={$typeFilters} />
+            <SortButton bind:sortBy={$sortBy} bind:sortOrder={$sortOrder} section='connections'/>
         </div>
         <Button type="submit" disabled={$submitting} class="w-10 p-0 sm:w-auto sm:px-4 sm:py-2">
 			{#if $submitting}
@@ -53,9 +52,15 @@
 			Confirm
 		</Button>
     </div>
-    <div class="container mx-auto max-w-5xl flex flex-col gap-y-6 py-10">
-        {#each data.contents as content}
-            <EventContentItem {content} bind:selectedContentIds />
-        {/each}
-    </div>
+    <div class="container mx-auto max-w-4xl flex flex-col gap-y-6 py-10">
+		{#each data.items as item}
+			{#if item.type === 'content'}
+				<ConnectionContentItem content={item} bind:selectedItems />
+			{:else if item.type === 'event'}
+				<ConnectionEventItem event={item} bind:selectedItems />
+			{:else if item.type === 'thread'}
+				<ConnectionThreadItem thread={item} bind:selectedItems />
+			{/if}
+		{/each}
+	</div>
 </form>

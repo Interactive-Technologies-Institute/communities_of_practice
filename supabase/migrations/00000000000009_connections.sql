@@ -75,6 +75,10 @@ alter type public.user_permission add value if not exists 'thread_threads.create
 alter type public.user_permission add value if not exists 'thread_threads.delete';
 alter type public.user_permission add value if not exists 'event_contents.create';
 alter type public.user_permission add value if not exists 'event_contents.delete';
+alter type public.user_permission add value if not exists 'event_events.create';
+alter type public.user_permission add value if not exists 'event_events.delete';
+alter type public.user_permission add value if not exists 'event_threads.create';
+alter type public.user_permission add value if not exists 'event_threads.delete';
 insert into public.role_permissions (role, permission)
 values 
 ('user', 'thread_contents.create'),
@@ -110,6 +114,8 @@ alter table public.thread_contents enable row level security;
 alter table public.thread_events enable row level security;
 alter table public.thread_threads enable row level security;
 alter table public.event_contents enable row level security;
+alter table public.event_events enable row level security;
+alter table public.event_threads enable row level security;
 create policy "Allow read access to thread-content links"
 on public.thread_contents
 for select
@@ -181,5 +187,41 @@ for delete
 using (
   auth.uid() = user_id
   and (select authorize('event_contents.delete'))
+);
+create policy "Allow read access to event-event links"
+on public.event_events
+for select
+using (true);
+create policy "Allow users to create event-event links"
+on public.event_events
+for insert
+with check (
+  auth.uid() = user_id
+  and (select authorize('event_events.create'))
+);
+create policy "Allow users to delete their event-event links"
+on public.event_events
+for delete
+using (
+  auth.uid() = user_id
+  and (select authorize('event_events.delete'))
+);
+create policy "Allow read access to event-thread links"
+on public.event_threads
+for select
+using (true);
+create policy "Allow users to create event-thread links"
+on public.event_threads
+for insert
+with check (
+  auth.uid() = user_id
+  and (select authorize('event_threads.create'))
+);
+create policy "Allow users to delete their event-thread links"
+on public.event_threads
+for delete
+using (
+  auth.uid() = user_id
+  and (select authorize('event_threads.delete'))
 );
 
