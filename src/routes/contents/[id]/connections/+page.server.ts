@@ -18,7 +18,8 @@ export const load = async (event) => {
         let query = event.locals.supabase
             .from('contents_view')
             .select('*')
-            .eq('moderation_status', 'approved');
+            .eq('moderation_status', 'approved')
+            .neq('id', contentId);
 
         if (search?.trim()) {
             query = query.ilike('title', `%${search.trim()}%`);
@@ -35,11 +36,11 @@ export const load = async (event) => {
         return contents;
     }
 
-    async function getConnectedContentIds(threadId: number): Promise<number[]> {
+    async function getConnectedContentIds(contentId: number): Promise<number[]> {
         const { data: connectedContents, error: connectedContentsError } = await event.locals.supabase
-            .from('thread_contents')
+            .from('content_contents')
             .select('annexed_id')
-            .eq('thread_id', threadId);
+            .eq('content_id', contentId);
 
         if (connectedContentsError) {
             const errorMessage = 'Error fetching connected contents, please try again later.';
@@ -71,11 +72,11 @@ export const load = async (event) => {
         return events;
     }
 
-    async function getConnectedEventIds(threadId: number): Promise<number[]> {
+    async function getConnectedEventIds(contentId: number): Promise<number[]> {
         const { data: connectedEvents, error: connectedEventsError } = await event.locals.supabase
-            .from('thread_events')
+            .from('content_events')
             .select('annexed_id')
-            .eq('thread_id', threadId);
+            .eq('content_id', contentId);
 
         if (connectedEventsError) {
             const errorMessage = 'Error fetching connected events, please try again later.';
@@ -90,8 +91,7 @@ export const load = async (event) => {
         let query = event.locals.supabase
             .from('forum_threads_view')
             .select('*')
-            .eq('moderation_status', 'approved')
-            .neq('id', threadId);
+            .eq('moderation_status', 'approved');
 
         if (search?.trim()) {
             query = query.ilike('title', `%${search.trim()}%`);
@@ -108,11 +108,11 @@ export const load = async (event) => {
         return threads;
     }
 
-    async function getConnectedThreadIds(threadId: number): Promise<number[]> {
+    async function getConnectedThreadIds(contentId: number): Promise<number[]> {
         const { data: connectedThreads, error: connectedThreadsError } = await event.locals.supabase
-            .from('thread_threads')
+            .from('content_threads')
             .select('annexed_id')
-            .eq('thread_id', threadId);
+            .eq('content_id', contentId);
 
         if (connectedThreadsError) {
             const errorMessage = 'Error fetching connected threads, please try again later.';
@@ -123,7 +123,7 @@ export const load = async (event) => {
         return connectedThreads?.map((row) => row.annexed_id) ?? [];
     }
 
-    const threadId = parseInt(event.params.id);
+    const contentId = parseInt(event.params.id);
     const contents = (await getContents()).map((c) => ({ ...c, type: 'content' as const}));
     const events = (await getEvents()).map((e) => ({ ...e, type: 'event' as const}));
     const threads = (await getThreads()).map((e) => ({ ...e, type: 'thread' as const}));
@@ -147,9 +147,9 @@ export const load = async (event) => {
         items = items.filter((item) => types.includes(item.type));
     }
     
-    const connectedContentIds = await getConnectedContentIds(threadId);
-    const connectedEventIds = await getConnectedEventIds(threadId);
-    const connectedThreadIds = await getConnectedThreadIds(threadId);
+    const connectedContentIds = await getConnectedContentIds(contentId);
+    const connectedEventIds = await getConnectedEventIds(contentId);
+    const connectedThreadIds = await getConnectedThreadIds(contentId);
     const connectedItems = [
         ...connectedContentIds.map((id) => ({ id, type: 'content' as const })),
         ...connectedEventIds.map((id) => ({ id, type: 'event' as const })),
@@ -162,37 +162,37 @@ export const load = async (event) => {
         connectForm: await superValidate(
             { selectedItems: connectedItems },
             zod(createConnectionsSchema),
-            { id: 'create-thread-connections' }
+            { id: 'create-content-connections' }
         ),
     };
 };
 
 export const actions = {
     default: async (event) =>
-        handleFormAction(event, createConnectionsSchema, 'create-thread-connections', async (event, userId, form) => {
-            const threadId = parseInt(event.params.id);
+        handleFormAction(event, createConnectionsSchema, 'create-content-connections', async (event, userId, form) => {
+            const contentId = parseInt(event.params.id);
             
             // Delete existing connections
             await event.locals.supabase
-                .from('thread_contents')
+                .from('content_contents')
                 .delete()
-                .eq('thread_id', threadId);
+                .eq('content_id', contentId);
 
             await event.locals.supabase
-                .from('thread_events')
+                .from('content_events')
                 .delete()
-                .eq('thread_id', threadId);
+                .eq('content_id', contentId);
 
             await event.locals.supabase
-                .from('thread_threads')
+                .from('content_threads')
                 .delete()
-                .eq('thread_id', threadId);
+                .eq('content_id', contentId);
 
             // Insert new connections
             const contentsToInsert = form.data.selectedItems
                 .filter((item) => item.type === 'content')
                 .map((item) => ({
-                    thread_id: threadId,
+                    content_id: contentId,
                     annexed_id: item.id,
                     user_id: userId
                 }));
@@ -200,7 +200,7 @@ export const actions = {
             const eventsToInsert = form.data.selectedItems
                 .filter((item) => item.type === 'event')
                 .map((item) => ({
-                    thread_id: threadId,
+                    content_id: contentId,
                     annexed_id: item.id,
                     user_id: userId
                 }));
@@ -208,20 +208,20 @@ export const actions = {
             const threadsToInsert = form.data.selectedItems
                 .filter((item) => item.type === 'thread')
                 .map((item) => ({
-                    thread_id: threadId,
+                    content_id: contentId,
                     annexed_id: item.id,
                     user_id: userId
                 }));
 
             if (contentsToInsert.length) {
-                await event.locals.supabase.from('thread_contents').insert(contentsToInsert);
+                await event.locals.supabase.from('content_contents').insert(contentsToInsert);
             }
             if (eventsToInsert.length) {
-                await event.locals.supabase.from('thread_events').insert(eventsToInsert);
+                await event.locals.supabase.from('content_events').insert(eventsToInsert);
             }
             if (threadsToInsert.length) {
-                await event.locals.supabase.from('thread_threads').insert(threadsToInsert);
+                await event.locals.supabase.from('content_threads').insert(threadsToInsert);
             }
-            throw redirect(303, `/forum/${threadId}`);
+            throw redirect(303, `/contents/${contentId}`);
         }),
 };

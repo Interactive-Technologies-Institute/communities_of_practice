@@ -38,6 +38,7 @@ export const load = async (event) => {
         updateForm: await superValidate(contentData, zod(editContentSchema), {
             id: 'update-content',
         }),
+        contentId: contentId
     };
 };
 

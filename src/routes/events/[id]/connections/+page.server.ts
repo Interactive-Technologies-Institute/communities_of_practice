@@ -18,8 +18,7 @@ export const load = async (event) => {
         let query = event.locals.supabase
             .from('contents_view')
             .select('*')
-            .eq('moderation_status', 'approved')
-            .order('moderation_status', { ascending: true });
+            .eq('moderation_status', 'approved');
 
         if (search?.trim()) {
             query = query.ilike('title', `%${search.trim()}%`);
@@ -55,7 +54,8 @@ export const load = async (event) => {
         let query = event.locals.supabase
             .from('events_view')
             .select('*')
-            .eq('moderation_status', 'approved');
+            .eq('moderation_status', 'approved')
+            .neq('id', eventId);
 
         if (search?.trim()) {
             query = query.ilike('title', `%${search.trim()}%`);
@@ -91,8 +91,7 @@ export const load = async (event) => {
         let query = event.locals.supabase
             .from('forum_threads_view')
             .select('*')
-            .eq('moderation_status', 'approved')
-            .neq('id', eventId);
+            .eq('moderation_status', 'approved');
 
         if (search?.trim()) {
             query = query.ilike('title', `%${search.trim()}%`);

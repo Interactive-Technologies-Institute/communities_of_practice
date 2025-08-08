@@ -26,7 +26,6 @@ create table public.event_threads (
     inserted_at timestamptz not null default timezone('utc', now()),
     primary key (event_id, annexed_id)
 );
-
 create table public.event_contents (
     event_id bigint references public.events on delete cascade not null,
     annexed_id bigint references public.contents on delete cascade not null,
@@ -34,7 +33,6 @@ create table public.event_contents (
     inserted_at timestamptz not null default timezone('utc', now()),
     primary key (event_id, annexed_id)
 );
-
 create table public.event_events (
     event_id bigint references public.events on delete cascade not null,
     annexed_id bigint references public.events on delete cascade not null,
@@ -42,7 +40,6 @@ create table public.event_events (
     inserted_at timestamptz not null default timezone('utc', now()),
     primary key (event_id, annexed_id)
 );
-
 create table public.content_threads (
     content_id bigint references public.contents on delete cascade not null,
     annexed_id bigint references public.forum_threads on delete cascade not null,
@@ -50,7 +47,6 @@ create table public.content_threads (
     inserted_at timestamptz not null default timezone('utc', now()),
     primary key (content_id, annexed_id)
 );
-
 create table public.content_events (
     content_id bigint references public.contents on delete cascade not null,
     annexed_id bigint references public.events on delete cascade not null,
@@ -58,7 +54,6 @@ create table public.content_events (
     inserted_at timestamptz not null default timezone('utc', now()),
     primary key (content_id, annexed_id)
 );
-
 create table public.content_contents (
     content_id bigint references public.contents on delete cascade not null,
     annexed_id bigint references public.contents on delete cascade not null,
@@ -66,56 +61,15 @@ create table public.content_contents (
     inserted_at timestamptz not null default timezone('utc', now()),
     primary key (content_id, annexed_id)
 );
-
-alter type public.user_permission add value if not exists 'thread_contents.create';
-alter type public.user_permission add value if not exists 'thread_contents.delete';
-alter type public.user_permission add value if not exists 'thread_events.create';
-alter type public.user_permission add value if not exists 'thread_events.delete';
-alter type public.user_permission add value if not exists 'thread_threads.create';
-alter type public.user_permission add value if not exists 'thread_threads.delete';
-alter type public.user_permission add value if not exists 'event_contents.create';
-alter type public.user_permission add value if not exists 'event_contents.delete';
-alter type public.user_permission add value if not exists 'event_events.create';
-alter type public.user_permission add value if not exists 'event_events.delete';
-alter type public.user_permission add value if not exists 'event_threads.create';
-alter type public.user_permission add value if not exists 'event_threads.delete';
-insert into public.role_permissions (role, permission)
-values 
-('user', 'thread_contents.create'),
-('user', 'thread_contents.delete'),
-('user', 'thread_events.create'),
-('user', 'thread_events.delete'),
-('user', 'thread_threads.create'),
-('user', 'thread_threads.delete'),
-('user', 'event_contents.create'),
-('user', 'event_contents.delete');
-insert into public.role_permissions (role, permission)
-values 
-('moderator', 'thread_contents.create'),
-('moderator', 'thread_contents.delete'),
-('moderator', 'thread_events.create'),
-('moderator', 'thread_events.delete'),
-('moderator', 'thread_threads.create'),
-('moderator', 'thread_threads.delete'),
-('moderator', 'event_contents.create'),
-('moderator', 'event_contents.delete');
-
-insert into public.role_permissions (role, permission)
-values 
-('admin', 'thread_contents.create'),
-('admin', 'thread_contents.delete'),
-('admin', 'thread_events.create'),
-('admin', 'thread_events.delete'),
-('admin', 'thread_threads.create'),
-('admin', 'thread_threads.delete'),
-('admin', 'event_contents.create'),
-('admin', 'event_contents.delete');
 alter table public.thread_contents enable row level security;
 alter table public.thread_events enable row level security;
 alter table public.thread_threads enable row level security;
 alter table public.event_contents enable row level security;
 alter table public.event_events enable row level security;
 alter table public.event_threads enable row level security;
+alter table public.content_contents enable row level security;
+alter table public.content_events enable row level security;
+alter table public.content_threads enable row level security;
 create policy "Allow read access to thread-content links"
 on public.thread_contents
 for select
@@ -223,5 +177,59 @@ for delete
 using (
   auth.uid() = user_id
   and (select authorize('event_threads.delete'))
+);
+create policy "Allow read access to content-content links"
+on public.content_contents
+for select
+using (true);
+create policy "Allow users to create content-content links"
+on public.content_contents
+for insert
+with check (
+  auth.uid() = user_id
+  and (select authorize('content_contents.create'))
+);
+create policy "Allow users to delete their content-content links"
+on public.content_contents
+for delete
+using (
+  auth.uid() = user_id
+  and (select authorize('content_contents.delete'))
+);
+create policy "Allow read access to content-event links"
+on public.content_events
+for select
+using (true);
+create policy "Allow users to create content-event links"
+on public.content_events
+for insert
+with check (
+  auth.uid() = user_id
+  and (select authorize('content_events.create'))
+);
+create policy "Allow users to delete their content-event links"
+on public.content_events
+for delete
+using (
+  auth.uid() = user_id
+  and (select authorize('content_events.delete'))
+);
+create policy "Allow read access to content-thread links"
+on public.content_threads
+for select
+using (true);
+create policy "Allow users to create content-thread links"
+on public.content_threads
+for insert
+with check (
+  auth.uid() = user_id
+  and (select authorize('content_threads.create'))
+);
+create policy "Allow users to delete their content-thread links"
+on public.content_threads
+for delete
+using (
+  auth.uid() = user_id
+  and (select authorize('content_threads.delete'))
 );
 

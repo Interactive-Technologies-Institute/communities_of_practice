@@ -1,5 +1,5 @@
 import { deleteContentSchema, downloadContentSchema } from '@/schemas/content';
-import type { Content, ModerationInfo, ThreadWithCounters, EventWithCounters } from '@/types/types';
+import type { Content, ModerationInfo, ContentWithCounter, EventWithCounters, ThreadWithCounters } from '@/types/types';
 import { handleFormAction } from '@/utils';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { setFlash } from 'sveltekit-flash-message/server';
@@ -57,12 +57,39 @@ export const load = async (event) => {
         return { count: downloaded.count, userDownloaded: downloaded.has_download };
     }
 
+    async function getConnectedContents(contentId: number): Promise<ContentWithCounter[]> {
+		const { data: connectedContentIds, error: contentsError } = await event.locals.supabase
+            .from('content_contents')
+            .select('annexed_id')
+            .eq('content_id', contentId);
+
+        if (contentsError) {
+            throw error(500, 'Error fetching connected content IDs');
+        }
+
+        const ids = connectedContentIds?.map(row => row.annexed_id) ?? [];
+
+        const { data: connectedContents, error: connectedContentsError } = await event.locals.supabase
+            .from('contents_view')
+            .select('*')
+            .in('id', ids)
+            .eq('moderation_status', 'approved')
+			.order('title', { ascending: true });
+
+        if (connectedContentsError) {
+            throw error(500, 'Error fetching connected contents');
+        }
+
+        return connectedContents;
+	}
+
     async function getConnectedEvents(contentId: number): Promise<EventWithCounters[]> {
         const { data: connectedEvents, error: connectedEventsError } = await event.locals.supabase
             .from('events_view')
-            .select('*, event_contents!inner(content_id)')
-            .eq('event_contents.content_id', contentId)
-            .eq('moderation_status', 'approved');
+            .select('*, content_events!inner(content_id)')
+            .eq('content_events.content_id', contentId)
+            .eq('moderation_status', 'approved')
+            .order('title', { ascending: true });
 
         if (connectedEventsError) {
             const errorMessage = 'Error fetching connected events, please try again later.';
@@ -76,9 +103,10 @@ export const load = async (event) => {
     async function getConnectedThreads(contentId: number): Promise<ThreadWithCounters[]> {
         const { data: connectedThreads, error: connectedThreadsError } = await event.locals.supabase
             .from('forum_threads_view')
-            .select('*, thread_contents!inner(content_id)')
-            .eq('thread_contents.content_id', contentId)
-            .eq('moderation_status', 'approved');
+            .select('*, content_threads!inner(content_id)')
+            .eq('content_threads.content_id', contentId)
+            .eq('moderation_status', 'approved')
+            .order('title', { ascending: true });
 
         if (connectedThreadsError) {
             const errorMessage = 'Error fetching connected forum threads, please try again later.';
@@ -97,6 +125,7 @@ export const load = async (event) => {
         content: content,
         moderation: await getContentModeration(contentId),
         downloadCount: downloadCount.count,
+        connectedContents: await getConnectedContents(contentId),
         connectedEvents: await getConnectedEvents(contentId),
         connectedThreads: await getConnectedThreads(contentId),
         downloadForm: await superValidate(

@@ -14,6 +14,7 @@
 	import ContentDownloadButton from '../_components/content-download-button.svelte';
 	import EventCompactItem from '@/components/event-compact-item.svelte';
 	import ThreadCompactItem from '@/components/thread-compact-item.svelte';
+	import ContentItem from '@/components/content-item.svelte';
 
 	export let data;
 
@@ -168,6 +169,9 @@
 				<div class="text-sm">
 					<ThreadCompactItem {thread} />
 				</div>
+			{/each}
+			{#each data.connectedContents as content}
+				<ContentItem {content} />
 			{/each}
 		{/if}
 	</div>

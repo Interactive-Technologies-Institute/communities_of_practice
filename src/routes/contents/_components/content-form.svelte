@@ -26,6 +26,8 @@
 
 	export let contentForm: SuperValidated<Infer<CreateContentSchema>> | SuperValidated<Infer<EditContentSchema>>;
 	export let schema: ZodSchema;
+	export let contentId: number = -1;
+	export let showConnectionsButton: boolean = false;
 
 	const form = superForm(contentForm, {
 		validators: zodClient(schema),
@@ -426,6 +428,11 @@
 		class="sticky bottom-0 flex w-full flex-row items-center justify-center gap-x-10 border-t bg-background/95 py-8 backdrop-blur supports-[backdrop-filter]:bg-background/60"
 	>
 		<Button variant="outline" href="/contents">Cancel</Button>
+		{#if showConnectionsButton}
+			<Button variant="outline" href={`/contents/${contentId}/connections`} target="_blank" rel="noopener noreferrer">
+				Connections
+			</Button>
+		{/if}
 		<Button type="submit" disabled={$submitting}>
 			{#if $submitting}
 				<Loader2 class="mr-2 h-4 w-4 animate-spin" />

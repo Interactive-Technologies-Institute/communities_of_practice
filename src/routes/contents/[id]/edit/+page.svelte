@@ -11,5 +11,6 @@
 
 <PageHeader title="Edit Content" subtitle="Edit this content" />
 <div class="container mx-auto mb-20">
-	<ContentForm contentForm={data.updateForm} schema={editContentSchema} />
+	<ContentForm contentForm={data.updateForm} schema={editContentSchema}
+		contentId={data.contentId} showConnectionsButton={true} />
 </div>
