@@ -3,7 +3,7 @@ import { error } from '@sveltejs/kit';
 import { setFlash } from 'sveltekit-flash-message/server';
 import { handleFormAction, handleSignInRedirect } from '@/utils';
 import type { ContentWithCounter, EventWithCounters, ThreadWithCounters, SelectableItem } from '@/types/types';
-import { createConnectionsSchema } from '@/schemas/connection';
+import { createAnnexesSchema } from '@/schemas/annex';
 import { superValidate } from 'sveltekit-superforms/server';
 import { zod } from 'sveltekit-superforms/adapters';
 import { redirect } from '@sveltejs/kit';
@@ -35,19 +35,19 @@ export const load = async (event) => {
         return contents;
     }
 
-    async function getConnectedContentIds(threadId: number): Promise<number[]> {
-        const { data: connectedContents, error: connectedContentsError } = await event.locals.supabase
+    async function getAnnexedContentIds(threadId: number): Promise<number[]> {
+        const { data: annexedContents, error: annexedContentsError } = await event.locals.supabase
             .from('thread_contents')
             .select('annexed_id')
             .eq('thread_id', threadId);
 
-        if (connectedContentsError) {
-            const errorMessage = 'Error fetching connected contents, please try again later.';
+        if (annexedContentsError) {
+            const errorMessage = 'Error fetching annexed contents, please try again later.';
             setFlash({ type: 'error', message: errorMessage }, event.cookies);
             return error(500, errorMessage);
         }
 
-        return connectedContents?.map((row) => row.annexed_id) ?? [];
+        return annexedContents?.map((row) => row.annexed_id) ?? [];
     }
 
     async function getEvents(): Promise<EventWithCounters[]> {
@@ -71,19 +71,19 @@ export const load = async (event) => {
         return events;
     }
 
-    async function getConnectedEventIds(threadId: number): Promise<number[]> {
-        const { data: connectedEvents, error: connectedEventsError } = await event.locals.supabase
+    async function getAnnexedEventIds(threadId: number): Promise<number[]> {
+        const { data: annexedEvents, error: annexedEventsError } = await event.locals.supabase
             .from('thread_events')
             .select('annexed_id')
             .eq('thread_id', threadId);
 
-        if (connectedEventsError) {
-            const errorMessage = 'Error fetching connected events, please try again later.';
+        if (annexedEventsError) {
+            const errorMessage = 'Error fetching annexed events, please try again later.';
             setFlash({ type: 'error', message: errorMessage }, event.cookies);
             return error(500, errorMessage);
         }
 
-        return connectedEvents?.map((row) => row.annexed_id) ?? [];
+        return annexedEvents?.map((row) => row.annexed_id) ?? [];
     }
 
     async function getThreads(): Promise<ThreadWithCounters[]> {
@@ -108,19 +108,19 @@ export const load = async (event) => {
         return threads;
     }
 
-    async function getConnectedThreadIds(threadId: number): Promise<number[]> {
-        const { data: connectedThreads, error: connectedThreadsError } = await event.locals.supabase
+    async function getAnnexedThreadIds(threadId: number): Promise<number[]> {
+        const { data: annexedThreads, error: annexedThreadsError } = await event.locals.supabase
             .from('thread_threads')
             .select('annexed_id')
             .eq('thread_id', threadId);
 
-        if (connectedThreadsError) {
-            const errorMessage = 'Error fetching connected threads, please try again later.';
+        if (annexedThreadsError) {
+            const errorMessage = 'Error fetching annexed threads, please try again later.';
             setFlash({ type: 'error', message: errorMessage }, event.cookies);
             return error(500, errorMessage);
         }
 
-        return connectedThreads?.map((row) => row.annexed_id) ?? [];
+        return annexedThreads?.map((row) => row.annexed_id) ?? [];
     }
 
     const threadId = parseInt(event.params.id);
@@ -147,32 +147,32 @@ export const load = async (event) => {
         items = items.filter((item) => types.includes(item.type));
     }
     
-    const connectedContentIds = await getConnectedContentIds(threadId);
-    const connectedEventIds = await getConnectedEventIds(threadId);
-    const connectedThreadIds = await getConnectedThreadIds(threadId);
-    const connectedItems = [
-        ...connectedContentIds.map((id) => ({ id, type: 'content' as const })),
-        ...connectedEventIds.map((id) => ({ id, type: 'event' as const })),
-        ...connectedThreadIds.map((id) => ({ id, type: 'thread' as const })),
+    const annexedContentIds = await getAnnexedContentIds(threadId);
+    const annexedEventIds = await getAnnexedEventIds(threadId);
+    const annexedThreadIds = await getAnnexedThreadIds(threadId);
+    const annexedItems = [
+        ...annexedContentIds.map((id) => ({ id, type: 'content' as const })),
+        ...annexedEventIds.map((id) => ({ id, type: 'event' as const })),
+        ...annexedThreadIds.map((id) => ({ id, type: 'thread' as const })),
     ];
 
     return {
         items,
-        connectedItems,
-        connectForm: await superValidate(
-            { selectedItems: connectedItems },
-            zod(createConnectionsSchema),
-            { id: 'create-thread-connections' }
+        annexedItems,
+        annexForm: await superValidate(
+            { selectedItems: annexedItems },
+            zod(createAnnexesSchema),
+            { id: 'create-thread-annexes' }
         ),
     };
 };
 
 export const actions = {
     default: async (event) =>
-        handleFormAction(event, createConnectionsSchema, 'create-thread-connections', async (event, userId, form) => {
+        handleFormAction(event, createAnnexesSchema, 'create-thread-annexes', async (event, userId, form) => {
             const threadId = parseInt(event.params.id);
             
-            // Delete existing connections
+            // Delete existing annexes
             await event.locals.supabase
                 .from('thread_contents')
                 .delete()
@@ -188,7 +188,7 @@ export const actions = {
                 .delete()
                 .eq('thread_id', threadId);
 
-            // Insert new connections
+            // Insert new annexes
             const contentsToInsert = form.data.selectedItems
                 .filter((item) => item.type === 'content')
                 .map((item) => ({

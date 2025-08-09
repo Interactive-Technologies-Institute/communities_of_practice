@@ -89,6 +89,6 @@ export const actions = {
 				}
 			}
 
-			return redirect(303, `/events/${insertedEvent.id}/connections`);
+			return redirect(303, `/events/${insertedEvent.id}/annexes`);
 		}),
 };

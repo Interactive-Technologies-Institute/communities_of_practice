@@ -152,64 +152,64 @@ export const load = async (event) => {
 	    return commentsWithExtra;
     }
 
-    async function getConnectedContents(threadId: number): Promise<ContentWithCounter[]> {
-        const { data: connectedContents, error: connectedContentsError } = await event.locals.supabase
+    async function getAnnexedContents(threadId: number): Promise<ContentWithCounter[]> {
+        const { data: annexedContents, error: annexedContentsError } = await event.locals.supabase
             .from('contents_view')
             .select('*, thread_contents!inner(thread_id)')
             .eq('thread_contents.thread_id', threadId)
             .eq('moderation_status', 'approved')
             .order('title', { ascending: true });
 
-        if (connectedContentsError) {
-            const errorMessage = 'Error fetching connected contents, please try again later.';
+        if (annexedContentsError) {
+            const errorMessage = 'Error fetching annexed contents, please try again later.';
             setFlash({ type: 'error', message: errorMessage }, event.cookies);
             return error(500, errorMessage);
         }
 
-        return connectedContents;
+        return annexedContents;
     }
 
-    async function getConnectedEvents(threadId: number): Promise<EventWithCounters[]> {
-        const { data: connectedEvents, error: connectedEventsError } = await event.locals.supabase
+    async function getAnnexedEvents(threadId: number): Promise<EventWithCounters[]> {
+        const { data: annexedEvents, error: annexedEventsError } = await event.locals.supabase
             .from('events_view')
             .select('*, thread_events!inner(thread_id)')
             .eq('thread_events.thread_id', threadId)
             .eq('moderation_status', 'approved')
             .order('title', { ascending: true });
 
-        if (connectedEventsError) {
-            const errorMessage = 'Error fetching connected events, please try again later.';
+        if (annexedEventsError) {
+            const errorMessage = 'Error fetching annexed events, please try again later.';
             setFlash({ type: 'error', message: errorMessage }, event.cookies);
             return error(500, errorMessage);
         }
 
-        return connectedEvents;
+        return annexedEvents;
     }
 
-    async function getConnectedThreads(threadId: number): Promise<ThreadWithCounters[]> {
-        const { data: connectedThreadIds, error: threadsError } = await event.locals.supabase
+    async function getAnnexedThreads(threadId: number): Promise<ThreadWithCounters[]> {
+        const { data: annexedThreadIds, error: threadsError } = await event.locals.supabase
             .from('thread_threads')
             .select('annexed_id')
             .eq('thread_id', threadId);
 
         if (threadsError) {
-            throw error(500, 'Error fetching connected thread IDs');
+            throw error(500, 'Error fetching annexed thread IDs');
         }
 
-        const ids = connectedThreadIds?.map(row => row.annexed_id) ?? [];
+        const ids = annexedThreadIds?.map(row => row.annexed_id) ?? [];
 
-        const { data: connectedThreads, error: connectedThreadsError } = await event.locals.supabase
+        const { data: annexedThreads, error: annexedThreadsError } = await event.locals.supabase
             .from('forum_threads_view')
             .select('*')
             .in('id', ids)
             .eq('moderation_status', 'approved')
             .order('title', { ascending: true });
 
-        if (connectedThreadsError) {
-            throw error(500, 'Error fetching connected threads');
+        if (annexedThreadsError) {
+            throw error(500, 'Error fetching annexed threads');
         }
 
-        return connectedThreads;
+        return annexedThreads;
     }
     
     const threadId = parseInt(event.params.id);
@@ -251,9 +251,9 @@ export const load = async (event) => {
         moderation: await getThreadModeration(threadId),
         likesCount: likesCount.count,
         commentsCount,
-        connectedContents: await getConnectedContents(threadId),
-        connectedEvents: await getConnectedEvents(threadId),
-        connectedThreads: await getConnectedThreads(threadId),
+        annexedContents: await getAnnexedContents(threadId),
+        annexedEvents: await getAnnexedEvents(threadId),
+        annexedThreads: await getAnnexedThreads(threadId),
         deleteForm: await superValidate(zod(deleteThreadSchema), {
             id: 'delete-thread',
         }),

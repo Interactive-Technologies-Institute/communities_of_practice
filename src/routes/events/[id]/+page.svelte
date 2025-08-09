@@ -18,7 +18,7 @@
 
 	export let data;
 
-	let showConnections = true;
+	let showAnnexes = true;
 	let showSummary = true;
 	let showRecording = true;
 	let showTranscription = false;
@@ -104,11 +104,11 @@
 			<div class="mt-4 flex items-center justify-between gap-4 border-t pt-4 text-sm text-muted-foreground">
 				<div class="flex gap-4">
 					<EventInterestButton data={data.toggleInterestForm} />
-					{#if data.connectedContents.length > 0}
-						<Button variant="ghost" size="sm" on:click={() => (showConnections = !showConnections)}
-							class={cn('flex items-center gap-2', { 'text-orange-500': showConnections })}>
+					{#if data.annexedContents.length > 0}
+						<Button variant="ghost" size="sm" on:click={() => (showAnnexes = !showAnnexes)}
+							class={cn('flex items-center gap-2', { 'text-orange-500': showAnnexes })}>
 							<Link class="h-4 w-4" />
-							Connections
+							Annexes
 						</Button>
 					{/if}
 					{#if data.event.recording_link}
@@ -156,19 +156,19 @@
 				{/if}
 			</Card>
 		{/if}
-		{#if showConnections && (data.connectedContents.length > 0 || data.connectedThreads.length > 0)}
+		{#if showAnnexes && (data.annexedContents.length > 0 || data.annexedThreads.length > 0)}
 			<div class="w-full flex items-center gap-4 text-foreground">
 				<hr class="flex-grow border-t border-foreground" />
-				<span class="text-sm font-semibold uppercase">Connections</span>
+				<span class="text-sm font-semibold uppercase">Annexes</span>
 				<hr class="flex-grow border-t border-foreground" />
 			</div>
-			{#each data.connectedEvents as event}
+			{#each data.annexedEvents as event}
 				<EventCompactItem {event} />
 			{/each}
-			{#each data.connectedThreads as thread}
+			{#each data.annexedThreads as thread}
 				<ThreadCompactItem {thread} />
 			{/each}
-			{#each data.connectedContents as content}
+			{#each data.annexedContents as content}
 				<ContentItem {content} />
 			{/each}
 		{/if}

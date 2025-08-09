@@ -57,64 +57,64 @@ export const load = async (event) => {
         return { count: downloaded.count, userDownloaded: downloaded.has_download };
     }
 
-    async function getConnectedContents(contentId: number): Promise<ContentWithCounter[]> {
-		const { data: connectedContentIds, error: contentsError } = await event.locals.supabase
+    async function getAnnexedContents(contentId: number): Promise<ContentWithCounter[]> {
+		const { data: annexedContentIds, error: contentsError } = await event.locals.supabase
             .from('content_contents')
             .select('annexed_id')
             .eq('content_id', contentId);
 
         if (contentsError) {
-            throw error(500, 'Error fetching connected content IDs');
+            throw error(500, 'Error fetching annexed content IDs');
         }
 
-        const ids = connectedContentIds?.map(row => row.annexed_id) ?? [];
+        const ids = annexedContentIds?.map(row => row.annexed_id) ?? [];
 
-        const { data: connectedContents, error: connectedContentsError } = await event.locals.supabase
+        const { data: annexedContents, error: annexedContentsError } = await event.locals.supabase
             .from('contents_view')
             .select('*')
             .in('id', ids)
             .eq('moderation_status', 'approved')
 			.order('title', { ascending: true });
 
-        if (connectedContentsError) {
-            throw error(500, 'Error fetching connected contents');
+        if (annexedContentsError) {
+            throw error(500, 'Error fetching annexed contents');
         }
 
-        return connectedContents;
+        return annexedContents;
 	}
 
-    async function getConnectedEvents(contentId: number): Promise<EventWithCounters[]> {
-        const { data: connectedEvents, error: connectedEventsError } = await event.locals.supabase
+    async function getAnnexedEvents(contentId: number): Promise<EventWithCounters[]> {
+        const { data: annexedEvents, error: annexedEventsError } = await event.locals.supabase
             .from('events_view')
             .select('*, content_events!inner(content_id)')
             .eq('content_events.content_id', contentId)
             .eq('moderation_status', 'approved')
             .order('title', { ascending: true });
 
-        if (connectedEventsError) {
-            const errorMessage = 'Error fetching connected events, please try again later.';
+        if (annexedEventsError) {
+            const errorMessage = 'Error fetching annexed events, please try again later.';
             setFlash({ type: 'error', message: errorMessage }, event.cookies);
             return error(500, errorMessage);
         }
 
-        return connectedEvents;
+        return annexedEvents;
     }
 
-    async function getConnectedThreads(contentId: number): Promise<ThreadWithCounters[]> {
-        const { data: connectedThreads, error: connectedThreadsError } = await event.locals.supabase
+    async function getAnnexedThreads(contentId: number): Promise<ThreadWithCounters[]> {
+        const { data: annexedThreads, error: annexedThreadsError } = await event.locals.supabase
             .from('forum_threads_view')
             .select('*, content_threads!inner(content_id)')
             .eq('content_threads.content_id', contentId)
             .eq('moderation_status', 'approved')
             .order('title', { ascending: true });
 
-        if (connectedThreadsError) {
-            const errorMessage = 'Error fetching connected forum threads, please try again later.';
+        if (annexedThreadsError) {
+            const errorMessage = 'Error fetching annexed forum threads, please try again later.';
             setFlash({ type: 'error', message: errorMessage }, event.cookies);
             return error(500, errorMessage);
         }
 
-        return connectedThreads;
+        return annexedThreads;
     }
     
     const downloadCount = await getDownloadCount(event.params.id);
@@ -125,9 +125,9 @@ export const load = async (event) => {
         content: content,
         moderation: await getContentModeration(contentId),
         downloadCount: downloadCount.count,
-        connectedContents: await getConnectedContents(contentId),
-        connectedEvents: await getConnectedEvents(contentId),
-        connectedThreads: await getConnectedThreads(contentId),
+        annexedContents: await getAnnexedContents(contentId),
+        annexedEvents: await getAnnexedEvents(contentId),
+        annexedThreads: await getAnnexedThreads(contentId),
         downloadForm: await superValidate(
                     { value: downloadCount.userDownloaded, file: content.file },
                     zod(downloadContentSchema),

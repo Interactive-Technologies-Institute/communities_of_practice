@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const createConnectionsSchema = z.object({
+export const createAnnexesSchema = z.object({
 	selectedItems: z.array(
 		z.object({
 			id: z.number(),
@@ -9,4 +9,4 @@ export const createConnectionsSchema = z.object({
 	),
 });
 
-export type CreateConnectionsSchema = typeof createConnectionsSchema;
+export type CreateAnnexesSchema = typeof createAnnexesSchema;

@@ -87,64 +87,64 @@ export const load = async (event) => {
 		return { count: interested.count, userInterested: interested.has_interest };
 	}
 
-	async function getConnectedContents(eventId: number): Promise<ContentWithCounter[]> {
-		const { data: connectedContents, error: connectedContentsError } = await event.locals.supabase
+	async function getAnnexedContents(eventId: number): Promise<ContentWithCounter[]> {
+		const { data: annexedContents, error: annexedContentsError } = await event.locals.supabase
 			.from('contents_view')
 			.select('*, event_contents!inner(event_id)')
 			.eq('event_contents.event_id', eventId)
 			.eq('moderation_status', 'approved')
 			.order('title', { ascending: true });
 
-		if (connectedContentsError) {
-			const errorMessage = 'Error fetching connected contents, please try again later.';
+		if (annexedContentsError) {
+			const errorMessage = 'Error fetching annexed contents, please try again later.';
 			setFlash({ type: 'error', message: errorMessage }, event.cookies);
 			return error(500, errorMessage);
 		}
 
-		return connectedContents;
+		return annexedContents;
 	}
 
-	async function getConnectedEvents(eventId: number): Promise<EventWithCounters[]> {
-		const { data: connectedEventIds, error: eventsError } = await event.locals.supabase
+	async function getAnnexedEvents(eventId: number): Promise<EventWithCounters[]> {
+		const { data: annexedEventIds, error: eventsError } = await event.locals.supabase
             .from('event_events')
             .select('annexed_id')
             .eq('event_id', eventId);
 
         if (eventsError) {
-            throw error(500, 'Error fetching connected event IDs');
+            throw error(500, 'Error fetching annexed event IDs');
         }
 
-        const ids = connectedEventIds?.map(row => row.annexed_id) ?? [];
+        const ids = annexedEventIds?.map(row => row.annexed_id) ?? [];
 
-        const { data: connectedEvents, error: connectedEventsError } = await event.locals.supabase
+        const { data: annexedEvents, error: annexedEventsError } = await event.locals.supabase
             .from('events_view')
             .select('*')
             .in('id', ids)
             .eq('moderation_status', 'approved')
 			.order('title', { ascending: true });
 
-        if (connectedEventsError) {
-            throw error(500, 'Error fetching connected events');
+        if (annexedEventsError) {
+            throw error(500, 'Error fetching annexed events');
         }
 
-        return connectedEvents;
+        return annexedEvents;
 	}
 
-	async function getConnectedThreads(eventId: number): Promise<ThreadWithCounters[]> {
-		const { data: connectedThreads, error: connectedThreadsError } = await event.locals.supabase
+	async function getAnnexedThreads(eventId: number): Promise<ThreadWithCounters[]> {
+		const { data: annexedThreads, error: annexedThreadsError } = await event.locals.supabase
 			.from('forum_threads_view')
 			.select('*, event_threads!inner(event_id)')
 			.eq('event_threads.event_id', eventId)
 			.eq('moderation_status', 'approved')
 			.order('title', { ascending: true });
 
-		if (connectedThreadsError) {
-			const errorMessage = 'Error fetching connected forum threads, please try again later.';
+		if (annexedThreadsError) {
+			const errorMessage = 'Error fetching annexed forum threads, please try again later.';
 			setFlash({ type: 'error', message: errorMessage }, event.cookies);
 			return error(500, errorMessage);
 		}
 
-		return connectedThreads;
+		return annexedThreads;
 	}
 
 	let hasVoted = false;
@@ -162,9 +162,9 @@ export const load = async (event) => {
 		votingOptions: await getVotingOptions(eventId),
 		hasVoted: hasVoted,
 		interestCount: interestCount.count,
-		connectedContents: await getConnectedContents(eventId),
-		connectedEvents: await getConnectedEvents(eventId),
-		connectedThreads: await getConnectedThreads(eventId),
+		annexedContents: await getAnnexedContents(eventId),
+		annexedEvents: await getAnnexedEvents(eventId),
+		annexedThreads: await getAnnexedThreads(eventId),
 		deleteForm: await superValidate(zod(deleteEventSchema), {
 			id: 'delete-event',
 		}),

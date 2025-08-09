@@ -9,23 +9,23 @@
 	import SortButton from '@/components/sort-button.svelte';
 	import { superForm } from 'sveltekit-superforms/client';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import { createConnectionsSchema } from '@/schemas/connection';
-	import ConnectionsFilterButton from '@/components/connections-filter-button.svelte';
-	import ConnectionContentItem from '@/components/connection-content-item.svelte';
-	import ConnectionEventItem from '@/components/connection-event-item.svelte';
-	import ConnectionThreadItem from '@/components/connection-thread-item.svelte';
+	import { createAnnexesSchema } from '@/schemas/annex';
+	import AnnexesFilterButton from '@/components/annexes-filter-button.svelte';
+	import AnnexContentItem from '@/components/annex-content-item.svelte';
+	import AnnexEventItem from '@/components/annex-event-item.svelte';
+	import AnnexThreadItem from '@/components/annex-thread-item.svelte';
 
 	export let data;
 
-	const form = superForm(data.connectForm, {
-		validators: zodClient(createConnectionsSchema),
+	const form = superForm(data.annexForm, {
+		validators: zodClient(createAnnexesSchema),
 		taintedMessage: false,
 		dataType: 'json'
 	});
 
 	const { form: formData, enhance, submitting } = form;
 	
-	let selectedItems = data.connectedItems;
+	let selectedItems = data.annexedItems;
 	$: $formData.selectedItems = selectedItems;
 
 	const search = queryParam('search', stringQueryParam(), { debounceHistory: 500 });
@@ -34,15 +34,15 @@
 	const sortOrder = queryParam('sortOrder', stringQueryParam());
 </script>
 
-<MetaTags title="Thread Connections" description="Connect the thread with contents, events and other threads" />
+<MetaTags title="Thread Annexes" description="Annex the thread with contents, events and other threads" />
 
-<PageHeader title="Thread Connections" subtitle="Connect the thread with contents, events and other threads" />
+<PageHeader title="Thread Annexes" subtitle="Annex the thread with contents, events and other threads" />
 <form method="POST" use:enhance>
 	<div class="container mx-auto max-w-4xl flex flex-row justify-between gap-x-2">
 		<div class="flex flex-1 flex-row gap-x-2 sm:gap-x-4 md:flex-auto">
 			<Input placeholder="Search..." class="flex-1 sm:max-w-64" bind:value={$search} />
-			<ConnectionsFilterButton bind:typeFilters={$typeFilters} />
-			<SortButton bind:sortBy={$sortBy} bind:sortOrder={$sortOrder} section='connections'/>
+			<AnnexesFilterButton bind:typeFilters={$typeFilters} />
+			<SortButton bind:sortBy={$sortBy} bind:sortOrder={$sortOrder} section='annexes'/>
 		</div>
 		<Button type="submit" disabled={$submitting} class="w-10 p-0 sm:w-auto sm:px-4 sm:py-2">
 			{#if $submitting}
@@ -55,11 +55,11 @@
 	<div class="container mx-auto max-w-4xl flex flex-col gap-y-6 py-10">
 		{#each data.items as item}
 			{#if item.type === 'content'}
-				<ConnectionContentItem content={item} bind:selectedItems />
+				<AnnexContentItem content={item} bind:selectedItems />
 			{:else if item.type === 'event'}
-				<ConnectionEventItem event={item} bind:selectedItems />
+				<AnnexEventItem event={item} bind:selectedItems />
 			{:else if item.type === 'thread'}
-				<ConnectionThreadItem thread={item} bind:selectedItems />
+				<AnnexThreadItem thread={item} bind:selectedItems />
 			{/if}
 		{/each}
 	</div>

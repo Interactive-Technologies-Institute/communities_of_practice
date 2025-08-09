@@ -25,7 +25,7 @@
 
 	export let data: SuperValidated<Infer<EditEventSchema>>;
 	export let eventId: number;
-	export let showConnectionsButton: boolean = false;
+	export let showAnnexesButton: boolean = false;
 
 	const form = superForm(data, {
 		validators: zodClient(editEventSchema),
@@ -500,9 +500,9 @@
 
 
 		<Button variant="outline" href="/events">Cancel</Button>
-		{#if showConnectionsButton}
-			<Button variant="outline" href={`/events/${eventId}/connections`} target="_blank" rel="noopener noreferrer">
-				Connections
+		{#if showAnnexesButton}
+			<Button variant="outline" href={`/events/${eventId}/annexes`} target="_blank" rel="noopener noreferrer">
+				Annexes
 			</Button>
 		{/if}
 		<Button type="submit" disabled={$submitting}>

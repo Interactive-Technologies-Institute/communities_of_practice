@@ -99,6 +99,6 @@ export const actions = {
 			} catch (e) {
 				console.error('Embedding error:', e);
 			}
-			return redirect(303, `/forum/${insertedThread.id}/connections`);
+			return redirect(303, `/forum/${insertedThread.id}/annexes`);
 		}),
 };
