@@ -49,7 +49,7 @@
 		size="sm"
 		class="flex items-center gap-2 text-orange-500"
 	>
-		<Download/>
+		<Download class="h-4 w-4" />
 		Download
 	</Button>
 </form>

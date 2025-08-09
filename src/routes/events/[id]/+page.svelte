@@ -104,7 +104,8 @@
 			<div class="mt-4 flex items-center justify-between gap-4 border-t pt-4 text-sm text-muted-foreground">
 				<div class="flex gap-4">
 					<EventInterestButton data={data.toggleInterestForm} />
-					{#if data.annexedContents.length > 0}
+					{#if data.annexedContents.length > 0 || data.annexedEvents.length > 0 || data.annexedThreads.length > 0 ||
+						data.contentsAnnexedTo.length > 0 || data.eventsAnnexedTo.length > 0 || data.threadsAnnexedTo.length > 0}
 						<Button variant="ghost" size="sm" on:click={() => (showAnnexes = !showAnnexes)}
 							class={cn('flex items-center gap-2', { 'text-orange-500': showAnnexes })}>
 							<Link class="h-4 w-4" />
@@ -156,7 +157,7 @@
 				{/if}
 			</Card>
 		{/if}
-		{#if showAnnexes && (data.annexedContents.length > 0 || data.annexedThreads.length > 0)}
+		{#if showAnnexes && (data.annexedContents.length > 0 || data.annexedEvents.length > 0 || data.annexedThreads.length > 0)}
 			<div class="w-full flex items-center gap-4 text-foreground">
 				<hr class="flex-grow border-t border-foreground" />
 				<span class="text-sm font-semibold uppercase">Annexes</span>
@@ -169,6 +170,22 @@
 				<ThreadCompactItem {thread} />
 			{/each}
 			{#each data.annexedContents as content}
+				<ContentItem {content} />
+			{/each}
+		{/if}
+		{#if showAnnexes && (data.contentsAnnexedTo.length > 0 || data.eventsAnnexedTo.length > 0 || data.threadsAnnexedTo.length > 0)}
+			<div class="w-full flex items-center gap-4 text-foreground">
+				<hr class="flex-grow border-t border-foreground" />
+				<span class="text-sm font-semibold uppercase">Annexed To</span>
+				<hr class="flex-grow border-t border-foreground" />
+			</div>
+			{#each data.eventsAnnexedTo as event}
+				<EventCompactItem {event} />
+			{/each}
+			{#each data.threadsAnnexedTo as thread}
+				<ThreadCompactItem {thread} />
+			{/each}
+			{#each data.contentsAnnexedTo as content}
 				<ContentItem {content} />
 			{/each}
 		{/if}

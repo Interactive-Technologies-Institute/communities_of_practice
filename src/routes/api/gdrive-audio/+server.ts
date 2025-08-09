@@ -43,10 +43,11 @@ export const GET: RequestHandler = async ({ url }) => {
 	});
 
 	const outBuffer = await readFile(tmpOutput);
+	const body = new Uint8Array(outBuffer);
 	await unlink(tmpInput);
 	await unlink(tmpOutput);
 
-	return new Response(outBuffer, {
+	return new Response(body, {
 		headers: {
 			'Content-Type': 'audio/mpeg',
 			'Content-Length': outBuffer.length.toString()

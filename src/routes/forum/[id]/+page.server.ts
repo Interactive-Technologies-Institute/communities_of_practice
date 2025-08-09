@@ -211,6 +211,67 @@ export const load = async (event) => {
 
         return annexedThreads;
     }
+
+    async function getContentsAnnexedTo(threadId: number): Promise<ContentWithCounter[]> {
+        const { data: contentsAnnexedTo, error: annexedToError } = await event.locals.supabase
+            .from('contents_view')
+            .select('*, content_threads!inner(annexed_id)')
+            .eq('content_threads.annexed_id', threadId)
+            .eq('moderation_status', 'approved')
+            .order('title', { ascending: true });
+
+        if (annexedToError) {
+            const errorMessage = 'Error fetching contents annexed to this thread, please try again later.';
+            setFlash({ type: 'error', message: errorMessage }, event.cookies);
+            return error(500, errorMessage);
+        }
+
+        return contentsAnnexedTo;
+    }
+
+    async function getEventsAnnexedTo(threadId: number): Promise<EventWithCounters[]> {
+        const { data: eventsAnnexedTo, error: annexedToError } = await event.locals.supabase
+            .from('events_view')
+            .select('*, event_threads!inner(annexed_id)')
+            .eq('event_threads.annexed_id', threadId)
+            .eq('moderation_status', 'approved')
+            .order('title', { ascending: true });
+
+        if (annexedToError) {
+            const msg = 'Error fetching events annexed to this thread, please try again later.';
+            setFlash({ type: 'error', message: msg }, event.cookies);
+            return error(500, msg);
+        }
+        return eventsAnnexedTo;
+    }
+
+    async function getThreadsAnnexedTo(threadId: number): Promise<ThreadWithCounters[]> {
+        const { data: threadsAnnexedToIds, error: threadsAnnexedToIdsError } = await event.locals.supabase
+            .from('thread_threads')
+            .select('thread_id')
+            .eq('annexed_id', threadId);
+
+        if (threadsAnnexedToIdsError) {
+            throw error(500, 'Error fetching thread IDs annexed to this thread');
+        }
+
+        const ids = threadsAnnexedToIds?.map(row => row.thread_id) ?? [];
+
+        if (ids.length === 0) return [];
+
+        const { data: threadsAnnexedTo, error: threadsAnnexedToError } = await event.locals.supabase
+            .from('forum_threads_view')
+            .select('*')
+            .in('id', ids)
+            .eq('moderation_status', 'approved')
+            .order('title', { ascending: true });
+
+        if (threadsAnnexedToError) {
+            throw error(500, 'Error fetching threads annexed to this thread');
+        }
+
+        return threadsAnnexedTo;
+    }
     
     const threadId = parseInt(event.params.id);
     if (isNaN(threadId)) throw error(400, 'Invalid thread ID');
@@ -254,6 +315,9 @@ export const load = async (event) => {
         annexedContents: await getAnnexedContents(threadId),
         annexedEvents: await getAnnexedEvents(threadId),
         annexedThreads: await getAnnexedThreads(threadId),
+        contentsAnnexedTo: await getContentsAnnexedTo(threadId),
+        eventsAnnexedTo: await getEventsAnnexedTo(threadId),
+        threadsAnnexedTo: await getThreadsAnnexedTo(threadId),
         deleteForm: await superValidate(zod(deleteThreadSchema), {
             id: 'delete-thread',
         }),

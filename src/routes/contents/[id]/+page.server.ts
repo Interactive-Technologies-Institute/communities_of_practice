@@ -116,6 +116,70 @@ export const load = async (event) => {
 
         return annexedThreads;
     }
+
+    async function getContentsAnnexedTo(contentId: number): Promise<ContentWithCounter[]> {
+        const { data: contentsAnnexedToIds, error: annexedToIdsError } = await event.locals.supabase
+            .from('content_contents')
+            .select('content_id')
+            .eq('annexed_id', contentId);
+
+        if (annexedToIdsError) {
+            const msg = 'Error fetching content IDs annexed to this content, please try again later.';
+            setFlash({ type: 'error', message: msg }, event.cookies);
+            return error(500, msg);
+        }
+
+        const ids = contentsAnnexedToIds?.map(row => row.content_id) ?? [];
+
+        const { data: contentsAnnexedTo, error: annexedToError } = await event.locals.supabase
+            .from('contents_view')
+            .select('*')
+            .in('id', ids)
+            .eq('moderation_status', 'approved')
+            .order('title', { ascending: true });
+
+        if (annexedToError) {
+            const msg = 'Error fetching contents annexed to this content, please try again later.';
+            setFlash({ type: 'error', message: msg }, event.cookies);
+            return error(500, msg);
+        }
+
+        return contentsAnnexedTo;
+    }
+
+    async function getEventsAnnexedTo(contentId: number): Promise<EventWithCounters[]> {
+        const { data: eventsAnnexedTo, error: annexedToError } = await event.locals.supabase
+            .from('events_view')
+            .select('*, event_contents!inner(annexed_id)')
+            .eq('event_contents.annexed_id', contentId)
+            .eq('moderation_status', 'approved')
+            .order('title', { ascending: true });
+
+        if (annexedToError) {
+            const msg = 'Error fetching events annexed to this content, please try again later.';
+            setFlash({ type: 'error', message: msg }, event.cookies);
+            return error(500, msg);
+        }
+
+        return eventsAnnexedTo;
+    }
+
+    async function getThreadsAnnexedTo(contentId: number): Promise<ThreadWithCounters[]> {
+	const { data: threadsAnnexedTo, error: annexedToError } = await event.locals.supabase
+		.from('forum_threads_view')
+		.select('*, thread_contents!inner(annexed_id)')
+		.eq('thread_contents.annexed_id', contentId)
+		.eq('moderation_status', 'approved')
+		.order('title', { ascending: true });
+
+	if (annexedToError) {
+		const msg = 'Error fetching threads annexed to this content, please try again later.';
+		setFlash({ type: 'error', message: msg }, event.cookies);
+		return error(500, msg);
+	}
+
+	return threadsAnnexedTo;
+}
     
     const downloadCount = await getDownloadCount(event.params.id);
 
@@ -128,6 +192,9 @@ export const load = async (event) => {
         annexedContents: await getAnnexedContents(contentId),
         annexedEvents: await getAnnexedEvents(contentId),
         annexedThreads: await getAnnexedThreads(contentId),
+        contentsAnnexedTo: await getContentsAnnexedTo(contentId),
+        eventsAnnexedTo: await getEventsAnnexedTo(contentId),
+        threadsAnnexedTo: await getThreadsAnnexedTo(contentId),
         downloadForm: await superValidate(
                     { value: downloadCount.userDownloaded, file: content.file },
                     zod(downloadContentSchema),

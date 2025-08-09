@@ -36,7 +36,7 @@
 		size="sm"
 		class={cn('flex items-center gap-2', $formData.value ? 'text-orange-500' : 'text-muted-foreground hover:text-foreground')}
 	>
-		<ThumbsUp/>
+		<ThumbsUp class="h-4 w-4" />
 		{#if $formData.value}
 			Interested
 		{:else}

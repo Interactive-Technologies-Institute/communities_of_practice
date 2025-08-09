@@ -3,7 +3,7 @@ import { json } from '@sveltejs/kit';
 import { createClient } from '@supabase/supabase-js';
 import tokenizer from 'gpt-tokenizer';
 import { OpenAI } from 'openai';
-import { SUPABASE_URL, SUPABASE_ANON_KEY, OPENAI_API_KEY } from '$env/static/private';
+import { OPENAI_API_KEY } from '$env/static/private';
 
 const openai = new OpenAI({
 	apiKey: OPENAI_API_KEY!,

@@ -147,6 +147,70 @@ export const load = async (event) => {
 		return annexedThreads;
 	}
 
+	async function getContentsAnnexedTo(eventId: number): Promise<ContentWithCounter[]> {
+		const { data: contentsAnnexedTo, error: annexedToError } = await event.locals.supabase
+			.from('contents_view')
+			.select('*, content_events!inner(annexed_id)')
+			.eq('content_events.annexed_id', eventId)
+			.eq('moderation_status', 'approved')
+			.order('title', { ascending: true });
+
+		if (annexedToError) {
+			const errorMessage = 'Error fetching contents annexed to this event, please try again later.';
+			setFlash({ type: 'error', message: errorMessage }, event.cookies);
+			return error(500, errorMessage);
+		}
+
+		return contentsAnnexedTo;
+	}
+
+	async function getEventsAnnexedTo(eventId: number): Promise<EventWithCounters[]> {
+		const { data: eventsAnnexedToIds, error: annexedToIdsError } = await event.locals.supabase
+			.from('event_events')
+			.select('event_id')
+			.eq('annexed_id', eventId);
+
+		if (annexedToIdsError) {
+			const msg = 'Error fetching event IDs annexed to this event, please try again later.';
+			setFlash({ type: 'error', message: msg }, event.cookies);
+			return error(500, msg);
+		}
+
+		const ids = eventsAnnexedToIds?.map(row => row.event_id) ?? [];
+
+		const { data: eventsAnnexedTo, error: annexedToError } = await event.locals.supabase
+			.from('events_view')
+			.select('*')
+			.in('id', ids)
+			.eq('moderation_status', 'approved')
+			.order('title', { ascending: true });
+
+		if (annexedToError) {
+			const msg = 'Error fetching events annexed to this event, please try again later.';
+			setFlash({ type: 'error', message: msg }, event.cookies);
+			return error(500, msg);
+		}
+
+		return eventsAnnexedTo;
+	}
+
+	async function getThreadsAnnexedTo(eventId: number): Promise<ThreadWithCounters[]> {
+		const { data: threadsAnnexedTo, error: annexedToError } = await event.locals.supabase
+			.from('forum_threads_view')
+			.select('*, thread_events!inner(annexed_id)')
+			.eq('thread_events.annexed_id', eventId)
+			.eq('moderation_status', 'approved')
+			.order('title', { ascending: true });
+
+		if (annexedToError) {
+			const errorMessage = 'Error fetching threads annexed to this event, please try again later.';
+			setFlash({ type: 'error', message: errorMessage }, event.cookies);
+			return error(500, errorMessage);
+		}
+
+		return threadsAnnexedTo;
+	}
+
 	let hasVoted = false;
 
 	if (user?.id) {
@@ -165,6 +229,9 @@ export const load = async (event) => {
 		annexedContents: await getAnnexedContents(eventId),
 		annexedEvents: await getAnnexedEvents(eventId),
 		annexedThreads: await getAnnexedThreads(eventId),
+		contentsAnnexedTo: await getContentsAnnexedTo(eventId),
+        eventsAnnexedTo: await getEventsAnnexedTo(eventId),
+        threadsAnnexedTo: await getThreadsAnnexedTo(eventId),
 		deleteForm: await superValidate(zod(deleteEventSchema), {
 			id: 'delete-event',
 		}),

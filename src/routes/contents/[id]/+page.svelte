@@ -6,7 +6,7 @@
 	import { Badge } from '@/components/ui/badge';
 	import { Button } from '@/components/ui/button';
 	import dayjs from 'dayjs';
-	import { Tag, FileImage, FileSpreadsheet, FileVideo, FileText, FileJson, File as FileIcon, FileAudio, FileArchive, FileType2, Presentation, Pen, Trash } from 'lucide-svelte';
+	import { Tag, FileImage, FileSpreadsheet, FileVideo, FileText, FileJson, File as FileIcon, FileAudio, FileArchive, FileType2, Presentation, Pen, Trash, Link } from 'lucide-svelte';
 	import { MetaTags } from 'svelte-meta-tags';
 	import ContentDeleteDialog from './_components/content-delete-dialog.svelte';
 	import { cn } from '@/utils';
@@ -137,6 +137,14 @@
 			<div class="mt-4 flex items-center justify-between gap-4 border-t pt-4 text-sm text-muted-foreground">
 				<div class="flex gap-4">
 					<ContentDownloadButton data={data.downloadForm} />
+					{#if data.annexedContents.length > 0 || data.annexedEvents.length > 0 || data.annexedThreads.length > 0 ||
+						data.contentsAnnexedTo.length > 0 || data.eventsAnnexedTo.length > 0 || data.threadsAnnexedTo.length > 0}
+						<Button variant="ghost" size="sm" on:click={() => (showAnnexes = !showAnnexes)}
+							class={cn('flex items-center gap-2', { 'text-orange-500': showAnnexes })}>
+							<Link class="h-4 w-4" />
+							Annexes
+						</Button>
+					{/if}
 				</div>
 				{#if data.content.user_id === data.user?.id}
 					<div class="flex gap-2">
@@ -154,7 +162,7 @@
 		</div>
 	</Card>
 	<div class="mx-auto flex flex-col space-y-2">
-		{#if showAnnexes && (data.annexedEvents.length > 0 || data.annexedThreads.length > 0)}
+		{#if showAnnexes && (data.annexedContents.length > 0 || data.annexedEvents.length > 0 || data.annexedThreads.length > 0)}
 			<div class="w-full flex items-center gap-4 text-foreground">
 				<hr class="flex-grow border-t border-foreground" />
 				<span class="text-sm font-semibold uppercase">Annexes</span>
@@ -171,6 +179,22 @@
 				</div>
 			{/each}
 			{#each data.annexedContents as content}
+				<ContentItem {content} />
+			{/each}
+		{/if}
+		{#if showAnnexes && (data.contentsAnnexedTo.length > 0 || data.eventsAnnexedTo.length > 0 || data.threadsAnnexedTo.length > 0)}
+			<div class="w-full flex items-center gap-4 text-foreground">
+				<hr class="flex-grow border-t border-foreground" />
+				<span class="text-sm font-semibold uppercase">Annexed To</span>
+				<hr class="flex-grow border-t border-foreground" />
+			</div>
+			{#each data.eventsAnnexedTo as event}
+				<EventCompactItem {event} />
+			{/each}
+			{#each data.threadsAnnexedTo as thread}
+				<ThreadCompactItem {thread} />
+			{/each}
+			{#each data.contentsAnnexedTo as content}
 				<ContentItem {content} />
 			{/each}
 		{/if}
