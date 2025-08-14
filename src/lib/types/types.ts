@@ -143,12 +143,8 @@ export type EventWithVotingOptions = Event & {
 	voting_options: EventVotingOption[];
 };
 
-export type VotingSummary = {
-	event_id: number;
+export type VoteCount = {
 	voting_option_id: number;
-	date: string;
-	start_time: string;
-	end_time: string;
 	vote_count: number;
 };
 

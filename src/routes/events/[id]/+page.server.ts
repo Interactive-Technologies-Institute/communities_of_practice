@@ -1,5 +1,5 @@
 import { deleteEventSchema, toggleEventInterestSchema, voteOnScheduleSchema, removeVotesSchema } from '@/schemas/event';
-import type { EventWithAuthor, EventVote, ModerationInfo, ContentWithCounter, EventWithCounters, ThreadWithCounters } from '@/types/types';
+import type { EventWithAuthor, EventVotingOption, VoteCount, ModerationInfo, ContentWithCounter, EventWithCounters, ThreadWithCounters } from '@/types/types';
 import { handleFormAction } from '@/utils';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { setFlash } from 'sveltekit-flash-message/server';
@@ -42,7 +42,7 @@ export const load = async (event) => {
 		return moderation;
 	}
 
-	async function getVotingOptions(id: number) {
+	async function getVotingOptions(id: number): Promise<EventVotingOption[]> {
 		const { data: votingOptions, error: votingError } = await event.locals.supabase
 			.from('events_voting_options')
 			.select('*')
@@ -56,10 +56,10 @@ export const load = async (event) => {
 	return votingOptions;
 	}
 
-	async function getUserVotes(userId: string, eventId: number): Promise<EventVote[]> {
+	async function getUserVoteIds(userId: string, eventId: number): Promise<number[]> {
 		const { data: userVotes, error } = await event.locals.supabase
 			.from('events_votes')
-			.select('*')
+			.select('voting_option_id')
 			.eq('user_id', userId)
 			.eq('event_id', eventId);
 
@@ -68,7 +68,21 @@ export const load = async (event) => {
 			return [];
 		}
 
-		return userVotes;
+		return userVotes.map(v => v.voting_option_id);
+	}
+
+	async function getVoteCounts(eventId: number): Promise<VoteCount[]> {
+		const { data: voteCounts, error: voteCountError } = await event.locals.supabase
+			.from('events_voting_counts_view')
+			.select('voting_option_id, vote_count')
+    		.eq('event_id', eventId);
+
+		if (voteCountError) {
+			console.error('Failed to fetch vote counts:', voteCountError);
+			return [];
+		}
+
+		return voteCounts;
 	}
 
 	async function getInterestCount(id: string): Promise<{ count: number; userInterested: boolean }> {
@@ -211,11 +225,10 @@ export const load = async (event) => {
 		return threadsAnnexedTo;
 	}
 
-	let hasVoted = false;
+	let userVoteIds: number[] = [];
 
 	if (user?.id) {
-		const userVotes = await getUserVotes(user.id, eventId);
-		hasVoted = userVotes.length > 0;
+		userVoteIds = await getUserVoteIds(user.id, eventId);
 	}
 	
 	const interestCount = await getInterestCount(event.params.id);
@@ -224,7 +237,8 @@ export const load = async (event) => {
 		event: await getEvent(eventId),
 		moderation: await getEventModeration(eventId),
 		votingOptions: await getVotingOptions(eventId),
-		hasVoted: hasVoted,
+		userVoteIds: userVoteIds,
+		voteCounts: await getVoteCounts(eventId),
 		interestCount: interestCount.count,
 		annexedContents: await getAnnexedContents(eventId),
 		annexedEvents: await getAnnexedEvents(eventId),

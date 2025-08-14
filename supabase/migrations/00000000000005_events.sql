@@ -161,17 +161,16 @@ create table public.events_votes (
 	voting_option_id bigint references public.events_voting_options on delete cascade not null,
 	constraint one_vote_per_option unique (user_id, voting_option_id)
 );
-create view public.events_voting_summary_view as
+create or replace view public.events_voting_counts_view
+with (security_invoker = on) as
 select
-	vo.event_id,
-	vo.id as voting_option_id,
-	vo.date,
-	vo.start_time,
-	vo.end_time,
-	count(v.id) as vote_count
+  vo.event_id,
+  vo.id as voting_option_id,
+  count(v.id) as vote_count
 from public.events_voting_options vo
-left join public.events_votes v on v.voting_option_id = vo.id
-group by vo.event_id, vo.id, vo.date, vo.start_time, vo.end_time;
+left join public.events_votes v
+  on v.voting_option_id = vo.id
+group by vo.event_id, vo.id;
 create function public.get_vote_option_count(voting_option_id bigint, user_id uuid default null) returns table (vote_count bigint, has_voted boolean) language sql security definer as $$
 select
   count(*) as vote_count,

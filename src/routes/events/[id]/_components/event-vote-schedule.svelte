@@ -7,20 +7,24 @@
 		type RemoveVotesSchema
 	} from '@/schemas/event';
 	import { Button } from '@/components/ui/button';
-	import type { EventWithAuthor } from '@/types/types';
+	import type { EventVotingOption, VoteCount, EventWithAuthor } from '@/types/types';
 	import dayjs from 'dayjs';
+	import VoteOptionItem from '@/components/vote-option-item.svelte';
 
 	export let event: EventWithAuthor;
 	export let voteOnSchedule: SuperValidated<Infer<VoteOnScheduleSchema>>;
 	export let removeVotes: SuperValidated<Infer<RemoveVotesSchema>>;
-	export let votingOptions;
-	export let hasVoted: boolean;
+	export let votingOptions: EventVotingOption[];
+	export let userVoteIds: number[] = [];
+	export let voteCounts: VoteCount[];
 
 	const voteForm = superForm(voteOnSchedule, {
 		validators: zodClient(voteOnScheduleSchema),
 		taintedMessage: true,
 		dataType: 'json'
 	});
+
+	$: hasVoted = userVoteIds.length > 0;
 
 	const removeForm = superForm(removeVotes, {
 		dataType: 'json',
@@ -51,21 +55,23 @@
 		votingClosed = dayjs().isAfter(votingDeadline);
 	}
 
-	function toggleOption(id: number) {
-		const list = $voteFormData.votes_ids;
-		if (list.includes(id)) {
-			$voteFormData.votes_ids = list.filter((x) => x !== id);
-		} else {
-			$voteFormData.votes_ids = [...list, id];
-		}
-	}
+	let selectedItems = $voteFormData.votes_ids;
+	$: $voteFormData.votes_ids = selectedItems;
+
+	$: votesByOption = new Map<number, number>(
+		(voteCounts ?? []).map((vc) => [vc.voting_option_id, vc.vote_count])
+	);
 </script>
 {#if votingClosed}
 	<p class="text-green-700 font-semibold">Schedule votes are now closed.</p>
 {:else}
+<p class="text-green-700 font-semibold">Voting deadline: {dayjs(`${event.voting_end_date}T${event.voting_end_time}`).format('DD/MM/YYYY [at] HH:mm')}</p>
 	{#if hasVoted}
-		<p class="text-green-700 font-semibold">You already voted to schedule this event.</p>
-
+		<div class="space-y-2">
+				{#each votingOptions as option}
+					<VoteOptionItem option={option} votes={votesByOption.get(option.id) ?? 0} hasVoted userVoted={userVoteIds.includes(option.id)} bind:selectedItems/>
+				{/each}
+			</div>
 		<form method="POST" action="?/removeVotes" use:enhanceRemove>
 			<Button type="submit" disabled={$submittingRemove}>
 				{#if $submittingRemove}Removing...{/if}
@@ -73,25 +79,11 @@
 			</Button>
 		</form>
 	{:else}
-		<p class="text-green-700 font-semibold">Voting deadline: {dayjs(`${event.voting_end_date}T${event.voting_end_time}`).format('DD/MM/YYYY [at] HH:mm')}</p>
 		<form method="POST" action="?/voteOnSchedule" use:enhanceVote>
 			<div class="space-y-2">
 				{#each votingOptions as option}
-					<label class="flex flex-col gap-1 md:flex-row md:items-center md:gap-2">
-						<input
-							type="checkbox"
-							checked={$voteFormData.votes_ids.includes(option.id)}
-							on:change={() => toggleOption(option.id)}
-						/>
-						<span>
-							{dayjs(option.date).format('dddd , DD/MM/YYYY')}
-							{#if option.start_time && option.end_time}
-								, {option.start_time.slice(0, 5)}–{option.end_time.slice(0, 5)}
-							{/if}
-						</span>
-					</label>
+					<VoteOptionItem option={option} votes={votesByOption.get(option.id) ?? 0} hasVoted={hasVoted} bind:selectedItems/>
 				{/each}
-
 			</div>
 			<div class="pt-4">
 				<Button type="submit" disabled={$submittingVote}>

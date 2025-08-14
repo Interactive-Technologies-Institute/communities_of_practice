@@ -1,7 +1,5 @@
 <script lang="ts">
-	import InteractableImage from '@/components/interactable-image.svelte';
 	import ModerationBanner from '@/components/moderation-banner.svelte';
-	import PageHeader from '@/components/page-header.svelte';
 	import Card from '@/components/ui/card/card.svelte';
 	import { AspectRatio } from '@/components/ui/aspect-ratio';
 	import { Button } from '@/components/ui/button';
@@ -31,7 +29,6 @@
 		return null;
 	}
 
-	
 	let openDeleteDialog = false;
 </script>
 
@@ -143,19 +140,21 @@
 		</div>
 	</Card>
 	<div class="mx-auto flex flex-col space-y-2">
-		{#if data.event.moderation_status === "approved" && data.event.allow_voting}
+		{#if data.event.moderation_status === "approved" && data.event.allow_voting && data.event.voting_end_date && data.event.voting_end_time}
 			<div class="w-full flex items-center gap-4 text-foreground">
 				<hr class="flex-grow border-t border-foreground" />
 				<span class="text-sm font-semibold uppercase">Vote Schedule</span>
 				<hr class="flex-grow border-t border-foreground" />
 			</div>
-			<Card class="w-full mx-auto p-2 space-y-4">
-				{#if data.votingOptions.length > 1}
-					<EventVoteSchedule event={data.event} voteOnSchedule={data.voteOnScheduleForm} removeVotes={data.removeVotesForm} votingOptions={data.votingOptions} hasVoted={data.hasVoted}/>
-				{:else}
+			{#if data.votingOptions.length > 1}
+				<EventVoteSchedule event={data.event} voteOnSchedule={data.voteOnScheduleForm} removeVotes={data.removeVotesForm}
+					votingOptions={data.votingOptions} userVoteIds={data.userVoteIds} voteCounts={data.voteCounts}/>
+			{:else}
+				<Card class="w-full mx-auto p-2 space-y-4">
 					<p class="text-muted-foreground">No voting options available.</p>
-				{/if}
-			</Card>
+				</Card>
+			{/if}
+			
 		{/if}
 		{#if showAnnexes && (data.annexedContents.length > 0 || data.annexedEvents.length > 0 || data.annexedThreads.length > 0)}
 			<div class="w-full flex items-center gap-4 text-foreground">

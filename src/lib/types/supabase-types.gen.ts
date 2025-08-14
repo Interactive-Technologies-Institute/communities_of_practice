@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
@@ -729,15 +729,15 @@ export type Database = {
             foreignKeyName: "events_final_voting_option_id_fkey"
             columns: ["final_voting_option_id"]
             isOneToOne: false
-            referencedRelation: "events_voting_options"
-            referencedColumns: ["id"]
+            referencedRelation: "events_voting_counts_view"
+            referencedColumns: ["voting_option_id"]
           },
           {
             foreignKeyName: "events_final_voting_option_id_fkey"
             columns: ["final_voting_option_id"]
             isOneToOne: false
-            referencedRelation: "events_voting_summary_view"
-            referencedColumns: ["voting_option_id"]
+            referencedRelation: "events_voting_options"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "events_user_id_fkey"
@@ -916,15 +916,15 @@ export type Database = {
             foreignKeyName: "events_votes_voting_option_id_fkey"
             columns: ["voting_option_id"]
             isOneToOne: false
-            referencedRelation: "events_voting_options"
-            referencedColumns: ["id"]
+            referencedRelation: "events_voting_counts_view"
+            referencedColumns: ["voting_option_id"]
           },
           {
             foreignKeyName: "events_votes_voting_option_id_fkey"
             columns: ["voting_option_id"]
             isOneToOne: false
-            referencedRelation: "events_voting_summary_view"
-            referencedColumns: ["voting_option_id"]
+            referencedRelation: "events_voting_options"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -2073,15 +2073,15 @@ export type Database = {
             foreignKeyName: "events_final_voting_option_id_fkey"
             columns: ["final_voting_option_id"]
             isOneToOne: false
-            referencedRelation: "events_voting_options"
-            referencedColumns: ["id"]
+            referencedRelation: "events_voting_counts_view"
+            referencedColumns: ["voting_option_id"]
           },
           {
             foreignKeyName: "events_final_voting_option_id_fkey"
             columns: ["final_voting_option_id"]
             isOneToOne: false
-            referencedRelation: "events_voting_summary_view"
-            referencedColumns: ["voting_option_id"]
+            referencedRelation: "events_voting_options"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "events_user_id_fkey"
@@ -2099,12 +2099,9 @@ export type Database = {
           },
         ]
       }
-      events_voting_summary_view: {
+      events_voting_counts_view: {
         Row: {
-          date: string | null
-          end_time: string | null
           event_id: number | null
-          start_time: string | null
           vote_count: number | null
           voting_option_id: number | null
         }
@@ -2625,12 +2622,12 @@ export type Database = {
       }
       get_guides_ordered_by_useful: {
         Args: {
-          sort_order?: string
+          filter_bookmarked?: boolean
+          filter_liked?: boolean
           search?: string
+          sort_order?: string
           tag_filters?: string[]
           user_id?: string
-          filter_liked?: boolean
-          filter_bookmarked?: boolean
         }
         Returns: {
           description: string | null
@@ -2658,10 +2655,10 @@ export type Database = {
         }[]
       }
       get_vote_option_count: {
-        Args: { voting_option_id: number; user_id?: string }
+        Args: { user_id?: string; voting_option_id: number }
         Returns: {
-          vote_count: number
           has_voted: boolean
+          vote_count: number
         }[]
       }
       halfvec_avg: {
@@ -2718,13 +2715,13 @@ export type Database = {
       }
       match_documents: {
         Args: {
-          query_embedding: string
-          match_threshold: number
           match_count: number
+          match_threshold: number
+          query_embedding: string
         }
         Returns: {
-          id: number
           content: string
+          id: number
           similarity: number
         }[]
       }

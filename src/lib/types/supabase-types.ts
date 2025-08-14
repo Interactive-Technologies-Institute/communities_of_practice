@@ -62,6 +62,13 @@ export type Database = MergeDeep<
 						tag: string;
 					};
 				};
+				events_voting_counts_view: {
+					Row: {
+						event_id: number;
+						voting_option_id: number;
+						vote_count: number;
+					};
+				};
 				guides_view: {
 					Row: {
 						description: string;
