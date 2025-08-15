@@ -4,7 +4,7 @@
 	import { Badge } from '@/components/ui/badge';
 	import { Button } from '@/components/ui/button';
 	import { Card } from '@/components/ui/card';
-	import dayjs from 'dayjs';
+	import dayjs from '$lib/dayjs';
 	import { Tag, ThumbsUp } from 'lucide-svelte';
 	import type { EventWithCounters } from '@/types/types';
 	import { onMount } from 'svelte';
@@ -75,14 +75,14 @@
 					<p class="font-medium line-clamp-1 leading-none">
 						{dayjs(`${event.date}T${event.start_time}`).format(
 							dayjs(event.date).year() === dayjs().year()
-								? 'ddd, MM/DD [at] HH:mm'
-								: 'ddd, MM/DD/YYYY [at] HH:mm'
+								? 'ddd, DD/MM [às] HH:mm'
+								: 'ddd, DD/MM/YYYY [às] HH:mm'
 						)}–{dayjs(`${event.date}T${event.end_time}`).format('HH:mm')}
 						•
 						{event.location}
 					</p>
 				{:else}
-					<p class="font-medium leading-none">Date not decided yet • {event.location}</p>
+					<p class="font-medium leading-none">Data por decidir • {event.location}</p>
 				{/if}
 				<h2 class="line-clamp-1 text-lg font-medium mt-2">{event.title}</h2>
 				<p class="line-clamp-1 text-muted-foreground">{event.description}</p>

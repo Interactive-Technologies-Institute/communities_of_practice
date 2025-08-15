@@ -146,20 +146,20 @@
 <form method="POST" enctype="multipart/form-data" use:enhance class="flex flex-col gap-y-10">
 	<Card.Root>
 		<Card.Header>
-			<Card.Title>Information</Card.Title>
-			<Card.Description>Add details to this thread</Card.Description>
+			<Card.Title>Informação</Card.Title>
+			<Card.Description>Adiciona detalhes a este tópico de discussão</Card.Description>
 		</Card.Header>
 		<Card.Content class="space-y-4">
 			<Form.Field {form} name="title">
 				<Form.Control let:attrs>
-					<Form.Label>Title*</Form.Label>
+					<Form.Label>Título*</Form.Label>
 					<Input {...attrs} bind:value={$formData.title} />
 					<Form.FieldErrors />
 				</Form.Control>
 			</Form.Field>
 			<Form.Field {form} name="content">
 				<Form.Control let:attrs>
-					<Form.Label>Content*</Form.Label>
+					<Form.Label>Conteúdo*</Form.Label>
 					<Textarea {...attrs} bind:value={$formData.content} />
 					<Form.FieldErrors />
 				</Form.Control>
@@ -167,7 +167,7 @@
 			<Form.Field {form} name="tags">
 				<Form.Control let:attrs>
 					<Form.Label class="flex justify-between items-center">
-						Tags*
+						Etiquetas*
 						<Button
 							type="button"
 							size="sm"
@@ -188,7 +188,7 @@
 			<Form.Field {form} name="summary">
 				<Form.Control let:attrs>
 					<Form.Label class="flex justify-between items-center">
-						Summary
+						Sumário
 						<Button
 							type="button"
 							size="sm"
@@ -198,7 +198,7 @@
 							{#if loadingSummary}
 								<Loader2 class="h-4 w-4 animate-spin" />
 							{:else}
-								Generate Summary
+								Gerar por IA
 							{/if}
 						</Button>
 					</Form.Label>
@@ -209,7 +209,7 @@
 			<div class="grid grid-cols-1 gap-x-4 md:grid-cols-2">
 				<Form.Field {form} name="image">
 					<Form.Control let:attrs>
-						<Form.Label>Image</Form.Label>
+						<Form.Label>Imagem</Form.Label>
 						<Card.Root class="aspect-[3/2] overflow-hidden">
 							{#if imageUrl}
 								<InteractableImage
@@ -230,17 +230,17 @@
 	<div
 		class="sticky bottom-0 flex w-full flex-row items-center justify-center gap-x-10 border-t bg-background/95 py-8 backdrop-blur supports-[backdrop-filter]:bg-background/60"
 	>
-		<Button variant="outline" href="/forum">Cancel</Button>
+		<Button variant="outline" href="/forum">Cancelar</Button>
 		{#if showAnnexesButton}
 			<Button variant="outline" href={`/forum/${threadId}/annexes`} target="_blank" rel="noopener noreferrer">
-				Annexes
+				Anexos
 			</Button>
 		{/if}
 		<Button type="submit" disabled={$submitting}>
 			{#if $submitting}
 			<Loader2 class="mr-2 h-4 w-4 animate-spin" />
 			{/if}
-			Submit
+			Submeter
 		</Button>
 	</div>
 </form>

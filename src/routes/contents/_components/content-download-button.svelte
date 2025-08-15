@@ -50,6 +50,6 @@
 		class="flex items-center gap-2 text-orange-500"
 	>
 		<Download class="h-4 w-4" />
-		Download
+		Transferir
 	</Button>
 </form>

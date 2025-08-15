@@ -6,9 +6,9 @@
 	export let data;
 </script>
 
-<MetaTags title="Edit Event" description="Edit this event" />
+<MetaTags title="Edita Evento" description="Edita este evento" />
 
-<PageHeader title="Edit Event" subtitle="Edit this event" />
+<PageHeader title="Edita Evento" subtitle="Edita este evento" />
 <div class="container mx-auto mb-20">
 	<EditEventForm data={data.updateForm} eventId={data.eventId} showAnnexesButton={true}/>
 </div>

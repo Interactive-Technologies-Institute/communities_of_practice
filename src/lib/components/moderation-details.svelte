@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { ModerationInfo } from '@/types/types';
-	import dayjs from 'dayjs';
+	import dayjs from '$lib/dayjs';
 	import { Info } from 'lucide-svelte';
 	import * as Alert from './ui/alert';
 	import * as Sheet from './ui/sheet';
@@ -12,7 +12,7 @@
 <Sheet.Root bind:open>
 	<Sheet.Content>
 		<Sheet.Header>
-			<Sheet.Title>Moderation Details</Sheet.Title>
+			<Sheet.Title>Detalhes de Moderação</Sheet.Title>
 			<Sheet.Description>
 				Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
 				labore et dolore magna aliqua.
@@ -23,17 +23,17 @@
 				{@const variant = item.status === 'rejected' ? 'destructive' : 'default'}
 				<div>
 					<p class="mb-1 text-xs text-muted-foreground">
-						{dayjs(item.inserted_at).format('YYYY-MM-DD HH:mm:ss')}
+						{dayjs(item.inserted_at).format('DD-MM-YYYY HH:mm:ss')}
 					</p>
 					<Alert.Root {variant} class="mx-auto max-w-xl">
 						<Info class="mr-2 h-4 w-4" />
 						<Alert.Title>
 							{#if item.status === 'rejected'}
-								Rejected (marked for deletetion)
+								Rejeitado (marcado para eliminação)
 							{:else if item.status === 'pending'}
-								Pending Moderation
+								Moderação Pendente
 							{:else if item.status === 'changes_requested'}
-								Changes Requested
+								Alterações Solicitadas
 							{/if}
 						</Alert.Title>
 						<Alert.Description>{item.comment}</Alert.Description>

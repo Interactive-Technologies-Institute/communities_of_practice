@@ -6,11 +6,11 @@
 </script>
 
 <MetaTags
-	title="Create Event"
-	description="Create a new event to and share it with the community"
+	title="Cria Evento"
+	description="Cria um novo evento e partilha-o com a comunidade"
 />
 
-<PageHeader title="Create Event" subtitle="Create a new event to and share it with the community" />
+<PageHeader title="Cria Evento" subtitle="Cria um novo evento e partilha-o com a comunidade" />
 <div class="container mx-auto mb-20">
 	<EventForm data={data.createForm} />
 </div>

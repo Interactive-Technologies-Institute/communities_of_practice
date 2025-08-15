@@ -5,7 +5,7 @@
 	import Card from '@/components/ui/card/card.svelte';
 	import { Badge } from '@/components/ui/badge';
 	import { Button } from '@/components/ui/button';
-	import dayjs from 'dayjs';
+	import dayjs from '$lib/dayjs';
 	import { Tag, FileImage, FileSpreadsheet, FileVideo, FileText, FileJson, File as FileIcon, FileAudio, FileArchive, FileType2, Presentation, Pen, Trash, Link } from 'lucide-svelte';
 	import { MetaTags } from 'svelte-meta-tags';
 	import ContentDeleteDialog from './_components/content-delete-dialog.svelte';
@@ -96,7 +96,7 @@
 	{/if}
 	<div class="w-full flex items-center gap-4 text-foreground">
 		<hr class="flex-grow border-t border-foreground" />
-		<span class="text-sm font-semibold uppercase">Content</span>
+		<span class="text-sm font-semibold uppercase">Conteúdo</span>
 		<hr class="flex-grow border-t border-foreground" />
 	</div>
 	<Card class="mx-auto p-2 space-y-4">
@@ -121,9 +121,9 @@
 			<div class="flex w-full justify-between items-end mt-4 text-sm text-muted-foreground">
 				<div class="flex flex-col">
 					{#if data.downloadForm.data.value}
-						<span>You’ve already downloaded this file.</span>
+						<span>Já transferiste este ficheiro.</span>
 					{/if}
-					<span>{data.downloadCount + ' members downloaded'}</span>
+					<span>{data.downloadCount + ' membros transferiram'}</span>
 				</div>
 				<div class="flex flex-wrap justify-end gap-x-3 max-w-[68%]">
 					{#each data.content.tags as tag}
@@ -142,7 +142,7 @@
 						<Button variant="ghost" size="sm" on:click={() => (showAnnexes = !showAnnexes)}
 							class={cn('flex items-center gap-2', { 'text-orange-500': showAnnexes })}>
 							<Link class="h-4 w-4" />
-							Annexes
+							Anexos
 						</Button>
 					{/if}
 				</div>
@@ -150,11 +150,11 @@
 					<div class="flex gap-2">
 						<Button variant="ghost" size="sm" href="/contents/{data.content.id}/edit" class="text-blue-500 gap-2 hover:text-blue-600">
 							<Pen class="h-4 w-4" />
-							Edit
+							Editar
 						</Button>
 						<Button variant="ghost" size="sm" on:click={() => (openDeleteDialog = true)} class="text-red-500 gap-2 hover:text-red-600">
 							<Trash class="h-4 w-4" /> 
-							Delete
+							Eliminar
 						</Button>
 					</div>
 				{/if}
@@ -165,7 +165,7 @@
 		{#if showAnnexes && (data.annexedContents.length > 0 || data.annexedEvents.length > 0 || data.annexedThreads.length > 0)}
 			<div class="w-full flex items-center gap-4 text-foreground">
 				<hr class="flex-grow border-t border-foreground" />
-				<span class="text-sm font-semibold uppercase">Annexes</span>
+				<span class="text-sm font-semibold uppercase">Anexos</span>
 				<hr class="flex-grow border-t border-foreground" />
 			</div>
 			{#each data.annexedEvents as event}
@@ -185,7 +185,7 @@
 		{#if showAnnexes && (data.contentsAnnexedTo.length > 0 || data.eventsAnnexedTo.length > 0 || data.threadsAnnexedTo.length > 0)}
 			<div class="w-full flex items-center gap-4 text-foreground">
 				<hr class="flex-grow border-t border-foreground" />
-				<span class="text-sm font-semibold uppercase">Annexed To</span>
+				<span class="text-sm font-semibold uppercase">Anexado A</span>
 				<hr class="flex-grow border-t border-foreground" />
 			</div>
 			{#each data.eventsAnnexedTo as event}

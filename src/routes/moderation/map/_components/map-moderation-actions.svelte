@@ -37,19 +37,19 @@
 <DropdownMenu.Root>
 	<DropdownMenu.Trigger asChild let:builder>
 		<Button variant="ghost" builders={[builder]} size="icon" class="relative h-8 w-8 p-0">
-			<span class="sr-only">Open menu</span>
+			<span class="sr-only">Abrir menu</span>
 			<Ellipsis class="h-4 w-4" />
 		</Button>
 	</DropdownMenu.Trigger>
 	<DropdownMenu.Content>
-		<DropdownMenu.Item href="/map?id={id}">Open</DropdownMenu.Item>
+		<DropdownMenu.Item href="/map?id={id}">Abrir</DropdownMenu.Item>
 		<DropdownMenu.Separator />
 		<DropdownMenu.Group>
 			<DropdownMenu.Label>Actions</DropdownMenu.Label>
-			<DropdownMenu.Item on:click={() => (openApproveDialog = true)}>Approve</DropdownMenu.Item>
-			<DropdownMenu.Item on:click={() => (openRejectDialog = true)}>Reject</DropdownMenu.Item>
+			<DropdownMenu.Item on:click={() => (openApproveDialog = true)}>Aprovar</DropdownMenu.Item>
+			<DropdownMenu.Item on:click={() => (openRejectDialog = true)}>Rejeitar</DropdownMenu.Item>
 			<DropdownMenu.Item on:click={() => (openRequestChangesDialog = true)}>
-				Request Changes
+				Solicitar alterações
 			</DropdownMenu.Item>
 		</DropdownMenu.Group>
 	</DropdownMenu.Content>
@@ -58,8 +58,8 @@
 <Dialog.Root bind:open={openApproveDialog}>
 	<Dialog.Content class="sm:max-w-[425px]">
 		<Dialog.Header>
-			<Dialog.Title>Approve Map Pin</Dialog.Title>
-			<Dialog.Description>Are you sure you want to approve this Map Pin?</Dialog.Description>
+			<Dialog.Title>Aprovar Marcador no Mapa</Dialog.Title>
+			<Dialog.Description>Tens a certeza de que queres aprovar este marcador no mapa?</Dialog.Description>
 		</Dialog.Header>
 		<form method="POST" use:enhance>
 			<input type="hidden" name="ref_id" value={id} />
@@ -67,16 +67,16 @@
 			<input type="hidden" name="status" value="approved" />
 			<Form.Field {form} name="comment">
 				<Form.Control let:attrs>
-					<Form.Label>Comment</Form.Label>
+					<Form.Label>Comentário</Form.Label>
 					<Textarea {...attrs} bind:value={$formData.comment} />
 				</Form.Control>
-				<Form.Description>Leave a comment for the User.</Form.Description>
+				<Form.Description>Deixa um comentário para o utilizador.</Form.Description>
 				<Form.FieldErrors />
 			</Form.Field>
 		</form>
 		<Dialog.Footer>
-			<Button variant="secondary" on:click={() => (openApproveDialog = false)}>Cancel</Button>
-			<Button type="submit" on:click={form.submit}>Approve</Button>
+			<Button variant="secondary" on:click={() => (openApproveDialog = false)}>Cancelar</Button>
+			<Button type="submit" on:click={form.submit}>Aprovar</Button>
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>
@@ -84,8 +84,8 @@
 <Dialog.Root bind:open={openRejectDialog}>
 	<Dialog.Content class="sm:max-w-[425px]">
 		<Dialog.Header>
-			<Dialog.Title>Reject Map Pin</Dialog.Title>
-			<Dialog.Description>Are you sure you want to reject this Map Pin?</Dialog.Description>
+			<Dialog.Title>Rejeitar Marcador no Mapa</Dialog.Title>
+			<Dialog.Description>Tens a certeza de que queres rejeitar este marcador no mapa?</Dialog.Description>
 		</Dialog.Header>
 		<form method="POST" use:enhance>
 			<input type="hidden" name="ref_id" value={id} />
@@ -93,16 +93,16 @@
 			<input type="hidden" name="status" value="rejected" />
 			<Form.Field {form} name="comment">
 				<Form.Control let:attrs>
-					<Form.Label>Comment</Form.Label>
+					<Form.Label>Comentário</Form.Label>
 					<Textarea {...attrs} bind:value={$formData.comment} />
 				</Form.Control>
-				<Form.Description>Leave a comment for the User.</Form.Description>
+				<Form.Description>Deixa um comentário para o utilizador.</Form.Description>
 				<Form.FieldErrors />
 			</Form.Field>
 		</form>
 		<Dialog.Footer>
-			<Button variant="secondary" on:click={() => (openRejectDialog = false)}>Cancel</Button>
-			<Button type="submit" on:click={form.submit}>Reject</Button>
+			<Button variant="secondary" on:click={() => (openRejectDialog = false)}>Cancelar</Button>
+			<Button type="submit" on:click={form.submit}>Rejeitar</Button>
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>
@@ -110,9 +110,9 @@
 <Dialog.Root bind:open={openRequestChangesDialog}>
 	<Dialog.Content class="sm:max-w-[425px]">
 		<Dialog.Header>
-			<Dialog.Title>Request Changes</Dialog.Title>
+			<Dialog.Title>Solicitar Alterações</Dialog.Title>
 			<Dialog.Description
-				>Are you sure you want to request changes for this Map Pin?</Dialog.Description
+				>Tens a certeza de que queres solicitar alterações para este marcador no mapa?</Dialog.Description
 			>
 		</Dialog.Header>
 		<form method="POST" use:enhance>
@@ -121,18 +121,18 @@
 			<input type="hidden" name="status" value="changes_requested" />
 			<Form.Field {form} name="comment">
 				<Form.Control let:attrs>
-					<Form.Label>Comment</Form.Label>
+					<Form.Label>Comentário</Form.Label>
 					<Textarea {...attrs} bind:value={$formData.comment} />
 				</Form.Control>
-				<Form.Description>Leave a comment for the User.</Form.Description>
+				<Form.Description>Deixa um comentário para o utilizador.</Form.Description>
 				<Form.FieldErrors />
 			</Form.Field>
 		</form>
 		<Dialog.Footer>
 			<Button variant="secondary" on:click={() => (openRequestChangesDialog = false)}>
-				Cancel
+				Cancelar
 			</Button>
-			<Button type="submit" on:click={form.submit}>Request Changes</Button>
+			<Button type="submit" on:click={form.submit}>Solicitar Alterações</Button>
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>

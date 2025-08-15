@@ -34,13 +34,13 @@
 	const sortOrder = queryParam('sortOrder', stringQueryParam());
 </script>
 
-<MetaTags title="Event Annexes" description="Annex the event with contents, threads and other events" />
+<MetaTags title="Anexos do Evento" description="Anexa o evento com conteúdos, tópicos de discussão e outros eventos" />
 
-<PageHeader title="Event Annexes" subtitle="Annex the event with contents, threads and other events" />
+<PageHeader title="Anexos do Evento" subtitle="Anexa o evento com conteúdos, tópicos de discussão e outros eventos" />
 <form method="POST" use:enhance>
     <div class="container mx-auto max-w-4xl flex flex-row justify-between gap-x-2">
         <div class="flex flex-1 flex-row gap-x-2 sm:gap-x-4 md:flex-auto">
-            <Input placeholder="Search..." class="flex-1 sm:max-w-64" bind:value={$search} />
+            <Input placeholder="Pesquisar..." class="flex-1 sm:max-w-64" bind:value={$search} />
             <AnnexesFilterButton bind:typeFilters={$typeFilters} />
             <SortButton bind:sortBy={$sortBy} bind:sortOrder={$sortOrder} section='annexes'/>
         </div>
@@ -49,7 +49,7 @@
 				<Loader2 class="h-4 w-4 animate-spin" />
 			{/if}
 			<PlusCircle class="h-4 w-4 sm:mr-2" />
-			Confirm
+			Confirmar
 		</Button>
     </div>
     <div class="container mx-auto max-w-4xl flex flex-col gap-y-6 py-10">

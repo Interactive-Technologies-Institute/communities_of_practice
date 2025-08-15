@@ -8,9 +8,9 @@
 	export let data;
 </script>
 
-<MetaTags title="Admin Panel" description="Configure the platform settings" />
+<MetaTags title="Painel de Administração" description="Configure as definições da plataforma" />
 
-<PageHeader title="Admin Panel" subtitle="Configure the platform settings" />
+<PageHeader title="Painel de Administração" subtitle="Configure as definições da plataforma" />
 <div class="container mb-20 flex flex-col gap-y-8 md:gap-y-10">
 	<FeaturesForm data={data.updateFeatures} />
 	<BrandingForm data={data.updateBranding} />

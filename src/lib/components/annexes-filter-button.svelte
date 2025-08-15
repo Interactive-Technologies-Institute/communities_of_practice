@@ -10,9 +10,9 @@
 	let open = false;
 
 	const itemTypes: { label: string; value: 'content' | 'event' | 'thread' }[] = [
-		{ label: 'Content', value: 'content' },
-		{ label: 'Event', value: 'event' },
-		{ label: 'Thread', value: 'thread' }
+		{ label: 'Conteúdo', value: 'content' },
+		{ label: 'Evento', value: 'event' },
+		{ label: 'Discussão', value: 'thread' }
 	];
 
 	function handleTypeSelect(currentValue: string) {
@@ -33,13 +33,13 @@
 					<div class="absolute -right-1 -top-1 flex h-2 w-2 rounded-full bg-primary md:mr-2" />
 				{/if}
 			</div>
-			<span class="sr-only md:not-sr-only">Filter</span>
+			<span class="sr-only md:not-sr-only">Filtrar</span>
 		</Button>
 	</Popover.Trigger>
 	<Popover.Content class="mt-2 w-[300px] p-0" align="start" side="bottom">
 		<Command.Root class="divide-border border-muted bg-background flex h-full w-full flex-col divide-y self-start overflow-hidden">
 			<Command.List>
-				<Command.Empty>No results found.</Command.Empty>
+				<Command.Empty>Nenhum resultado encontrado.</Command.Empty>
 				<Command.Group>
 					{#each itemTypes as type}
 						<Command.Item
@@ -69,7 +69,7 @@
 							typeFilters = [];
 						}}
 					>
-						Clear filters
+						Limpar filtros
 					</Command.Item>
 				{/if}
 			</Command.List>

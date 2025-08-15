@@ -28,15 +28,14 @@
 	</form>
 	<AlertDialog.Content>
 		<AlertDialog.Header>
-			<AlertDialog.Title>Are you absolutely sure?</AlertDialog.Title>
+			<AlertDialog.Title>Tens a certeza absoluta?</AlertDialog.Title>
 			<AlertDialog.Description>
-				This action cannot be undone. This will permanently delete this map pin and remove its data
-				from our servers.
+				Esta ação não pode ser anulada. Isto vai apagar permanentemente este marcador no mapa e remover os respetivos dados dos nossos servidores.
 			</AlertDialog.Description>
 		</AlertDialog.Header>
 		<AlertDialog.Footer>
-			<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
-			<AlertDialog.Action on:click={form.submit}>Continue</AlertDialog.Action>
+			<AlertDialog.Cancel>Cancelar</AlertDialog.Cancel>
+			<AlertDialog.Action on:click={form.submit}>Continuar</AlertDialog.Action>
 		</AlertDialog.Footer>
 	</AlertDialog.Content>
 </AlertDialog.Root>

@@ -8,13 +8,13 @@
 </script>
 
 <MetaTags
-	title="Edit User Profile"
-	description="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua"
+	title="Edita Perfil de Utilizador"
+	description="Edita o teu perfil de utilizador, incluindo a palavra-passe, avatar e informações pessoais"
 />
 
 <PageHeader
-	title="Edit User Profile"
-	subtitle="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua"
+	title="Edita Perfil de Utilizador"
+	subtitle="Edita o teu perfil de utilizador, incluindo a palavra-passe, avatar e informações pessoais"
 />
 <div class="container mb-20 flex flex-col gap-y-8 md:gap-y-10">
 	<ProfileForm data={data.updateProfile} />

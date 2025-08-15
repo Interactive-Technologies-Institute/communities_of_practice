@@ -6,9 +6,9 @@
 	export let data;
 </script>
 
-<MetaTags title="Edit Thread" description="Edit this thread" />
+<MetaTags title="Edita Tópico de Discussão" description="Edita este tópico de discussão" />
 
-<PageHeader title="Edit Thread" subtitle="Edit this thread" />
+<PageHeader title="Edita Tópico de Discussão" subtitle="Edita este tópico de discussão" />
 <div class="container mx-auto mb-20">
 	<ThreadForm data={data.updateForm} threadId={data.threadId} showAnnexesButton={true}/>
 </div>

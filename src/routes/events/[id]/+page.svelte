@@ -6,7 +6,7 @@
 	import ContentItem  from '@/components/content-item.svelte';
 	import EventCompactItem from '@/components/event-compact-item.svelte';
 	import ThreadCompactItem  from '@/components/thread-compact-item.svelte';
-	import dayjs from 'dayjs';
+	import dayjs from '$lib/dayjs';
 	import { Calendar, MapPin, Pen, Tag, Trash, Text, Video, Link } from 'lucide-svelte';
 	import { MetaTags } from 'svelte-meta-tags';
 	import EventDeleteDialog from './_components/event-delete-dialog.svelte';
@@ -54,7 +54,7 @@
 	{/if}
 	<div class="w-full flex items-center gap-4 text-foreground">
 		<hr class="flex-grow border-t border-foreground" />
-		<span class="text-sm font-semibold uppercase">Event</span>
+		<span class="text-sm font-semibold uppercase">Evento</span>
 		<hr class="flex-grow border-t border-foreground" />
 	</div>
 	<Card class="mx-auto">
@@ -72,12 +72,12 @@
 					{#if data.event.date}
 						{dayjs(`${data.event.date}T${data.event.start_time}`).format(
 							dayjs(data.event.date).year() === dayjs().year()
-							? 'DD/MM [at] HH:mm'
-							: 'DD/MM/YYYY [at] HH:mm'
+							? 'DD/MM [às] HH:mm'
+							: 'DD/MM/YYYY [às] HH:mm'
 							)}–{dayjs(`${data.event.date}T${data.event.end_time}`).format('HH:mm')}
 					<!-- Allow voting, voting open -->		
 					{:else}
-						Not decided yet
+						Por decidir
 					{/if}
 				</div>
 
@@ -88,7 +88,7 @@
 			</div>
 			<p class="whitespace-pre-wrap break-words mb-3 mt-3">{data.event.description}</p>
 			<div class="flex w-full justify-between items-end mt-4 text-sm text-muted-foreground">
-				<span>{data.interestCount + ' members interested'}</span>
+				<span>{data.interestCount + ' membros interessados'}</span>
 				<div class="flex flex-wrap justify-end gap-x-3 max-w-[70%]">
 					{#each data.event.tags as tag}
 						<a href={`/forum?tags=${tag}`} class="flex items-center gap-1 hover:underline">
@@ -106,21 +106,21 @@
 						<Button variant="ghost" size="sm" on:click={() => (showAnnexes = !showAnnexes)}
 							class={cn('flex items-center gap-2', { 'text-orange-500': showAnnexes })}>
 							<Link class="h-4 w-4" />
-							Annexes
+							Anexos
 						</Button>
 					{/if}
 					{#if data.event.recording_link}
 						<Button variant="ghost" size="sm" on:click={() => (showRecording = !showRecording)}
 							class={cn('flex items-center gap-2', { 'text-orange-500': showRecording })}>
 							<Video class="h-4 w-4" />
-							Recording
+							Gravação
 						</Button>
 					{/if}
 					{#if data.event.summary}
 						<Button variant="ghost" size="sm" on:click={() => (showSummary = !showSummary)}
 							class={cn('flex items-center gap-2', { 'text-orange-500': showSummary })}>
 							<Text class="h-4 w-4" />
-							Summary
+							Sumário
 						</Button>
 					{/if}
 				</div>
@@ -128,11 +128,11 @@
 					<div class="flex gap-2">
 						<Button variant="ghost" size="sm" href="/events/{data.event.id}/edit" class="text-blue-500 gap-2 hover:text-blue-600">
 							<Pen class="h-4 w-4" />
-							Edit
+							Editar
 						</Button>
 						<Button variant="ghost" size="sm" on:click={() => (openDeleteDialog = true)} class="text-red-500 gap-2 hover:text-red-600">
 							<Trash class="h-4 w-4" /> 
-							Delete
+							Eliminar
 						</Button>
 					</div>
 				{/if}
@@ -143,7 +143,7 @@
 		{#if data.event.moderation_status === "approved" && data.event.allow_voting && data.event.voting_end_date && data.event.voting_end_time}
 			<div class="w-full flex items-center gap-4 text-foreground">
 				<hr class="flex-grow border-t border-foreground" />
-				<span class="text-sm font-semibold uppercase">Vote Schedule</span>
+				<span class="text-sm font-semibold uppercase">Votar Horário</span>
 				<hr class="flex-grow border-t border-foreground" />
 			</div>
 			{#if data.votingOptions.length > 1}
@@ -151,7 +151,7 @@
 					votingOptions={data.votingOptions} userVoteIds={data.userVoteIds} voteCounts={data.voteCounts}/>
 			{:else}
 				<Card class="w-full mx-auto p-2 space-y-4">
-					<p class="text-muted-foreground">No voting options available.</p>
+					<p class="text-muted-foreground">Não há opções de voto disponíveis.</p>
 				</Card>
 			{/if}
 			
@@ -159,7 +159,7 @@
 		{#if showAnnexes && (data.annexedContents.length > 0 || data.annexedEvents.length > 0 || data.annexedThreads.length > 0)}
 			<div class="w-full flex items-center gap-4 text-foreground">
 				<hr class="flex-grow border-t border-foreground" />
-				<span class="text-sm font-semibold uppercase">Annexes</span>
+				<span class="text-sm font-semibold uppercase">Anexos</span>
 				<hr class="flex-grow border-t border-foreground" />
 			</div>
 			{#each data.annexedEvents as event}
@@ -175,7 +175,7 @@
 		{#if showAnnexes && (data.contentsAnnexedTo.length > 0 || data.eventsAnnexedTo.length > 0 || data.threadsAnnexedTo.length > 0)}
 			<div class="w-full flex items-center gap-4 text-foreground">
 				<hr class="flex-grow border-t border-foreground" />
-				<span class="text-sm font-semibold uppercase">Annexed To</span>
+				<span class="text-sm font-semibold uppercase">Anexado A</span>
 				<hr class="flex-grow border-t border-foreground" />
 			</div>
 			{#each data.eventsAnnexedTo as event}
@@ -191,7 +191,7 @@
 		{#if showRecording && (data.event.recording_link || data.event.transcription)}
 			<div class="w-full flex items-center gap-4 text-foreground">
 				<hr class="flex-grow border-t border-foreground" />
-				<span class="text-sm font-semibold uppercase">Recording</span>
+				<span class="text-sm font-semibold uppercase">Gravação</span>
 				<hr class="flex-grow border-t border-foreground" />
 			</div>
 			<Card class="p-4 text-sm">
@@ -207,7 +207,7 @@
 					<div class="mt-2 flex justify-center">
 						<button on:click={() => (showTranscription = !showTranscription)}
 							class="mt-2 text-sm font-medium text-blue-600 hover:underline focus:outline-none">
-							{showTranscription ? 'Hide Transcription' : 'Show Transcription'}
+							{showTranscription ? 'Ocultar transcrição' : 'Mostrar transcrição'}
 						</button>
 					</div>
 					{#if showTranscription}
@@ -219,7 +219,7 @@
 		{#if showSummary && data.event.summary}
 			<div class="w-full flex items-center gap-4 text-foreground">
 				<hr class="flex-grow border-t border-foreground" />
-				<span class="text-sm font-semibold uppercase">Summary</span>
+				<span class="text-sm font-semibold uppercase">Sumário</span>
 				<hr class="flex-grow border-t border-foreground" />
 			</div>
 			<Card class="p-4 text-sm">

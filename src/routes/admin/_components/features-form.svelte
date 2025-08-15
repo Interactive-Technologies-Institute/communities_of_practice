@@ -22,8 +22,8 @@
 <form method="POST" action="?/updateFeatures" use:enhance>
 	<Card.Root>
 		<Card.Header>
-			<Card.Title>Features</Card.Title>
-			<Card.Description>Enable or disable platform features</Card.Description>
+			<Card.Title>Funcionalidades</Card.Title>
+			<Card.Description>Ativar ou desativar funcionalidades da plataforma</Card.Description>
 		</Card.Header>
 		<Card.Content>
 			<div class="max-w-2xl space-y-4">
@@ -34,9 +34,9 @@
 				>
 					<Form.Control let:attrs>
 						<div class="space-y-0.5">
-							<Form.Label>Guides</Form.Label>
+							<Form.Label>Guias</Form.Label>
 							<Form.Description>
-								Enable this feature to allow users to create and share guides.
+								Ative esta funcionalidade para permitir que os utilizadores criem e partilhem guias.
 							</Form.Description>
 						</div>
 						<Switch includeInput {...attrs} bind:checked={$formData.guides} />
@@ -49,9 +49,9 @@
 				>
 					<Form.Control let:attrs>
 						<div class="space-y-0.5">
-							<Form.Label>Events</Form.Label>
+							<Form.Label>Eventos</Form.Label>
 							<Form.Description>
-								Enable this feature to allow users to create and share events.
+								Ative esta funcionalidade para permitir que os utilizadores criem e partilhem eventos.
 							</Form.Description>
 						</div>
 						<Switch includeInput {...attrs} bind:checked={$formData.events} />
@@ -64,9 +64,9 @@
 				>
 					<Form.Control let:attrs>
 						<div class="space-y-0.5">
-							<Form.Label>Map</Form.Label>
+							<Form.Label>Mapa</Form.Label>
 							<Form.Description>
-								Enable this feature to create a map of your community.
+								Ative esta funcionalidade para criar um mapa da sua comunidade.
 							</Form.Description>
 						</div>
 						<Switch includeInput {...attrs} bind:checked={$formData.map} />
@@ -79,9 +79,9 @@
 				>
 					<Form.Control let:attrs>
 						<div class="space-y-0.5">
-							<Form.Label>Forum</Form.Label>
+							<Form.Label>Fórum</Form.Label>
 							<Form.Description>
-								Enable this feature to allow users to create threads.
+								Ative esta funcionalidade para permitir que os utilizadores criem tópicos de discussão.
 							</Form.Description>
 						</div>
 						<Switch includeInput {...attrs} bind:checked={$formData.forum_threads} />
@@ -94,9 +94,9 @@
 				>
 					<Form.Control let:attrs>
 						<div class="space-y-0.5">
-							<Form.Label>Contents</Form.Label>
+							<Form.Label>Conteúdos</Form.Label>
 							<Form.Description>
-								Enable this feature to allow users to create contents.
+								Ative esta funcionalidade para permitir que os utilizadores criem conteúdos.
 							</Form.Description>
 						</div>
 						<Switch includeInput {...attrs} bind:checked={$formData.contents} />
@@ -109,9 +109,9 @@
 				>
 					<Form.Control let:attrs>
 						<div class="space-y-0.5">
-							<Form.Label>Members</Form.Label>
+							<Form.Label>Membros</Form.Label>
 							<Form.Description>
-								Enable this feature to view all the members of the community.
+								Ative esta funcionalidade para visualizar todos os membros da comunidade.
 							</Form.Description>
 						</div>
 						<Switch includeInput {...attrs} bind:checked={$formData.users} />
@@ -126,7 +126,7 @@
 						<div class="space-y-0.5">
 							<Form.Label>Docs</Form.Label>
 							<Form.Description>
-								Enable this feature to create and share documentation.
+								Ative esta funcionalidade para criar e partilhar documentação.
 							</Form.Description>
 						</div>
 						<Switch includeInput {...attrs} bind:checked={$formData.docs} />
@@ -139,7 +139,7 @@
 				{#if $submitting}
 					<Loader2 class="h-4 w-4 animate-spin" />
 				{/if}
-				Save Settings
+				Guardar Configurações
 			</Button>
 		</Card.Footer>
 	</Card.Root>

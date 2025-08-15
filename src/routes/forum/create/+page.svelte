@@ -6,11 +6,11 @@
 </script>
 
 <MetaTags
-	title="Create Thread"
-	description="Create a new thread for the forum of the community"
+	title="Cria Tópico de Discussão"
+	description="Cria um novo tópico de discussão para o fórum da comunidade"
 />
 
-<PageHeader title="Create Thread" subtitle="Create a new thread for the forum of the community" />
+<PageHeader title="Cria Tópico de Discussão" subtitle="Cria um novo tópico de discussão para o fórum da comunidade" />
 <div class="container mx-auto mb-20">
 	<ThreadForm data={data.createForm} />
 </div>

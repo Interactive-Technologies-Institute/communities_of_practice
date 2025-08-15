@@ -6,7 +6,7 @@
 	import { ScrollArea } from '@/components/ui/scroll-area';
 	import { Separator } from '@/components/ui/separator';
 	import type { Notification, NotificationType } from '@/types/types';
-	import dayjs from 'dayjs';
+	import dayjs from '$lib/dayjs';
 	import { Check, Inbox } from 'lucide-svelte';
 
 	export let notifications: Notification[];
@@ -18,34 +18,34 @@
 	});
 
 	const notificationTypeToLabel: Record<NotificationType, string> = {
-		guide_pending: 'Your guide is pending moderation',
-		guide_changes_requested: 'Your guide needs changes',
-		guide_approved: 'Your guide has been approved',
-		guide_rejected: 'Your guide has been rejected',
-		event_pending: 'Your event is pending moderation',
-		event_pending_moderation: 'An event is pending moderation',
-		event_changes_requested: 'Your event needs changes',
-		event_approved: 'Your event has been approved',
-		event_rejected: 'Your event has been rejected',
-		event_announcement: 'A new event has been approved',
-		event_voting_closed: 'Voting has ended on an event',
-		event_voting_closed_no_votes: 'Your event voting has ended with no votes',
-		event_voting_reopened: 'Voting has reopened on an event',
-		map_pin_pending: 'Your map pin is pending moderation',
-		map_pin_changes_requested: 'Your map pin needs changes',
-		map_pin_approved: 'Your map pin has been approved',
-		map_pin_rejected: 'Your map pin has been rejected',
-		forum_thread_pending: 'Your thread is pending moderation',
-		forum_thread_changes_requested: 'Your thread needs changes',
-		forum_thread_approved: 'Your thread has been approved',
-		forum_thread_rejected: 'Your thread has been rejected',
-		forum_thread_announcement: 'A new thread has been approved',
-		content_pending: 'Your content is pending moderation',
-		content_pending_moderation: 'A content is pending moderation',
-		content_changes_requested: 'Your content needs changes',
-		content_approved: 'Your content has been approved',
-		content_rejected: 'Your content has been rejected',
-		content_announcement: 'A new content has been approved',
+		guide_pending: 'O teu guia está pendente de moderação',
+		guide_changes_requested: 'O teu guia necessita de alterações',
+		guide_approved: 'O teu guia foi aprovado',
+		guide_rejected: 'O teu guia foi rejeitado',
+		event_pending: 'O teu evento está pendente de moderação',
+		event_pending_moderation: 'Um evento está pendente de moderação',
+		event_changes_requested: 'O teu evento necessita de alterações',
+		event_approved: 'O teu evento foi aprovado',
+		event_rejected: 'O teu evento foi rejeitado',
+		event_announcement: 'Um novo evento foi aprovado',
+		event_voting_closed: 'A votação de um evento foi encerrada',
+		event_voting_closed_no_votes: 'A votação do teu evento foi encerrada sem votos',
+		event_voting_reopened: 'A votação de um evento foi reaberta',
+		map_pin_pending: 'O teu marcador no mapa está pendente de moderação',
+		map_pin_changes_requested: 'O teu marcador no mapa necessita de alterações',
+		map_pin_approved: 'O teu marcador no mapa foi aprovado',
+		map_pin_rejected: 'O teu marcador no mapa foi rejeitado',
+		forum_thread_pending: 'O teu tópico está pendente de moderação',
+		forum_thread_changes_requested: 'O teu tópico de discussão necessita de alterações',
+		forum_thread_approved: 'O teu tópico de discussão foi aprovado',
+		forum_thread_rejected: 'O teu tópico de discussão foi rejeitado',
+		forum_thread_announcement: 'Um novo tópico de discussão foi aprovado',
+		content_pending: 'O teu conteúdo está pendente de moderação',
+		content_pending_moderation: 'Um conteúdo está pendente de moderação',
+		content_changes_requested: 'O teu conteúdo necessita de alterações',
+		content_approved: 'O teu conteúdo foi aprovado',
+		content_rejected: 'O teu conteúdo foi rejeitado',
+		content_announcement: 'Um novo conteúdo foi aprovado',
 	};
 
 	function getNotificationHref(notification: Notification): string {
@@ -101,14 +101,14 @@
 			</div>
 		</Button>
 	</Popover.Trigger>
-	<Popover.Content class="w-80 p-0" align="end">
+	<Popover.Content class="w-90 p-0" align="end">
 		<div class="flex flex-col gap-y-1 p-4">
-			<p class="font-medium leading-none">Notifications</p>
+			<p class="font-medium leading-none">Notificações</p>
 			<p class="text-sm text-muted-foreground">
 				{#if unreadCount > 0}
-					You have {unreadCount} unread {unreadCount === 1 ? 'notification' : 'notifications'}
+					Tens {unreadCount} {unreadCount === 1 ? 'notificação' : 'notificações'} por ler
 				{:else}
-					No unread notifications
+					Não tens notificações por ler
 				{/if}
 			</p>
 		</div>
@@ -148,7 +148,7 @@
 			<form method="POST" action="/?/readAllNotifications" use:enhance>
 				<Button type="submit" class="w-full">
 					<Check class="mr-2 h-4 w-4" />
-					Mark all as read
+					Marcar todas como lidas
 				</Button>
 			</form>
 		</div>

@@ -19,5 +19,5 @@
 		});
 	}}
 >
-	<LocateFixed class="mr-2 h-4 w-4" />My pin
+	<LocateFixed class="mr-2 h-4 w-4" />O meu marcador
 </Button>

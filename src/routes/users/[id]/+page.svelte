@@ -9,7 +9,7 @@
 	import { Mail, Map, SquareArrowOutUpRight, Pen } from 'lucide-svelte';
 	import { MetaTags } from 'svelte-meta-tags';
 	import { Badge } from '@/components/ui/badge';
-	import ThreadItem from '../../../lib/components/thread-item.svelte';
+	import ThreadItem from '@/components/thread-item.svelte';
 
 	export let data;
 
@@ -51,7 +51,7 @@
 	}
 </script>
 
-<MetaTags title="User Details" description="" />
+<MetaTags title="Detalhes do Utilizador" description="" />
 
 <!--<PageHeader title="User Details" subtitle="View user details and their contributions" />-->
 <div class="container mx-auto mb-20 mt-10 flex flex-col-reverse md:flex-row gap-10 justify-center">
@@ -60,7 +60,7 @@
 		<!-- Interests -->
 		<div class="w-full flex items-center gap-4 text-foreground">
 			<hr class="flex-grow border-t border-foreground" />
-			<span class="text-sm font-semibold uppercase">Interests</span>
+			<span class="text-sm font-semibold uppercase">Interesses</span>
 			<hr class="flex-grow border-t border-foreground" />
 		</div>
 		{#if data.userProfile.interests?.length}
@@ -74,12 +74,12 @@
 				{/each}
 			</div>
 		{:else}
-			<p class="text-sm text-muted-foreground">Interests were not set yet.</p>
+			<p class="text-sm text-muted-foreground">Os interesses ainda não foram definidos.</p>
 		{/if}
 		<!-- Skills -->
 		<div class="w-full flex items-center gap-4 text-foreground">
 			<hr class="flex-grow border-t border-foreground" />
-			<span class="text-sm font-semibold uppercase">Skills</span>
+			<span class="text-sm font-semibold uppercase">Competências</span>
 			<hr class="flex-grow border-t border-foreground" />
 		</div>
 		{#if data.userProfile.skills?.length}
@@ -93,12 +93,12 @@
 				{/each}
 			</div>
 		{:else}
-			<p class="text-sm text-muted-foreground">Skills were not set yet.</p>
+			<p class="text-sm text-muted-foreground">As competências ainda não foram definidas.</p>
 		{/if}
 		<!-- Education -->
 		<div class="w-full flex items-center gap-4 text-foreground">
 			<hr class="flex-grow border-t border-foreground" />
-			<span class="text-sm font-semibold uppercase">Education</span>
+			<span class="text-sm font-semibold uppercase">Experiências Académicas</span>
 			<hr class="flex-grow border-t border-foreground" />
 		</div>
 		{#if data.userProfile.education?.length}
@@ -112,12 +112,12 @@
 				{/each}
 			</div>
 		{:else}
-			<p class="text-sm text-muted-foreground">Educational experiences were not set yet.</p>
+			<p class="text-sm text-muted-foreground">As experiências académicas ainda não foram definidas.</p>
 		{/if}
 		<!-- Languages -->
 		<div class="w-full flex items-center gap-4 text-foreground">
 			<hr class="flex-grow border-t border-foreground" />
-			<span class="text-sm font-semibold uppercase">Languages</span>
+			<span class="text-sm font-semibold uppercase">Línguas</span>
 			<hr class="flex-grow border-t border-foreground" />
 		</div>
 		{#if data.userProfile.languages?.length}
@@ -131,12 +131,12 @@
 				{/each}
 			</div>
 		{:else}
-			<p class="text-sm text-muted-foreground">Languages were not set yet.</p>
+			<p class="text-sm text-muted-foreground">As línguas ainda não foram definidas.</p>
 		{/if}
 		<!-- Threads -->
 		<div class="w-full flex items-center gap-4 text-foreground">
 			<hr class="flex-grow border-t border-foreground" />
-			<span class="text-sm font-semibold uppercase">Threads</span>
+			<span class="text-sm font-semibold uppercase">Tópicos</span>
 			<hr class="flex-grow border-t border-foreground" />
 		</div>
 		{#if data.forum_threads && data.forum_threads.length > 0}
@@ -144,7 +144,7 @@
 				<ThreadItem {thread} />
 			{/each}
 		{:else}
-			<p class="text-sm text-muted-foreground">A thread was not created yet.</p>
+			<p class="text-sm text-muted-foreground">Ainda não foi criado nenhum tópico.</p>
 		{/if}
 	</div>
 
@@ -162,14 +162,14 @@
 				</Badge>
 			</Card.Description>
 			<span class="text-sm text-muted-foreground">
-				{"Joined at " + new Date(data.userProfile.inserted_at).toLocaleDateString()}
+				{"Juntou-se a " + new Date(data.userProfile.inserted_at).toLocaleDateString()}
 			</span>
 		</Card.Header>
 		<Card.Content class="text-center flex flex-col items-center p-4 space-y-4">
 			<p>{data.userProfile.description ?? 'No description provided'}</p>
 			<div class="text-sm text-muted-foreground flex flex-col justify-center gap-2">
 				{#if data.userProfile.gender}<span>{data.userProfile.gender}</span>{/if}
-				{#if age}<span>{age} years old</span>{/if}
+				{#if age}<span>{age} anos</span>{/if}
 				{#if data.userProfile.nationality}<span>{data.userProfile.nationality}</span>{/if}
 				{#if data.userProfile.profession}<span>{data.userProfile.profession}</span>{/if}
 			</div>
@@ -182,14 +182,14 @@
 				{/if}
 				{#if $page.url.pathname === '/users/me' || data.user?.id === data.userProfile.id}
 					<Button href="/users/me/edit" variant="ghost" class="text-blue-500 hover:text-blue-600">
-						<Pen class="h-4 w-4" />
-						Edit Profile
+						<Pen class="mr-2 h-4 w-4" />
+						Editar Perfil
 					</Button>
 				{/if}
 				{#if data.mapPin}
 					<Button href="/map?id={data.mapPin.id}&zoom=10" variant="ghost" class="text-orange-500">
 						<Map class="mr-2 h-4 w-4" />
-						View on Map
+						Ver no Mapa
 					</Button>
 				{/if}
 			</div>

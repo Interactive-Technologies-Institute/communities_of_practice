@@ -50,9 +50,9 @@
     >
         <ThumbsUp class="h-4 w-4" />
         {#if isLikedLocal}
-            Liked
+            Gostei
         {:else}
-            Like
+            Gostar
         {/if}
     </Button>
 </form>

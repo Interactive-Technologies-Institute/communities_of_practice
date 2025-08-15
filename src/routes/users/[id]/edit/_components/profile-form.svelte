@@ -59,28 +59,28 @@
 	}}>
 	<Card.Root>
 		<Card.Header>
-			<Card.Title>Edit Profile</Card.Title>
-			<Card.Description>Lorem Ipsum</Card.Description>
+			<Card.Title>Editar Perfil</Card.Title>
+			<Card.Description>Edita o teu perfil</Card.Description>
 		</Card.Header>
 		<Card.Content>
 			<div class="max-w-2xl space-y-4">
 				<Form.Field {form} name="display_name">
 					<Form.Control let:attrs>
-						<Form.Label>Name*</Form.Label>
+						<Form.Label>Nome de exibição*</Form.Label>
 						<Input {...attrs} bind:value={$formData.display_name} />
 						<Form.FieldErrors />
 					</Form.Control>
 				</Form.Field>
 				<Form.Field {form} name="description">
 					<Form.Control let:attrs>
-						<Form.Label>Description</Form.Label>
+						<Form.Label>Descrição</Form.Label>
 						<Input {...attrs} bind:value={$formData.description} />
 						<Form.FieldErrors />
 					</Form.Control>
 				</Form.Field>
 				<Form.Field {form} name="date">
 					<Form.Control let:attrs>
-						<Form.Label for="date">Date</Form.Label>
+						<Form.Label for="date">Data de nascimento</Form.Label>
 						<Input
 							{...attrs}
 							type="text"
@@ -92,7 +92,7 @@
 				</Form.Field>
 				<Form.Field {form} name="profession">
 					<Form.Control let:attrs>
-						<Form.Label>Profession</Form.Label>
+						<Form.Label>Profissão</Form.Label>
 						<Input {...attrs} bind:value={$formData.profession} />
 						<Form.FieldErrors />
 					</Form.Control>
@@ -106,42 +106,42 @@
 				</Form.Field>
 				<Form.Field {form} name="gender">
 					<Form.Control let:attrs>
-						<Form.Label>Gender</Form.Label>
+						<Form.Label>Género</Form.Label>
 						<Input {...attrs} bind:value={$formData.gender} />
 						<Form.FieldErrors />
 					</Form.Control>
 				</Form.Field>
 				<Form.Field {form} name="nationality">
 					<Form.Control let:attrs>
-						<Form.Label>Nationality</Form.Label>
+						<Form.Label>Nacionalidade</Form.Label>
 						<Input {...attrs} bind:value={$formData.nationality} />
 						<Form.FieldErrors />
 					</Form.Control>
 				</Form.Field>
 				<Form.Field {form} name="interests">
 					<Form.Control let:attrs>
-						<Form.Label>Interests</Form.Label>
+						<Form.Label>Interesses</Form.Label>
 						<TagInput {...attrs} bind:value={$formData.interests} />
 						<Form.FieldErrors />
 					</Form.Control>
 				</Form.Field>
 				<Form.Field {form} name="skills">
 					<Form.Control let:attrs>
-						<Form.Label>Skills</Form.Label>
+						<Form.Label>Competências</Form.Label>
 						<TagInput {...attrs} bind:value={$formData.skills} />
 						<Form.FieldErrors />
 					</Form.Control>
 				</Form.Field>
 				<Form.Field {form} name="education_exps">
 					<Form.Control let:attrs>
-						<Form.Label>Educational Experiences</Form.Label>
+						<Form.Label>Experiências académicas</Form.Label>
 						<TagInput {...attrs} bind:value={$formData.education_exps} />
 						<Form.FieldErrors />
 					</Form.Control>
 				</Form.Field>
 				<Form.Field {form} name="languages">
 					<Form.Control let:attrs>
-						<Form.Label>Languages</Form.Label>
+						<Form.Label>Línguas</Form.Label>
 						<TagInput {...attrs} bind:value={$formData.languages} />
 						<Form.FieldErrors />
 					</Form.Control>
@@ -161,7 +161,7 @@
 								class="absolute right-2"
 								on:click={resetAvatar}
 								disabled={resettingAvatar}>
-								Reset Avatar
+								Repor Avatar
 							</Button>
 						</div>
 						<FileInput {...attrs} bind:files={$avatar} accept="image/*" />
@@ -178,7 +178,7 @@
 				{#if $submitting}
 					<Loader2 class="mr-2 h-4 w-4 animate-spin" />
 				{/if}
-				Save Settings
+				Guardar Configurações
 			</Button>
 		</Card.Footer>
 	</Card.Root>

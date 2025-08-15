@@ -333,20 +333,20 @@
 <form method="POST" enctype="multipart/form-data" use:enhance class="flex flex-col gap-y-10">
 	<Card.Root>
 		<Card.Header>
-			<Card.Title>Upload Content</Card.Title>
-			<Card.Description>Fill in details and upload your file</Card.Description>
+			<Card.Title>Carregar Conteúdo</Card.Title>
+			<Card.Description>Preenche os detalhes e carrega o teu ficheiro</Card.Description>
 		</Card.Header>
 		<Card.Content class="space-y-4">
 			<Form.Field {form} name="title">
 				<Form.Control let:attrs>
-					<Form.Label>Title*</Form.Label>
+					<Form.Label>Título*</Form.Label>
 					<Input {...attrs} bind:value={$formData.title} />
 					<Form.FieldErrors />
 				</Form.Control>
 			</Form.Field>
 			<Form.Field {form} name="file">
 				<Form.Control let:attrs>
-					<Form.Label>{isEdit ? 'Upload New File' : 'Upload File*'}</Form.Label>
+					<Form.Label>{isEdit ? 'Carregar Ficheiro Novo' : 'Carregar Ficheiro*'}</Form.Label>
 					<FileInput {...attrs} bind:files={$file} />
 					<input hidden value={$formData.fileUrl} name="fileUrl" />
 					<input hidden value={$formData.mime_type} name="mime_type" />
@@ -356,7 +356,7 @@
 			<Form.Field {form} name="description">
 				<Form.Control let:attrs>
 					<Form.Label class="flex items-center justify-between"
-						>Description*
+						>Descrição*
 						<Button
 							type="button"
 							size="sm"
@@ -366,7 +366,7 @@
 							{#if loadingDescription}
 								<Loader2 class="h-4 w-4 animate-spin" />
 							{:else}
-								Generate Description
+								Gerar por IA
 							{/if}
 						</Button>
 					</Form.Label>
@@ -377,7 +377,7 @@
 			<Form.Field {form} name="tags">
 				<Form.Control let:attrs>
 					<Form.Label class="flex justify-between items-center">
-						Tags*
+						Etiquetas*
 						<Button
 							type="button"
 							size="sm"
@@ -387,7 +387,7 @@
 							{#if loadingTags}
 								<Loader2 class="h-4 w-4 animate-spin" />
 							{:else}
-								Generate Tags
+								Gerar por IA
 							{/if}
 						</Button>
 					</Form.Label>
@@ -397,7 +397,7 @@
 			</Form.Field>
 			{#if isEdit}
 				<div class="space-y-2">
-					<h3 class="text-sm font-medium">Current File</h3>
+					<h3 class="text-sm font-medium">Ficheiro Atual</h3>
 					<div class="flex flex-row items-center gap-4">
 						<div class="flex flex-col items-center">
 							<svelte:component
@@ -416,7 +416,7 @@
 							class="mt-1 self-start"
 						>
 							<Eye class="mr-1 h-4 w-4" />
-							View
+							Visualizar
 						</Button>
 					</div>
 				</div>
@@ -427,17 +427,17 @@
 	<div
 		class="sticky bottom-0 flex w-full flex-row items-center justify-center gap-x-10 border-t bg-background/95 py-8 backdrop-blur supports-[backdrop-filter]:bg-background/60"
 	>
-		<Button variant="outline" href="/contents">Cancel</Button>
+		<Button variant="outline" href="/contents">Cancelar</Button>
 		{#if showAnnexesButton}
 			<Button variant="outline" href={`/contents/${contentId}/annexes`} target="_blank" rel="noopener noreferrer">
-				Annexes
+				Anexos
 			</Button>
 		{/if}
 		<Button type="submit" disabled={$submitting}>
 			{#if $submitting}
 				<Loader2 class="mr-2 h-4 w-4 animate-spin" />
 			{/if}
-			Submit
+			Submeter
 		</Button>
 	</div>
 </form>

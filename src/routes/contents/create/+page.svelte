@@ -7,11 +7,11 @@
 </script>
 
 <MetaTags
-	title="Create Content"
-	description="Create a new content for the repository of the community"
+	title="Cria Conteúdo"
+	description="Cria um novo conteúdo para o repositório da comunidade"
 />
 
-<PageHeader title="Create Content" subtitle="Create a new content for the repository of the community" />
+<PageHeader title="Cria Conteúdo" subtitle="Cria um novo conteúdo para o repositório da comunidade" />
 <div class="container mx-auto mb-20">
 	<ContentForm contentForm={data.createForm} schema={createContentSchema} />
 </div>

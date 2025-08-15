@@ -2,7 +2,7 @@
 	import { Badge } from '@/components/ui/badge';
 	import { Card } from '@/components/ui/card';
 	import type { ContentWithCounter } from '@/types/types';
-	import dayjs from 'dayjs';
+	import dayjs from '$lib/dayjs';
 	import { FileSpreadsheet, FileImage, FileVideo, Presentation, FileJson, FileText, File as FileIcon, FileAudio, FileArchive, FileType2, Download } from 'lucide-svelte';
 
 	export let content: ContentWithCounter & { type: 'content' };
@@ -111,7 +111,6 @@
 					</p>
                     <input
                         type="checkbox"
-                        name="contentIds"
                         value={content.id}
                         checked={checked}
 						on:change={toggleCheckbox}

@@ -35,7 +35,7 @@
 	});
 </script>
 
-<MetaTags title="Map" description="Find & share places" />
+<MetaTags title="Mapa" description="Encontra e partilha locais" />
 
 <div class="relative h-[calc(100dvh-3.5rem)] min-h-[32rem]">
 	<Map bind:lng={$lng} bind:lat={$lat} bind:zoom={$zoom}>
@@ -64,9 +64,9 @@
 								</div>
 							</div>
 							<p class="text-sm text-muted-foreground">
-								{user.description ?? 'No description provided'}
+								{user.description ?? 'Nenhuma descrição fornecida'}
 							</p>
-							<Button href="/users/{user.id}" variant="link" class="px-0">View Profile</Button>
+							<Button href="/users/{user.id}" variant="link" class="px-0">Ver perfil</Button>
 						</Card>
 					</div>
 				</Marker>
@@ -89,7 +89,7 @@
 				}}
 			>
 				<Select.Trigger class="w-full bg-background sm:max-w-52">
-					<Select.Value placeholder="Filter by type" />
+					<Select.Value placeholder="Filtrar por tipo" />
 				</Select.Trigger>
 				<Select.Content>
 					{#each data.userTypes as userType}

@@ -37,7 +37,7 @@
 <DropdownMenu.Root>
 	<DropdownMenu.Trigger asChild let:builder>
 		<Button variant="ghost" builders={[builder]} size="icon" class="relative h-8 w-8 p-0">
-			<span class="sr-only">Open menu</span>
+			<span class="sr-only">Abrir menu</span>
 			<Ellipsis class="h-4 w-4" />
 		</Button>
 	</DropdownMenu.Trigger>
@@ -45,10 +45,10 @@
 		<DropdownMenu.Item href="/users/{id}">Profile</DropdownMenu.Item>
 		<DropdownMenu.Separator />
 		<DropdownMenu.RadioGroup value={currentRole} onValueChange={handleRoleChange}>
-			<DropdownMenu.Label>Roles</DropdownMenu.Label>
-			<DropdownMenu.RadioItem value="user">User</DropdownMenu.RadioItem>
-			<DropdownMenu.RadioItem value="moderator">Moderator</DropdownMenu.RadioItem>
-			<DropdownMenu.RadioItem value="admin">Admin</DropdownMenu.RadioItem>
+			<DropdownMenu.Label>Funções</DropdownMenu.Label>
+			<DropdownMenu.RadioItem value="user">Membro</DropdownMenu.RadioItem>
+			<DropdownMenu.RadioItem value="moderator">Moderador</DropdownMenu.RadioItem>
+			<DropdownMenu.RadioItem value="admin">Administrador</DropdownMenu.RadioItem>
 		</DropdownMenu.RadioGroup>
 	</DropdownMenu.Content>
 </DropdownMenu.Root>
@@ -56,17 +56,17 @@
 <AlertDialog.Root bind:open={showConfirmDialog}>
 	<AlertDialog.Content>
 		<AlertDialog.Header>
-			<AlertDialog.Title>Confirm Role Change</AlertDialog.Title>
+			<AlertDialog.Title>Confirmar Alteração de Função</AlertDialog.Title>
 			<AlertDialog.Description>
-				Are you sure you want to change this user's role to {selectedRole}?
+				Tens a certeza de que queres mudar a função deste utilizador para {selectedRole}?
 			</AlertDialog.Description>
 		</AlertDialog.Header>
 		<AlertDialog.Footer>
-			<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
+			<AlertDialog.Cancel>Cancelar</AlertDialog.Cancel>
 			<form method="POST" use:enhance>
 				<input type="hidden" name="userId" value={id} />
 				<input type="hidden" name="role" value={selectedRole} />
-				<AlertDialog.Action type="submit">Confirm</AlertDialog.Action>
+				<AlertDialog.Action type="submit">Confirmar</AlertDialog.Action>
 			</form>
 		</AlertDialog.Footer>
 	</AlertDialog.Content>

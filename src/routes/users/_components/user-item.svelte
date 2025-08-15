@@ -18,11 +18,11 @@
 
 	function roleDisplay(role: string): string {
 		const roleMap: Record<string, string> = {
-			admin: 'Administrator',
-			moderator: 'Moderator',
-			user: 'Member'
+			admin: 'Administrador',
+			moderator: 'Moderador',
+			user: 'Membro'
 		};
-		return roleMap[role] ?? 'Unknown';
+		return roleMap[role] ?? 'Desconhecido';
 	}
 </script>
 
@@ -40,7 +40,7 @@
 						{roleDisplay(user.role)}
 					</Badge>
 				</div>
-				<p class="text-xs text-muted-foreground">{"Joined at " + new Date(user.inserted_at).toLocaleDateString()}</p>
+				<p class="text-xs text-muted-foreground">{"Juntou-se a " + new Date(user.inserted_at).toLocaleDateString()}</p>
 			</div>
 		</div>
 	</Card>

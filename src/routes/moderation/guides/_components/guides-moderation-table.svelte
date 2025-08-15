@@ -3,7 +3,7 @@
 	import * as Table from '@/components/ui/table';
 	import type { UpdateModerationInfoSchema } from '@/schemas/moderation-info';
 	import type { GuideWithModeration } from '@/types/types';
-	import dayjs from 'dayjs';
+	import dayjs from '$lib/dayjs';
 	import { createRender, createTable, Render, Subscribe } from 'svelte-headless-table';
 	import { addPagination } from 'svelte-headless-table/plugins';
 	import { writable } from 'svelte/store';

@@ -3,7 +3,7 @@
 	import * as Table from '@/components/ui/table';
 	import type { UpdateModerationInfoSchema } from '@/schemas/moderation-info';
 	import type { MapPinWithModeration } from '@/types/types';
-	import dayjs from 'dayjs';
+	import dayjs from '$lib/dayjs';
 	import { createRender, createTable, Render, Subscribe } from 'svelte-headless-table';
 	import { addPagination } from 'svelte-headless-table/plugins';
 	import { writable } from 'svelte/store';
@@ -29,12 +29,12 @@
 		}),
 		table.column({
 			accessor: ({ moderation }) => moderation[0].inserted_at,
-			header: 'Updated At',
+			header: 'Atualizado em',
 			cell: ({ value }) => dayjs(value).format('YYYY-MM-DD HH:mm:ss'),
 		}),
 		table.column({
 			accessor: ({ moderation }) => moderation[0].status,
-			header: 'Status',
+			header: 'Estado',
 			cell: ({ value, row }) => {
 				if (row.isData()) {
 					return createRender(MapModerationStatusCell, {
@@ -46,7 +46,7 @@
 		}),
 		table.column({
 			accessor: ({ moderation }) => moderation[0].comment,
-			header: 'Comment',
+			header: 'Comentário',
 		}),
 		table.column({
 			accessor: ({ id, user_id }) => ({ id, user_id }),
@@ -107,13 +107,13 @@
 			variant="outline"
 			size="sm"
 			on:click={() => ($pageIndex = $pageIndex - 1)}
-			disabled={!$hasPreviousPage}>Previous</Button
+			disabled={!$hasPreviousPage}>Anterior</Button
 		>
 		<Button
 			variant="outline"
 			size="sm"
 			disabled={!$hasNextPage}
-			on:click={() => ($pageIndex = $pageIndex + 1)}>Next</Button
+			on:click={() => ($pageIndex = $pageIndex + 1)}>Próximo</Button
 		>
 	</div>
 </div>

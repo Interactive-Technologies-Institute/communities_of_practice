@@ -126,41 +126,41 @@ function switchToFixed() {
 <form method="POST" enctype="multipart/form-data" use:enhance class="flex flex-col gap-y-10">
 	<Card.Root>
 		<Card.Header>
-			<Card.Title>Information</Card.Title>
-			<Card.Description>Add details to this event</Card.Description>
+			<Card.Title>Informação</Card.Title>
+			<Card.Description>Adiciona detalhes a este evento</Card.Description>
 		</Card.Header>
 		<Card.Content class="space-y-4">
 			<Form.Field {form} name="title">
 				<Form.Control let:attrs>
-					<Form.Label>Title*</Form.Label>
+					<Form.Label>Título*</Form.Label>
 					<Input {...attrs} bind:value={$formData.title} />
 					<Form.FieldErrors />
 				</Form.Control>
 			</Form.Field>
 			<Form.Field {form} name="description">
 				<Form.Control let:attrs>
-					<Form.Label>Description*</Form.Label>
+					<Form.Label>Descrição*</Form.Label>
 					<Textarea {...attrs} bind:value={$formData.description} />
 					<Form.FieldErrors />
 				</Form.Control>
 			</Form.Field>
 			<Form.Field {form} name="tags">
 				<Form.Control let:attrs>
-					<Form.Label>Tags*</Form.Label>
+					<Form.Label>Etiquetas*</Form.Label>
 					<TagInput {...attrs} bind:value={$formData.tags} />
 					<Form.FieldErrors />
 				</Form.Control>
 			</Form.Field>
 			<Form.Field {form} name="location">
 					<Form.Control let:attrs>
-						<Form.Label>Location*</Form.Label>
+						<Form.Label>Localização / plataforma*</Form.Label>
 						<Input {...attrs} bind:value={$formData.location} />
 						<Form.FieldErrors />
 					</Form.Control>
 				</Form.Field>
 			<Form.Field {form} name="allow_voting">
 				<Form.Control let:attrs>
-					<Form.Label>Allow Schedule Voting?</Form.Label>
+					<Form.Label>Permitir votação do horário?</Form.Label>
 					<div class="flex items-center gap-4">
 						<label class="flex items-center gap-1">
 							<input
@@ -172,7 +172,7 @@ function switchToFixed() {
 									switchToVoting();
 								}}
 							/>
-							<span>Yes</span>
+							<span>Sim</span>
 						</label>
 						<label class="flex items-center gap-1">
 							<input
@@ -184,7 +184,7 @@ function switchToFixed() {
 									switchToFixed();
 								}}
 							/>
-							<span>No</span>
+							<span>Não</span>
 						</label>
 					</div>
 				</Form.Control>
@@ -193,7 +193,7 @@ function switchToFixed() {
 				<div class="grid grid-cols-1 gap-x-4 gap-y-4 md:grid-cols-3">
 					<Form.Field {form} name="date">
 						<Form.Control id="date" let:attrs>
-							<Form.Label for="date">Date*</Form.Label>
+							<Form.Label for="date">Data*</Form.Label>
 							<Popover.Root>
 								<Popover.Trigger
 									{...attrs}
@@ -203,7 +203,7 @@ function switchToFixed() {
 										!date && 'text-muted-foreground'
 									)}
 								>
-									{date ? df.format(date.toDate(getLocalTimeZone())) : 'Pick a date'}
+									{date ? df.format(date.toDate(getLocalTimeZone())) : 'Escolhe uma data'}
 									<CalendarIcon class="ml-auto h-4 w-4 opacity-50" />
 								</Popover.Trigger>
 								<Popover.Content class="w-auto p-0" side="top">
@@ -222,14 +222,14 @@ function switchToFixed() {
 					</Form.Field>
 					<Form.Field {form} name="start_time">
 						<Form.Control let:attrs>
-							<Form.Label>Start Time*</Form.Label>
+							<Form.Label>Hora de início*</Form.Label>
 							<Input type="time" step="60" {...attrs} bind:value={$formData.start_time} />
 							<Form.FieldErrors />
 						</Form.Control>
 					</Form.Field>
 					<Form.Field {form} name="end_time">
 						<Form.Control let:attrs>
-							<Form.Label>End Time*</Form.Label>
+							<Form.Label>Hora de fim*</Form.Label>
 							<Input type="time" step="60" {...attrs} bind:value={$formData.end_time} />
 							<Form.FieldErrors />
 						</Form.Control>
@@ -239,7 +239,7 @@ function switchToFixed() {
 				<div class="grid grid-cols-1 gap-x-4 gap-y-4 md:grid-cols-2">
 					<Form.Field {form} name="voting_end_date">
 						<Form.Control id="voting_end_date" let:attrs>
-							<Form.Label for="voting_end_date">Voting Deadline Date*</Form.Label>
+							<Form.Label for="voting_end_date">Data limite de votação*</Form.Label>
 							<Popover.Root>
 								<Popover.Trigger
 									{...attrs}
@@ -251,7 +251,7 @@ function switchToFixed() {
 								>
 									{votingParsedEndDate
 										? df.format(votingParsedEndDate.toDate(getLocalTimeZone()))
-										: 'Pick a date'}
+										: 'Escolhe uma data'}
 									<CalendarIcon class="ml-auto h-4 w-4 opacity-50" />
 								</Popover.Trigger>
 								<Popover.Content class="w-auto p-0" side="top">
@@ -270,7 +270,7 @@ function switchToFixed() {
 					</Form.Field>
 					<Form.Field {form} name="voting_end_time">
 						<Form.Control let:attrs>
-							<Form.Label>Voting Deadline Time*</Form.Label>
+							<Form.Label>Hora limite de votação*</Form.Label>
 							<Input type="time" step="60" {...attrs} bind:value={$formData.voting_end_time} />
 							<Form.FieldErrors />
 						</Form.Control>
@@ -278,7 +278,7 @@ function switchToFixed() {
 				</div>
 				<Form.Field {form} name="voting_options">
 					<Form.Control let:attrs>
-						<Form.Label class="text-lg font-semibold">Voting Options*</Form.Label>
+						<Form.Label class="text-lg font-semibold">Opções de voto*</Form.Label>
 						<Form.FieldErrors />
 					</Form.Control>
 				</Form.Field>
@@ -287,7 +287,7 @@ function switchToFixed() {
 						<div class="grid grid-cols-1 gap-x-4 gap-y-4 md:grid-cols-3 flex-1">
 							<Form.Field {form} name={`voting_options[${i}].date`}>
 								<Form.Control id={`vote-date-${i}`} let:attrs>
-								<Form.Label for={`vote-date-${i}`}>Date</Form.Label>
+								<Form.Label for={`vote-date-${i}`}>Data</Form.Label>
 								<Popover.Root>
 									<Popover.Trigger
 									{...attrs}
@@ -299,7 +299,7 @@ function switchToFixed() {
 									>
 									{votingParsedDates[i]
 									? df.format(votingParsedDates[i].toDate(getLocalTimeZone()))
-									: 'Pick a date'}
+									: 'Escolhe uma data'}
 									<CalendarIcon class="ml-auto h-4 w-4 opacity-50" />
 									</Popover.Trigger>
 									<Popover.Content class="w-auto p-0" side="top">
@@ -322,7 +322,7 @@ function switchToFixed() {
 						</Form.Field>
 						<Form.Field {form} name={`voting_options[${i}].start_time`}>
 							<Form.Control let:attrs>
-							<Form.Label>Start Time</Form.Label>
+							<Form.Label>Hora de início</Form.Label>
 							{#if $formData.voting_options && $formData.voting_options[i]}
 								<Input type="time" {...attrs} bind:value={$formData.voting_options[i].start_time} />
 							{/if}
@@ -331,7 +331,7 @@ function switchToFixed() {
 						</Form.Field>
 						<Form.Field {form} name={`voting_options[${i}].end_time`}>
 							<Form.Control let:attrs>
-							<Form.Label>End Time</Form.Label>
+							<Form.Label>Hora de fim</Form.Label>
 							{#if $formData.voting_options && $formData.voting_options[i]}
 								<Input type="time" {...attrs} bind:value={$formData.voting_options[i].end_time} />
 							{/if}
@@ -358,7 +358,7 @@ function switchToFixed() {
 			<div class="grid grid-cols-1 gap-x-4 md:grid-cols-2">
 				<Form.Field {form} name="image">
 					<Form.Control let:attrs>
-						<Form.Label>Cover Image*</Form.Label>
+						<Form.Label>Imagem de capa*</Form.Label>
 						<Card.Root class="aspect-[3/2] overflow-hidden">
 							{#if imageUrl}
 								<InteractableImage
@@ -379,12 +379,12 @@ function switchToFixed() {
 	<div
 		class="sticky bottom-0 flex w-full flex-row items-center justify-center gap-x-10 border-t bg-background/95 py-8 backdrop-blur supports-[backdrop-filter]:bg-background/60"
 	>
-		<Button variant="outline" href="/events">Cancel</Button>
+		<Button variant="outline" href="/events">Cancelar</Button>
 		<Button type="submit" disabled={$submitting}>
 			{#if $submitting}
 				<Loader2 class="h-4 w-4 animate-spin" />
 			{/if}
-			Submit
+			Submeter
 		</Button>
 	</div>
 </form>

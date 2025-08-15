@@ -19,9 +19,9 @@
 	const { form: formData, enhance, submitting } = form;
 </script>
 
-<MetaTags title="Sign In" description="Sign in to your account" />
+<MetaTags title="Iniciar Sessão" description="Inicia sessão na tua conta" />
 
-<PageHeader title="Sign In" subtitle="Sign in to your account" />
+<PageHeader title="Iniciar Sessão" subtitle="Inicia sessão na tua conta" />
 <div class="container mb-20 mt-10 flex flex-col items-center justify-center md:mt-20">
 	<Card class="w-full max-w-[32rem] px-6 py-5 sm:px-8 sm:py-6 md:px-12 md:py-10">
 		<form method="POST" use:enhance>
@@ -34,7 +34,7 @@
 			</Form.Field>
 			<Form.Field {form} name="password">
 				<Form.Control let:attrs>
-					<Form.Label>Password</Form.Label>
+					<Form.Label>Palavra-passe</Form.Label>
 					<PasswordInput {...attrs} bind:value={$formData.password} />
 					<Form.FieldErrors />
 				</Form.Control>
@@ -43,7 +43,7 @@
 				{#if $submitting}
 					<Loader2 class="h-4 w-4 animate-spin" />
 				{/if}
-				Sign In
+				Iniciar Sessão
 			</Form.Button>
 		</form>
 	</Card>

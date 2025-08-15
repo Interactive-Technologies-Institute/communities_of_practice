@@ -7,7 +7,7 @@
 	import { ScrollArea } from '@/components/ui/scroll-area';
 	import { Separator } from '@/components/ui/separator';
 	import type { Conversation, UserWithRole, Speaker } from '@/types/types';
-	import dayjs from 'dayjs';
+	import dayjs from '$lib/dayjs';
 	import { BotMessageSquare, SendHorizontal, Loader2 } from 'lucide-svelte';
     import { Input } from '@/components/ui/input';
 	import { onMount } from 'svelte';
@@ -87,7 +87,7 @@
 	</Popover.Trigger>
 	<Popover.Content class="w-[28rem] max-h-[85vh] p-0 flex flex-col" align="end">
 		<div class="p-2 border-b">
-			AI Assistant
+			Assistente IA
 		</div>
 		<Separator />
 		<div class="overflow-y-auto">
@@ -96,7 +96,7 @@
 					{#each conversations as conversation (conversation.id)}
 						<div class="flex flex-col">
 							<p class="text-xs font-medium text-muted-foreground">
-								{conversation.speaker === 'user' ? 'You' : 'AI'} · {dayjs(conversation.inserted_at).fromNow()}
+								{conversation.speaker === 'user' ? 'Tu' : 'IA'} · {dayjs(conversation.inserted_at).fromNow()}
 							</p>
 							<p class="text-sm text-foreground mb-2 whitespace-pre-line break-normal" style="overflow-wrap:anywhere">
 								{conversation.entry}
@@ -104,7 +104,7 @@
 						</div>
 					{/each}
 				{:else}
-					<p class="text-sm text-muted-foreground text-center">Ask me something...</p>
+					<p class="text-sm text-muted-foreground text-center">Pergunta alguma coisa...</p>
 				{/if}
 			</ScrollArea>
 		</div>
@@ -114,7 +114,7 @@
 		<div class="flex items-center gap-2 p-2 border-t">
 			<Input
 				name="message"
-				placeholder="Type your question..."
+				placeholder="Escreve a tua questão..."
 				class="flex-1"
 				bind:value={message}
 				disabled={loadingAI}

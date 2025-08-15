@@ -7,17 +7,17 @@
 	$: path = $page.url.pathname.split('/').pop();
 </script>
 
-<MetaTags title="Moderation" description="Moderate users and content" />
+<MetaTags title="Moderação" description="Modera utilizadores e funcionalidades" />
 
-<PageHeader title="Moderation" subtitle="Moderate users and content" />
+<PageHeader title="Moderação" subtitle="Modera utilizadores e funcionalidades" />
 <div class="container mx-auto mb-20">
 	<Tabs.Root value={path}>
 		<Tabs.List>
-			<Tabs.TriggerLink href="/moderation/users" value="users">Users</Tabs.TriggerLink>
-			<Tabs.TriggerLink href="/moderation/guides" value="guides">Guides</Tabs.TriggerLink>
-			<Tabs.TriggerLink href="/moderation/events" value="events">Events</Tabs.TriggerLink>
-			<Tabs.TriggerLink href="/moderation/map" value="map">Map</Tabs.TriggerLink>
-			<Tabs.TriggerLink href="/moderation/contents" value="contents">Contents</Tabs.TriggerLink>
+			<Tabs.TriggerLink href="/moderation/users" value="users">Membros</Tabs.TriggerLink>
+			<Tabs.TriggerLink href="/moderation/guides" value="guides">Guias</Tabs.TriggerLink>
+			<Tabs.TriggerLink href="/moderation/events" value="events">Eventos</Tabs.TriggerLink>
+			<Tabs.TriggerLink href="/moderation/map" value="map">Mapa</Tabs.TriggerLink>
+			<Tabs.TriggerLink href="/moderation/contents" value="contents">Conteúdos</Tabs.TriggerLink>
 		</Tabs.List>
 		<slot />
 	</Tabs.Root>

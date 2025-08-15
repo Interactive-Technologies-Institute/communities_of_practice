@@ -2,7 +2,7 @@
 	import { Card } from '@/components/ui/card';
 	import type { ThreadWithCounters } from '@/types/types';
 	import { Calendar, ThumbsUp, MessageSquare, MessagesSquare } from 'lucide-svelte';
-    import dayjs from 'dayjs';
+    import dayjs from '$lib/dayjs';
 
 	export let thread: ThreadWithCounters & { type: 'thread' };
     export let selectedItems: { id: number; type: 'content' | 'event' | 'thread' }[];
@@ -31,22 +31,21 @@
 					<p class="text-sm line-clamp-1 break-all font-medium">{thread.title}</p>
 				</div>
 				<div class="flex text-muted-foreground items-center gap-2 ml-2">
-                        <p class="text-xs whitespace-nowrap overflow-hidden text-ellipsis">{dayjs(`${thread.inserted_at}`).format(
-							dayjs(thread.inserted_at).year() === dayjs().year()
-								? 'DD/MM'
-								: 'DD/MM/YYYY'
-						)}</p>
-                        <ThumbsUp class="h-4 w-4" />
-                        <p class="text-xs whitespace-nowrap overflow-hidden text-ellipsis">
-                            {thread.likes_count}
-                        </p>
-                        <MessageSquare class="h-4 w-4" />
-                        <p class="text-xs whitespace-nowrap overflow-hidden text-ellipsis">
-                            {thread.comments_count}
-                        </p>
-                        <input
+					<p class="text-xs whitespace-nowrap overflow-hidden text-ellipsis">{dayjs(`${thread.inserted_at}`).format(
+						dayjs(thread.inserted_at).year() === dayjs().year()
+							? 'DD/MM'
+							: 'DD/MM/YYYY'
+					)}</p>
+					<ThumbsUp class="h-4 w-4" />
+					<p class="text-xs whitespace-nowrap overflow-hidden text-ellipsis">
+						{thread.likes_count}
+					</p>
+					<MessageSquare class="h-4 w-4" />
+					<p class="text-xs whitespace-nowrap overflow-hidden text-ellipsis">
+						{thread.comments_count}
+					</p>
+					<input
 						type="checkbox"
-						name="threadIds"
 						value={thread.id}
 						checked={checked}
 						on:change={toggleCheckbox}

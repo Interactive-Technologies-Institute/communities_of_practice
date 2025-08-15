@@ -8,7 +8,7 @@
 	import ThreadCompactItem from '@/components/thread-compact-item.svelte';
 	import ContentItem from '@/components/content-item.svelte';
 	import Card from '@/components/ui/card/card.svelte';
-	import dayjs from 'dayjs';
+	import dayjs from '$lib/dayjs';
 	import { Pen, Tag, Trash, Text, MessageSquare, Link } from 'lucide-svelte';
 	import { MetaTags } from 'svelte-meta-tags';
 	import ThreadDeleteDialog from './_components/thread-delete-dialog.svelte';
@@ -59,7 +59,7 @@
 	{/if}
 	<div class="w-full flex items-center gap-4 text-foreground">
 		<hr class="flex-grow border-t border-foreground" />
-		<span class="text-sm font-semibold uppercase">Thread</span>
+		<span class="text-sm font-semibold uppercase">Tópico</span>
 		<hr class="flex-grow border-t border-foreground" />
 	</div>
 	<Card class="mx-auto p-2 space-y-4">
@@ -75,7 +75,7 @@
 					<p class="text-sm font-medium">{data.thread.author.display_name}</p>
 					<p class="text-xs text-muted-foreground">{dayjs(data.thread.inserted_at).fromNow()}
 						{#if data.thread.inserted_at !== data.thread.updated_at}
-								(edited)
+								(editado)
 							{/if}
 					</p>
 				</div>
@@ -87,8 +87,8 @@
 			<p class="whitespace-pre-wrap break-words">{data.thread.content}</p>
 			<div class="flex w-full justify-between items-end mt-4 text-sm text-muted-foreground">
 				<div class="flex gap-3">
-					<span>{data.likesCount} {data.likesCount === 1 ? 'like' : 'likes'}</span>
-					<span>{data.commentsCount} {data.commentsCount === 1 ? 'comment' : 'comments'}</span>
+					<span>{data.likesCount} {data.likesCount === 1 ? 'gosto' : 'gostos'}</span>
+					<span>{data.commentsCount} {data.commentsCount === 1 ? 'comentário' : 'comentários'}</span>
 				</div>
 				<div class="flex flex-wrap justify-end gap-x-3 max-w-[70%]">
 					{#each data.thread.tags as tag}
@@ -107,20 +107,20 @@
 						<Button variant="ghost" size="sm" on:click={() => (showAnnexes = !showAnnexes)}
 							class={cn('flex items-center gap-2', { 'text-orange-500': showAnnexes })}>
 							<Link class="h-4 w-4" />
-							Annexes
+							Anexos
 						</Button>
 					{/if}
 					{#if data.thread.summary}
 						<Button variant="ghost" size="sm" on:click={() => (showSummary = !showSummary)}
 							class={cn('flex items-center gap-2', { 'text-orange-500': showSummary })}>
 							<Text class="h-4 w-4" />
-							Summary
+							Sumário
 						</Button>
 					{/if}
 					<Button variant="ghost" size="sm" on:click={() => (showCommentForm = !showCommentForm)}
 						class={cn('flex items-center gap-2', { 'text-orange-500': showCommentForm })}>
 						<MessageSquare class="h-4 w-4" />
-						Comment
+						Comentar
 					</Button>
 				</div>
 
@@ -128,11 +128,11 @@
 					<div class="flex gap-2">
 						<Button variant="ghost" size="sm" href="/forum/{data.thread.id}/edit" class="text-blue-500 gap-2 hover:text-blue-600">
 							<Pen class="h-4 w-4" />
-							Edit
+							Editar
 						</Button>
 						<Button variant="ghost" size="sm" on:click={() => (openDeleteDialog = true)} class="text-red-500 gap-2 hover:text-red-600">
 							<Trash class="h-4 w-4" /> 
-							Delete
+							Eliminar
 						</Button>
 					</div>
 				{/if}
@@ -143,7 +143,7 @@
 		{#if showAnnexes && (data.annexedContents.length > 0 || data.annexedEvents.length > 0 || data.annexedThreads.length > 0)}
 			<div class="w-full flex items-center gap-4 text-foreground">
 				<hr class="flex-grow border-t border-foreground" />
-				<span class="text-sm font-semibold uppercase">Annexes</span>
+				<span class="text-sm font-semibold uppercase">Anexos</span>
 				<hr class="flex-grow border-t border-foreground" />
 			</div>
 			{#each data.annexedEvents as event}
@@ -159,7 +159,7 @@
 		{#if showAnnexes && (data.contentsAnnexedTo.length > 0 || data.eventsAnnexedTo.length > 0 || data.threadsAnnexedTo.length > 0)}
 			<div class="w-full flex items-center gap-4 text-foreground">
 				<hr class="flex-grow border-t border-foreground" />
-				<span class="text-sm font-semibold uppercase">Annexed To</span>
+				<span class="text-sm font-semibold uppercase">Anexado A</span>
 				<hr class="flex-grow border-t border-foreground" />
 			</div>
 			{#each data.eventsAnnexedTo as event}
@@ -175,7 +175,7 @@
 		{#if showSummary && data.thread.summary}
 			<div class="w-full flex items-center gap-4 text-foreground">
 				<hr class="flex-grow border-t border-foreground" />
-				<span class="text-sm font-semibold uppercase">Summary</span>
+				<span class="text-sm font-semibold uppercase">Sumário</span>
 				<hr class="flex-grow border-t border-foreground" />
 			</div>
 			<Card class="p-4 text-sm">
@@ -185,14 +185,14 @@
 		{#if showCommentForm}
 			<div class="w-full flex items-center gap-4 text-foreground">
 				<hr class="flex-grow border-t border-foreground" />
-				<span class="text-sm font-semibold uppercase">Comment Form</span>
+				<span class="text-sm font-semibold uppercase">Formulário de comentário</span>
 				<hr class="flex-grow border-t border-foreground" />
 			</div>
 			<ThreadCommentForm data={data.createThreadCommentForm} />
 		{/if}
 		<div class="w-full flex items-center gap-4 text-foreground">
 			<hr class="flex-grow border-t border-foreground" />
-			<span class="text-sm font-semibold uppercase">Comments</span>
+			<span class="text-sm font-semibold uppercase">Comentários</span>
 			<hr class="flex-grow border-t border-foreground" />
 		</div>
 		<SortButton bind:sortBy={$sortBy} bind:sortOrder={$sortOrder} section='comments'/>

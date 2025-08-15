@@ -38,9 +38,9 @@
 	>
 		<ThumbsUp class="h-4 w-4" />
 		{#if $formData.value}
-			Interested
+			Interessado
 		{:else}
-			Interest
+			Interessa-me
 		{/if}
 	</Button>
 </form>

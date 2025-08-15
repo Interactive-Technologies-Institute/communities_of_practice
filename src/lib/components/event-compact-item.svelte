@@ -3,7 +3,7 @@
 	import { Card } from '@/components/ui/card';
 	import type { EventWithCounters } from '@/types/types';
 	import { Calendar, ThumbsUp } from 'lucide-svelte';
-    import dayjs from 'dayjs';
+    import dayjs from '$lib/dayjs';
 
 	export let event: EventWithCounters;
 
@@ -60,11 +60,11 @@
                     {#if event.date && event.start_time && event.end_time}
                         <p class="text-xs whitespace-nowrap overflow-hidden text-ellipsis">{dayjs(`${event.date}T${event.start_time}`).format(
                                 dayjs(event.date).year() === dayjs().year()
-                                    ? 'DD/MM [at] HH:mm'
-                                    : 'DD/MM/YYYY [at] HH:mm'
+                                    ? 'DD/MM [às] HH:mm'
+                                    : 'DD/MM/YYYY [às] HH:mm'
                             )}–{dayjs(`${event.date}T${event.end_time}`).format('HH:mm')}</p>
                     {:else}
-                        <p class="text-xs whitespace-nowrap overflow-hidden text-ellipsis">Date not decided</p>
+                        <p class="text-xs whitespace-nowrap overflow-hidden text-ellipsis">Data por decidir</p>
                     {/if}
 					<ThumbsUp class="h-4 w-4" />
 					<p class="text-xs whitespace-nowrap overflow-hidden text-ellipsis">

@@ -3,7 +3,7 @@
 	import { Card } from '@/components/ui/card';
 	import type { ContentWithCounter } from '@/types/types';
 	import { FileSpreadsheet, FileImage, FileVideo, FileText, Presentation, FileJson, File as FileIcon, FileAudio, FileArchive, FileType2, Download } from 'lucide-svelte';
-	import dayjs from 'dayjs';
+	import dayjs from '$lib/dayjs';
 
 	export let content: ContentWithCounter;
 

@@ -76,7 +76,7 @@
 			</div>
 		</form>
 		<div class="rounded-sm bg-primary px-2 py-1 text-primary-foreground">
-			Drag the pin to your location
+			Arrasta o marcador para a tua localização
 		</div>
 		<div
 			class="mb-[5.5rem] flex h-10 w-10 items-center justify-center rounded-full border-2 border-primary bg-background"

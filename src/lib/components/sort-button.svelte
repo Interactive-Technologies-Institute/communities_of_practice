@@ -14,29 +14,29 @@
 
     $: sortOptions = section === 'forum'
     ? [
-        { key: 'date_inserted', label: 'Most Recent' },
-        { key: 'likes', label: 'Most Liked' }
+        { key: 'date_inserted', label: 'Mais Recente' },
+        { key: 'likes', label: 'Mais Likes' }
     ]
     : section === 'comments'
     ? [
-        { key: 'date_inserted', label: 'Most Recent' },
-        { key: 'likes', label: 'Most Liked' }
+        { key: 'date_inserted', label: 'Mais Recente' },
+        { key: 'likes', label: 'Mais Likes' }
     ]
     : section === 'contents'
     ? [
-        { key: 'date_inserted', label: 'Most Recent' },
-        { key: 'downloads', label: 'Most Downloaded' },
-        { key: 'title', label: 'Alphabetic' }
+        { key: 'date_inserted', label: 'Mais Recente' },
+        { key: 'downloads', label: 'Mais Transferidos' },
+        { key: 'title', label: 'Alfabética' }
     ]
     : section === 'members'
     ? [
-        { key: 'date_inserted', label: 'Most Recent' },
-        { key: 'display_name', label: 'Alphabetic' }
+        { key: 'date_inserted', label: 'Mais Recente' },
+        { key: 'display_name', label: 'Alfabética' }
     ]
     : section === 'annexes'
     ? [
-        { key: 'date_inserted', label: 'Recently Added' },
-        { key: 'title', label: 'Alphabetic' }
+        { key: 'date_inserted', label: 'Adicionado Recentemente' },
+        { key: 'title', label: 'Alfabética' }
     ]
     : [];
 
@@ -56,12 +56,13 @@
             <div class="relative flex items-center">
                 <ArrowUpDown class="h-4 w-4 md:mr-2" />
             </div>
-            <span class="sr-only md:not-sr-only">Sort</span>
+            <span class="sr-only md:not-sr-only">Ordenar</span>
         </Button>
     </Popover.Trigger>
     <Popover.Content class="mt-2 w-[200px] p-0" align="start" side="bottom">
         <Command.Root>
             <Command.List>
+                <span class="text-muted-foreground px-3 pb-2 pt-4 text-xs">Ordem</span>
                 <Command.Group>
                     {#each sortOptions as option}
                         <Command.Item
@@ -85,12 +86,12 @@
             </Command.List>
         </Command.Root>
         <div class="border-t p-2 flex justify-between items-center">
-            <span class="text-sm">Order:</span>
+            <span class="text-sm">Ordem:</span>
             <Button variant="ghost" on:click={toggleSortOrder}>
                 {#if sortOrder === 'asc'}
-                    Ascending
+                    Ascendente
                 {:else}
-                    Descending
+                    Descendente
                 {/if}
             </Button>
         </div>

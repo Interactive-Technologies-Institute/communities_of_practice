@@ -46,20 +46,20 @@
 		<Card.Content class="space-y-4">
 			<Form.Field {form} name="content">
 				<Form.Control let:attrs>
-					<Form.Label>Write a reply</Form.Label>
+					<Form.Label>Escreve uma resposta</Form.Label>
 					<Textarea {...attrs} class="w-full rounded border px-3 py-2 text-sm max-h-48 overflow-auto" bind:value={$formData.content} />
 					<p class="text-xs mt-1 text-muted-foreground">
-						{$formData.content.length} / 5000 characters
+						{$formData.content.length} / 5000 caracteres
 					</p>
 					<Form.FieldErrors />
 				</Form.Control>
 			</Form.Field>
-			<Button type="button" variant="outline" on:click={() => (open = false)}>Cancel</Button>
+			<Button type="button" variant="outline" on:click={() => (open = false)}>Cancelar</Button>
 			<Button type="submit" disabled={$submitting || !isSubmitEnabled}>
 				{#if $submitting}
 					<Loader2 class="h-4 w-4 animate-spin" />
 				{/if}
-				Submit
+				Submeter
 			</Button>
 		</Card.Content>
 	</Card.Root>

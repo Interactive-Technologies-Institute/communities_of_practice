@@ -8,7 +8,7 @@
 	} from '@/schemas/event';
 	import { Button } from '@/components/ui/button';
 	import type { EventVotingOption, VoteCount, EventWithAuthor } from '@/types/types';
-	import dayjs from 'dayjs';
+	import dayjs from '$lib/dayjs';
 	import VoteOptionItem from '@/components/vote-option-item.svelte';
 
 	export let event: EventWithAuthor;
@@ -63,9 +63,9 @@
 	);
 </script>
 {#if votingClosed}
-	<p class="text-green-700 font-semibold">Schedule votes are now closed.</p>
+	<p class="text-green-700 font-semibold">A votação do horário está encerrada.</p>
 {:else}
-<p class="text-green-700 font-semibold">Voting deadline: {dayjs(`${event.voting_end_date}T${event.voting_end_time}`).format('DD/MM/YYYY [at] HH:mm')}</p>
+<p class="text-green-700 font-semibold">Votação encerra {dayjs(`${event.voting_end_date}T${event.voting_end_time}`).format('DD/MM/YYYY [às] HH:mm')}</p>
 	{#if hasVoted}
 		<div class="space-y-2">
 				{#each votingOptions as option}
@@ -74,8 +74,8 @@
 			</div>
 		<form method="POST" action="?/removeVotes" use:enhanceRemove>
 			<Button type="submit" disabled={$submittingRemove}>
-				{#if $submittingRemove}Removing...{/if}
-				{#if !$submittingRemove}Remove My Vote{/if}
+				{#if $submittingRemove}A remover...{/if}
+				{#if !$submittingRemove}Remover voto{/if}
 			</Button>
 		</form>
 	{:else}
@@ -87,8 +87,8 @@
 			</div>
 			<div class="pt-4">
 				<Button type="submit" disabled={$submittingVote}>
-					{#if $submittingVote}Submitting...{/if}
-					{#if !$submittingVote}Submit Vote{/if}
+					{#if $submittingVote}A submeter...{/if}
+					{#if !$submittingVote}Submeter voto{/if}
 				</Button>
 			</div>
 		</form>

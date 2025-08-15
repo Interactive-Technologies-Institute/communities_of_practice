@@ -4,7 +4,7 @@
 	import PageHeader from '@/components/page-header.svelte';
 	import { Button } from '@/components/ui/button';
 	import Card from '@/components/ui/card/card.svelte';
-	import dayjs from 'dayjs';
+	import dayjs from '$lib/dayjs';
 	import { ChartNoAxesColumn, Clock, Footprints, Pen, Tag, Trash } from 'lucide-svelte';
 	import { MetaTags } from 'svelte-meta-tags';
 	import GuideDeleteDialog from './_components/guide-delete-dialog.svelte';

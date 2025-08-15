@@ -47,14 +47,14 @@
 <form method="POST" action="?/updateUserTypes" use:enhance>
 	<Card.Root id="user-types-form">
 		<Card.Header>
-			<Card.Title>User Types</Card.Title>
-			<Card.Description>Create types to categorize users</Card.Description>
+			<Card.Title>Tipos de Utilizador</Card.Title>
+			<Card.Description>Crie tipos para categorizar os utilizadores</Card.Description>
 		</Card.Header>
 		<Card.Content>
 			<div class="max-w-2xl space-y-4">
 				<div>
 					<Form.Fieldset {form} name="types">
-						<Form.Legend class="mb-1">Types*</Form.Legend>
+						<Form.Legend class="mb-1">Tipos*</Form.Legend>
 						{#each $formData.types as _, i}
 							<Form.ElementField {form} name="types[{i}]">
 								<Form.Control let:attrs>
@@ -80,12 +80,12 @@
 						<Form.FieldErrors />
 					</Form.Fieldset>
 					<Button type="button" variant="outline" size="sm" class="mt-2" on:click={addType}>
-						Add Type
+						Adicionar Tipo
 					</Button>
 				</div>
 				<Form.Field {form} name="default">
 					<Form.Control let:attrs>
-						<Form.Label>Default Type*</Form.Label>
+						<Form.Label>Tipo Padrão*</Form.Label>
 						<Select.Root
 							{...attrs}
 							selected={selectedDefault}
@@ -115,7 +115,7 @@
 				{#if $submitting}
 					<Loader2 class="h-4 w-4 animate-spin" />
 				{/if}
-				Save Settings
+				Guardar Configurações
 			</Button>
 		</Card.Footer>
 	</Card.Root>

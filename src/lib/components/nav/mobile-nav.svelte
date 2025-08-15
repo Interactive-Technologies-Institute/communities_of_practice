@@ -36,7 +36,7 @@
 							$page.url.pathname.startsWith('/docs') ? 'text-foreground' : 'text-foreground/60'
 						)}
 					>
-						ocs
+						Docs
 					</a>
 				</FeatureWrapper>
 				<FeatureWrapper feature="guides">
@@ -48,7 +48,7 @@
 							$page.url.pathname.startsWith('/guides') ? 'text-foreground' : 'text-foreground/60'
 						)}
 					>
-						Guides
+						Guias
 					</a>
 				</FeatureWrapper>
 				<FeatureWrapper feature="events">
@@ -60,7 +60,7 @@
 							$page.url.pathname.startsWith('/events') ? 'text-foreground' : 'text-foreground/60'
 						)}
 					>
-						Events
+						Eventos
 					</a>
 				</FeatureWrapper>
 				<FeatureWrapper feature="map">
@@ -72,7 +72,7 @@
 							$page.url.pathname.startsWith('/map') ? 'text-foreground' : 'text-foreground/60'
 						)}
 					>
-						Map
+						Mapa
 					</a>
 				</FeatureWrapper>
 				<FeatureWrapper feature="forum_threads">
@@ -84,7 +84,7 @@
 							$page.url.pathname.startsWith('/forum') ? 'text-foreground' : 'text-foreground/60'
 						)}
 					>
-						Forum
+						Fórum
 					</a>
 				</FeatureWrapper>
 				<FeatureWrapper feature="contents">
@@ -96,7 +96,7 @@
 							$page.url.pathname.startsWith('/contents') ? 'text-foreground' : 'text-foreground/60'
 						)}
 					>
-						Contents
+						Conteúdos
 					</a>
 				</FeatureWrapper>
 				<FeatureWrapper feature="users">
@@ -108,7 +108,7 @@
 							$page.url.pathname.startsWith('/users') ? 'text-foreground' : 'text-foreground/60'
 						)}
 					>
-						Members
+						Membros
 					</a>
 				</FeatureWrapper>
 			</nav>

@@ -8,7 +8,7 @@
 	import { Tag, ThumbsUp, MessageSquare} from 'lucide-svelte';
 	import * as Avatar from '@/components/ui/avatar';
 	import { firstAndLastInitials } from '@/utils';
-	import dayjs from 'dayjs';
+	import dayjs from '$lib/dayjs';
 	import InteractableImage from '@/components/interactable-image.svelte';
 
 	export let thread: ThreadWithAuthorAndCounters;
@@ -47,7 +47,7 @@
 						<p class="text-sm font-medium">{thread.author.display_name}</p>
 						<p class="text-xs text-muted-foreground">{dayjs(thread.inserted_at).fromNow()}
 							{#if thread.inserted_at !== thread.updated_at}
-								(edited)
+								(editado)
 							{/if}
 						</p>
 					</div>

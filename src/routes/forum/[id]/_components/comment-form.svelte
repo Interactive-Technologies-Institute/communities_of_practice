@@ -40,7 +40,7 @@
 				<Form.Control let:attrs>
 					<Textarea {...attrs} class="w-full rounded border mt-4 px-3 py-2 text-sm max-h-48 overflow-auto" bind:value={$formData.content} />
 					<p class="text-xs mt-1 text-muted-foreground">
-						{$formData.content.length} / 5000 characters
+						{$formData.content.length} / 5000 caracteres
 					</p>
 					<Form.FieldErrors />
 				</Form.Control>
@@ -50,7 +50,7 @@
 					{#if $submitting}
 						<Loader2 class="h-4 w-4 animate-spin mr-2" />
 					{/if}
-					Submit
+					Submeter
 				</Button>
 			</div>
 		</Card.Content>

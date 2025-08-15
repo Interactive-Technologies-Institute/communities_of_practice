@@ -39,9 +39,9 @@
 	>
 		<ThumbsUp class="h-4 w-4" />
 		{#if $formData.value}
-			Liked
+			Gostei
 		{:else}
-			Like
+			Gostar
 		{/if}
 	</Button>
 

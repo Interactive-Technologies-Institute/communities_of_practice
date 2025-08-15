@@ -21,28 +21,28 @@
 <form method="POST" action="?/updatePassword" use:enhance>
 	<Card.Root id="user-types-form">
 		<Card.Header>
-			<Card.Title>Change Password</Card.Title>
-			<Card.Description>Lorem Ipsum</Card.Description>
+			<Card.Title>Alterar Palavra-passe</Card.Title>
+			<Card.Description>Altera a tua palavra-passe</Card.Description>
 		</Card.Header>
 		<Card.Content>
 			<div class="max-w-2xl space-y-4">
 				<Form.Field {form} name="currentPassword">
 					<Form.Control let:attrs>
-						<Form.Label>Current Password*</Form.Label>
+						<Form.Label>Palavra-passe atual*</Form.Label>
 						<PasswordInput {...attrs} bind:value={$formData.currentPassword} />
 						<Form.FieldErrors />
 					</Form.Control>
 				</Form.Field>
 				<Form.Field {form} name="newPassword">
 					<Form.Control let:attrs>
-						<Form.Label>New Password*</Form.Label>
+						<Form.Label>Nova palavra-passe*</Form.Label>
 						<PasswordInput {...attrs} bind:value={$formData.newPassword} />
 						<Form.FieldErrors />
 					</Form.Control>
 				</Form.Field>
 				<Form.Field {form} name="confirmNewPassword">
 					<Form.Control let:attrs>
-						<Form.Label>Confirm Password*</Form.Label>
+						<Form.Label>Confirma palavra-passe*</Form.Label>
 						<PasswordInput {...attrs} bind:value={$formData.confirmNewPassword} />
 						<Form.FieldErrors />
 					</Form.Control>
@@ -54,7 +54,7 @@
 				{#if $submitting}
 					<Loader2 class="h-4 w-4 animate-spin" />
 				{/if}
-				Save Settings
+				Guardar Configurações
 			</Button>
 		</Card.Footer>
 	</Card.Root>

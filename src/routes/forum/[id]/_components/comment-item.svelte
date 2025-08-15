@@ -16,7 +16,7 @@
 	import ThreadDeleteCommentDialog from './comment-delete-dialog.svelte';
 	import { Trash, MessageSquare, Pen, Check, X } from 'lucide-svelte';
 	import { cn } from '@/utils';
-	import dayjs from 'dayjs';
+	import dayjs from '$lib/dayjs';
 	import { onMount } from 'svelte';
 
 	export let comment: NestedComment;
@@ -80,7 +80,7 @@
 	{#if comment.is_deleted}
         <Card class="relative flex h-full flex-col overflow-hidden" style="margin-left: {level * 1.5}rem;">
             <div class="flex flex-1 flex-col px-4 py-3">
-                <p class="text-muted-foreground italic">Deleted comment</p>
+                <p class="text-muted-foreground italic">Comentário eliminado</p>
             </div>
         </Card>
     {:else}
@@ -88,7 +88,7 @@
 			<div class="flex flex-1 flex-col px-4 py-3">
 				{#if comment.is_reply}
 					<p class="text-xs text-muted-foreground mb-2">
-						Replying to <span class="font-medium">{comment.parent_author}</span>
+						A responder a <span class="font-medium">{comment.parent_author}</span>
 					</p>
 					{/if}
 					<div class="flex items-start mb-3 gap-2">
@@ -102,7 +102,7 @@
 							<p class="text-sm font-medium">{comment.author.display_name}</p>
 							<p class="text-xs text-muted-foreground">{dayjs(comment.inserted_at).fromNow()}
 								{#if comment.inserted_at !== comment.updated_at}
-									(edited)
+									(editado)
 								{/if}
 							</p>
 						</div>
@@ -118,13 +118,13 @@
 						/>
 
 						<p class="text-xs mt-1 text-muted-foreground">
-							{editedContent.length} / 5000 characters
+							{editedContent.length} / 5000 caracteres
 						</p>
 
 						{#if editedContent.length < 1}
-							<p class="text-sm mt-1 font-medium text-destructive">Content must be at least 1 character.</p>
+							<p class="text-sm mt-1 font-medium text-destructive">O conteúdo tem de ter pelo menos 1 carácter.</p>
 						{:else if editedContent.length > 5000}
-							<p class="text-sm mt-1 font-medium text-destructive">Content must not exceed 5000 characters.</p>
+							<p class="text-sm mt-1 font-medium text-destructive">O conteúdo não pode exceder 5000 caracteres.</p>
 						{/if}
 				{:else}
 					<p bind:this={pRef} class="whitespace-pre-wrap break-words" class:line-clamp-4={!expanded}>
@@ -133,13 +133,13 @@
 					{#if showToggle}
 						<button on:click={() => (expanded = !expanded)}
 							class="mt-1 text-sm font-medium text-blue-600 hover:underline focus:outline-none">
-							{expanded ? 'Show less' : 'Show more'}
+							{expanded ? 'Mostrar menos' : 'Mostrar mais'}
 						</button>
 					{/if}
 				{/if}
 				<div class="text-base text-muted-foreground flex flex-wrap items-center justify-between w-full">
 					<div class="flex items-center gap-1">
-						<span>{comment.likes_count} {comment.likes_count === 1 ? 'like' : 'likes'}</span>
+						<span>{comment.likes_count} {comment.likes_count === 1 ? 'gosto' : 'gostos'}</span>
 					</div>
 				</div>
 				<div class="mt-2 flex items-center justify-between gap-4 border-t pt-2 text-sm text-muted-foreground">
@@ -151,7 +151,7 @@
 						<Button variant="ghost" size="sm" on:click={() => (replying = !replying)}
 							class={cn('flex items-center gap-2', { 'text-orange-500': replying })}>
 							<MessageSquare class="h-4 w-4" />
-							Reply
+							Responder
 						</Button>
 					</div>
 
@@ -163,7 +163,7 @@
 									<input type="hidden" name="content" value={editedContent} />
 									<Button type="submit" variant="ghost" size="sm" disabled={!isCommentValid()} class="text-blue-500 hover:text-blue-600" >
 										<Check class="h-4 w-4" />
-										Save
+										Guardar
 									</Button>
 								</form>
 								<Button
@@ -173,17 +173,16 @@
 									class="text-red-500 hover:text-red-600"
 								>
 									<X class="h-4 w-4" />
-									Cancel
+									Cancelar
 								</Button>
 							{:else}
-								<!-- Normal Edit/Delete buttons -->
 								<Button variant="ghost" size="sm" on:click={() => (editing = true)} class="text-blue-500 hover:text-blue-600">
 									<Pen class="h-4 w-4" />
-									Edit
+									Editar
 								</Button>
 								<Button variant="ghost" size="sm" on:click={() => (openDeleteDialog = true)} class="text-red-500 hover:text-red-600">
 									<Trash class="h-4 w-4" />
-									Delete
+									Eliminar
 								</Button>
 							{/if}
 						</div>

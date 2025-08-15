@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Card } from '@/components/ui/card';
 	import { Calendar, Check } from 'lucide-svelte';
-	import dayjs from 'dayjs';
+	import dayjs from '$lib/dayjs';
 	import type { EventVotingOption } from '@/types/types';
 
     export let option: EventVotingOption;

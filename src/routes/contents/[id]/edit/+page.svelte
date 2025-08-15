@@ -7,9 +7,9 @@
 	export let data;
 </script>
 
-<MetaTags title="Edit Content" description="Edit this content" />
+<MetaTags title="Edita Conteúdo" description="Edita este conteúdo" />
 
-<PageHeader title="Edit Content" subtitle="Edit this content" />
+<PageHeader title="Edita Conteúdo" subtitle="Edita este conteúdo" />
 <div class="container mx-auto mb-20">
 	<ContentForm contentForm={data.updateForm} schema={editContentSchema}
 		contentId={data.contentId} showAnnexesButton={true} />
