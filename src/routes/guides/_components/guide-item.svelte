@@ -11,10 +11,10 @@
 	export let usefulCount: number;
 
 	const moderationStatusLabels = {
-		pending: 'Pending',
-		approved: 'Approved',
-		changes_requested: 'Changes Requested',
-		rejected: 'Rejected',
+		pending: 'Pendente',
+		approved: 'Aprovado',
+		changes_requested: 'Alterações Solicitadas',
+		rejected: 'Rejeitado',
 	};
 
 	$: imageUrl = $page.data.supabase.storage.from('guides').getPublicUrl(guide.image).data.publicUrl;

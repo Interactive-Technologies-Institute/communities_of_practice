@@ -8,10 +8,10 @@
 	export let content: ContentWithCounter;
 
 	const moderationStatusLabels = {
-		pending: 'Pending',
-		approved: 'Approved',
-		changes_requested: 'Changes Requested',
-		rejected: 'Rejected',
+		pending: 'Pendente',
+		approved: 'Aprovado',
+		changes_requested: 'Alterações Solicitadas',
+		rejected: 'Rejeitado',
 	};
 
 	function getFileIcon(mimeType: string | null) {
@@ -69,7 +69,7 @@
 </script>
 
 <a href="/contents/{content.id}" class="h-full">
-	<Card class="relative flex h-full flex-col overflow-hidden">
+	<Card class="relative flex h-full flex-col overflow-hidden hover:bg-accent/50">
 		<div class="flex flex-1 flex-col px-4 py-3">
 			<div class="flex items-center justify-between">
 				<div class="flex items-center gap-2">

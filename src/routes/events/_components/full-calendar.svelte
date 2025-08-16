@@ -4,6 +4,7 @@
 	import type { Event } from '@/types/types';
 	import type { EventMountArg } from '@fullcalendar/core';
 	import dayGridPlugin from '@fullcalendar/daygrid';
+	import pt from '@fullcalendar/core/locales/pt';
 
 	export let events: Event[] = [];
 
@@ -22,6 +23,7 @@
 		calendar = new Calendar(calendarEl, {
 			plugins: [dayGridPlugin],
 			initialView: 'dayGridMonth',
+			locale: pt,
 			events: transformedEvents,
 			aspectRatio: 2.25,
 			showNonCurrentDates: false,

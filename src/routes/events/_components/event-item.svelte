@@ -22,18 +22,18 @@
 	});
 
 	const moderationStatusLabels = {
-		pending: 'Pending',
-		approved: 'Approved',
-		changes_requested: 'Changes Requested',
-		rejected: 'Rejected',
+		pending: 'Pendente',
+		approved: 'Aprovado',
+		changes_requested: 'Alterações Solicitadas',
+		rejected: 'Rejeitado',
 	};
 
 	const eventStatusLabels = {
-		voting_open: 'Voting Open',
-		no_one_voted: 'No One Voted',
-		scheduled: 'Scheduled',
-		ongoing: 'Ongoing',
-		completed: 'Completed',
+		voting_open: 'Votação Aberta',
+		no_one_voted: 'Ninguém Votou',
+		scheduled: 'Agendado',
+		ongoing: 'Em Curso',
+		completed: 'Concluído',
 	};
 
 	const eventStatusVariants: Record<string, 'default' | 'secondary' | 'destructive' | 'warning' | 'success'> = {
@@ -48,7 +48,7 @@
 </script>
 
 <a href="/events/{event.id}" class="h-full">
-	<Card class="relative flex h-full flex-col overflow-hidden">
+	<Card class="relative flex h-full flex-col overflow-hidden hover:bg-accent/50">
 		<AspectRatio ratio={3 / 2}>
 			{#if imageUrl}
 				<img src={imageUrl} alt="Event Cover" class="h-full w-full object-cover" />

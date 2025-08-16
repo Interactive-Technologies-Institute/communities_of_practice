@@ -4,19 +4,19 @@ import type { ComponentType } from 'svelte';
 
 export const typeMap: Record<ModerationStatus, { label: string; icon: ComponentType<Icon> }> = {
 	pending: {
-		label: 'Pending',
+		label: 'Pendente',
 		icon: Badge,
 	},
 	approved: {
-		label: 'Approved',
+		label: 'Aprovado',
 		icon: BadgeCheck,
 	},
 	changes_requested: {
-		label: 'Changes Requested',
+		label: 'Alterações Solicitadas',
 		icon: BadgeInfo,
 	},
 	rejected: {
-		label: 'Rejected',
+		label: 'Rejeitado',
 		icon: BadgeX,
 	},
 };

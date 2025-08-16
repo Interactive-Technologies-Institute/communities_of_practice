@@ -10,9 +10,7 @@
 
 	$: checked = selectedItems.some(s => s.id === content.id && s.type === 'content');
 
-	function toggleCheckbox(event: Event) {
-		event.stopPropagation();
-		event.preventDefault();
+	function toggleCheckbox() {
 		if (checked) {
 			selectedItems = selectedItems.filter(s => !(s.id === content.id && s.type === 'content'));
 		} else {
@@ -21,10 +19,10 @@
 	}
 
 	const moderationStatusLabels = {
-		pending: 'Pending',
-		approved: 'Approved',
-		changes_requested: 'Changes Requested',
-		rejected: 'Rejected',
+		pending: 'Pendente',
+		approved: 'Aprovado',
+		changes_requested: 'Alterações Solicitadas',
+		rejected: 'Rejeitado',
 	};
 
 	function getFileIcon(mimeType: string | null) {
@@ -81,44 +79,44 @@
 	}
 </script>
 
-<a href="/contents/{content.id}" target="_blank" rel="noopener noreferrer" class="h-full">
-	<Card class="relative flex h-full flex-col overflow-hidden">
-		<div class="flex flex-1 flex-col px-4 py-3">
-			<div class="flex items-center justify-between">
-				<div class="flex items-center gap-2">
-					<svelte:component this={getFileIcon(content.mime_type)} class="h-8 w-8 text-muted-foreground" />
-					<p class="text-sm line-clamp-1 break-all font-medium">{content.title}</p>
-					<Badge class="text-[10px] font-normal px-1.5 py-0.5">
-						{fileTypeDisplay(content.mime_type)}
+<Card class="relative flex h-full flex-col overflow-hidden">
+	<div class="flex flex-1 flex-col px-4 py-3">
+		<div class="flex items-center justify-between">
+			<div class="flex items-center gap-2">
+				<svelte:component this={getFileIcon(content.mime_type)} class="h-8 w-8 text-muted-foreground" />
+				<a href={`/contents/${content.id}`} target="_blank" rel="noopener noreferrer" class="text-sm line-clamp-1 break-all font-medium hover:underline">
+					{content.title}
+				</a>
+				<Badge class="text-[10px] font-normal px-1.5 py-0.5">
+					{fileTypeDisplay(content.mime_type)}
+				</Badge>
+				{#if content.moderation_status !== 'approved'}
+					<Badge class="text-[10px] font-normal px-1.5 py-0.5"
+						variant={content.moderation_status === 'rejected' ? 'destructive' : 'secondary'}
+					>
+						{moderationStatusLabels[content.moderation_status]}
 					</Badge>
-					{#if content.moderation_status !== 'approved'}
-						<Badge class="text-[10px] font-normal px-1.5 py-0.5"
-							variant={content.moderation_status === 'rejected' ? 'destructive' : 'secondary'}
-						>
-							{moderationStatusLabels[content.moderation_status]}
-						</Badge>
-					{/if}
-				</div>
-				<div class="flex text-muted-foreground items-center gap-2 ml-2">
-					<p class="text-xs whitespace-nowrap overflow-hidden text-ellipsis">{dayjs(`${content.inserted_at}`).format(
-							dayjs(content.inserted_at).year() === dayjs().year()
-								? 'DD/MM'
-								: 'DD/MM/YYYY'
-						)}</p>
-					<Download class="h-4 w-4" />
-					<p class="text-xs whitespace-nowrap overflow-hidden text-ellipsis">
-						{content.downloads_count}
-					</p>
-                    <input
-                        type="checkbox"
-                        value={content.id}
-                        checked={checked}
-						on:change={toggleCheckbox}
-                        class="ml-2"
-                    />
-				</div>
+				{/if}
+			</div>
+			<div class="flex text-muted-foreground items-center gap-2 ml-2">
+				<p class="text-xs whitespace-nowrap overflow-hidden text-ellipsis">{dayjs(`${content.inserted_at}`).format(
+						dayjs(content.inserted_at).year() === dayjs().year()
+							? 'DD/MM'
+							: 'DD/MM/YYYY'
+					)}</p>
+				<Download class="h-4 w-4" />
+				<p class="text-xs whitespace-nowrap overflow-hidden text-ellipsis">
+					{content.downloads_count}
+				</p>
+				<input
+					type="checkbox"
+					value={content.id}
+					checked={checked}
+					on:change={toggleCheckbox}
+					class="ml-2"
+				/>
 			</div>
 		</div>
-	</Card>
-</a>
+	</div>
+</Card>
 

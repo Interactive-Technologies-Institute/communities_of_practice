@@ -49,10 +49,10 @@
 	const isCommentValid = () => editedContent.length >= 1 && editedContent.length <= 5000;
 
 	const moderationStatusLabels = {
-		pending: 'Pending',
-		approved: 'Approved',
-		changes_requested: 'Changes Requested',
-		rejected: 'Rejected'
+		pending: 'Pendente',
+		approved: 'Aprovado',
+		changes_requested: 'Alterações Solicitadas',
+		rejected: 'Rejeitado'
 	};
 
 	$: avatarUrl = comment.author.avatar

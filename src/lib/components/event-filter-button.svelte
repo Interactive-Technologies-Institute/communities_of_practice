@@ -12,11 +12,11 @@
 	let open = false;
 
     const eventStatuses: { label: string; value: string }[] = [
-		{ label: 'Voting Open', value: 'voting_open' },
-		{ label: 'No One Voted', value: 'no_one_voted' },
-		{ label: 'Scheduled', value: 'scheduled' },
-		{ label: 'Ongoing', value: 'ongoing' },
-		{ label: 'Completed', value: 'completed' }
+		{ label: 'Votação Aberta', value: 'voting_open' },
+		{ label: 'Ninguém Votou', value: 'no_one_voted' },
+		{ label: 'Agendado', value: 'scheduled' },
+		{ label: 'Em Curso', value: 'ongoing' },
+		{ label: 'Concluído', value: 'completed' }
 	];
 
     function handleStatusSelect(currentValue: string) {

@@ -14,10 +14,10 @@
 	export let thread: ThreadWithAuthorAndCounters;
 
 	const moderationStatusLabels = {
-		pending: 'Pending',
-		approved: 'Approved',
-		changes_requested: 'Changes Requested',
-		rejected: 'Rejected'
+		pending: 'Pendente',
+		approved: 'Aprovado',
+		changes_requested: 'Alterações Solicitadas',
+		rejected: 'Rejeitado'
 	};
 
 	$: updatedAt = thread?.updated_at
@@ -35,7 +35,7 @@
 
 
 <a href={`/forum/${thread.id}`} class="h-full">
-	<Card class="relative flex h-full flex-col overflow-hidden">
+	<Card class="relative flex h-full flex-col overflow-hidden hover:bg-accent/50">
 		<div class="flex flex-1 flex-col px-4 py-3">
 			<div class="mb-3">
 				<div class="flex items-start gap-2">
