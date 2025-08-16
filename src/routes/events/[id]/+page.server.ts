@@ -22,8 +22,10 @@ export const load = async (event) => {
 			setFlash({ type: 'error', message: errorMessage }, event.cookies);
 			return error(500, errorMessage);
 		}
-		const image = event.locals.supabase.storage.from('events').getPublicUrl(eventData.image);
-		return { ...eventData, image: image.data.publicUrl };
+		const imageUrl = eventData.image
+			?event.locals.supabase.storage.from('events').getPublicUrl(eventData.image).data.publicUrl
+			: undefined;
+		return { ...eventData, image: imageUrl };
 	}
 
 	async function getEventModeration(id: number): Promise<ModerationInfo[]> {

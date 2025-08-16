@@ -51,10 +51,6 @@ export const createEventSchema = z
 			message: 'End time must be in HH:MM format',
 		}).nullish(),
 	})
-	.refine((data) => data.image || data.imageUrl, {
-		message: 'Image is required',
-		path: ['image'],
-	})
 	.refine((data) => {
 		if (!data.allow_voting) {
 			return !!data.start_time && !!data.end_time && data.start_time < data.end_time;
@@ -251,10 +247,6 @@ export const editEventSchema = z
 				message: 'End time must be in HH:MM format',
 			})
 			.nullish(),
-	})
-	.refine((data) => data.image || data.imageUrl, {
-		message: 'Image is required',
-		path: ['image'],
 	})
 	.refine((data) => {
 		if (!data.allow_voting) {

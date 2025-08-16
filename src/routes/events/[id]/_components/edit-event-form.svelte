@@ -475,7 +475,7 @@
 			<div class="grid grid-cols-1 gap-x-4 md:grid-cols-2">
 				<Form.Field {form} name="image">
 					<Form.Control let:attrs>
-						<Form.Label>Imagem de capa*</Form.Label>
+						<Form.Label>Imagem de capa</Form.Label>
 						<Card.Root class="aspect-[3/2] overflow-hidden">
 							{#if imageUrl}
 								<InteractableImage

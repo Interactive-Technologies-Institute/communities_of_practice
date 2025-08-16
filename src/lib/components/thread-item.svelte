@@ -20,13 +20,9 @@
 		rejected: 'Rejeitado'
 	};
 
-	$: updatedAt = thread?.updated_at
-	? new Date(thread.updated_at).toLocaleString()
-	: 'No updates yet';
-
 	$: imageUrl = thread.image
-	? $page.data.supabase.storage.from('forum_threads').getPublicUrl(thread.image).data.publicUrl
-	: '';
+		? $page.data.supabase.storage.from('forum_threads').getPublicUrl(thread.image).data.publicUrl
+		: '';
 
 	$: avatarUrl = thread.author.avatar
         ? $page.data.supabase.storage.from('users').getPublicUrl(thread.author.avatar).data.publicUrl

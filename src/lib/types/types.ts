@@ -113,7 +113,7 @@ export type Event = {
 	title: string;
 	description: string;
 	tags: string[];
-	image: string;
+	image?: string;
 	location: string;
 	recording_link: string | null;
 	transcription: string | null;

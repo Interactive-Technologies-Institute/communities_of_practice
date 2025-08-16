@@ -44,29 +44,33 @@
 		completed: 'success',
 	};
 
-	$: imageUrl = $page.data.supabase.storage.from('events').getPublicUrl(event.image).data.publicUrl;
+	$: imageUrl = event.image
+		? $page.data.supabase.storage.from('events').getPublicUrl(event.image).data.publicUrl
+		: ''
 </script>
 
 <a href="/events/{event.id}" class="h-full">
 	<Card class="relative flex h-full flex-col overflow-hidden hover:bg-accent/50">
-		<AspectRatio ratio={3 / 2}>
-			{#if imageUrl}
+		<AspectRatio ratio={3 / 1}>
+			{#if imageUrl !== ''}
 				<img src={imageUrl} alt="Event Cover" class="h-full w-full object-cover" />
-				{#if event.moderation_status !== 'approved'}
-					<Badge
-						class="absolute right-2 top-2"
-						variant={event.moderation_status === 'rejected' ? 'destructive' : 'secondary'}
-					>
-						{moderationStatusLabels[event.moderation_status]}
-					</Badge>
-				{:else if event.status !== null && event.status !== undefined}
-					<Badge
-						class="absolute right-2 top-2"
-						variant={eventStatusVariants[event.status] ?? 'default'}
-					>
-						{eventStatusLabels[event.status]}
-					</Badge>
-				{/if}
+			{:else}
+				<div class="h-full w-full bg-primary flex items-center justify-center"></div>
+			{/if}
+			{#if event.moderation_status !== 'approved'}
+				<Badge
+					class="absolute right-2 top-2"
+					variant={event.moderation_status === 'rejected' ? 'destructive' : 'secondary'}
+				>
+					{moderationStatusLabels[event.moderation_status]}
+				</Badge>
+			{:else if event.status !== null && event.status !== undefined}
+				<Badge
+					class="absolute right-2 top-2"
+					variant={eventStatusVariants[event.status] ?? 'default'}
+				>
+					{eventStatusLabels[event.status]}
+				</Badge>
 			{/if}
 		</AspectRatio>
 		<div class="flex flex-1 flex-col px-4 py-3">

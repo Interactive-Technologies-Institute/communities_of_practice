@@ -38,7 +38,7 @@
 	openGraph={{
 		title: data.event.title,
 		description: data.event.description,
-		images: [{ url: data.event.image }],
+		images: [{ url: data.event.image ?? ''}],
 	}}
 	twitter={{
 		cardType: 'summary_large_image',
@@ -59,8 +59,10 @@
 	</div>
 	<Card class="mx-auto">
 		<AspectRatio ratio={4 / 1}>
-			{#if data.event.image}
+			{#if data.event.image !== null && data.event.image !== undefined}
 				<img src={data.event.image} alt="Event Cover" class="h-full w-full object-cover" />
+			{:else}
+				<div class="h-full w-full bg-primary flex items-center justify-center"></div>
 			{/if}
 		</AspectRatio>
 		<div class="flex flex-1 flex-col px-4 py-3">
