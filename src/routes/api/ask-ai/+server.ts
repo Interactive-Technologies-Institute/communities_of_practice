@@ -1,6 +1,4 @@
-// src/routes/api/ask/+server.ts
 import { json } from '@sveltejs/kit';
-import { createClient } from '@supabase/supabase-js';
 import tokenizer from 'gpt-tokenizer';
 import { OpenAI } from 'openai';
 import { OPENAI_API_KEY } from '$env/static/private';

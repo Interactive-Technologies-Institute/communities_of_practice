@@ -663,7 +663,7 @@ export type Database = {
           final_voting_option_id: number | null
           fts: unknown | null
           id: number
-          image: string | null
+          image: string
           inserted_at: string
           location: string
           recording_link: string | null
@@ -686,7 +686,7 @@ export type Database = {
           final_voting_option_id?: number | null
           fts?: unknown | null
           id?: number
-          image?: string | null
+          image: string
           inserted_at?: string
           location: string
           recording_link?: string | null
@@ -709,7 +709,7 @@ export type Database = {
           final_voting_option_id?: number | null
           fts?: unknown | null
           id?: number
-          image?: string | null
+          image?: string
           inserted_at?: string
           location?: string
           recording_link?: string | null

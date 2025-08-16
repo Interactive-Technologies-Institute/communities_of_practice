@@ -1,16 +1,13 @@
 <script lang="ts">
-	import { page } from '$app/stores';
-	import { enhance } from '$app/forms';
 	import { beforeNavigate } from '$app/navigation';
 	import { Button } from '@/components/ui/button';
 	import * as Popover from '@/components/ui/popover';
 	import { ScrollArea } from '@/components/ui/scroll-area';
 	import { Separator } from '@/components/ui/separator';
-	import type { Conversation, UserWithRole, Speaker } from '@/types/types';
+	import type { Conversation, Speaker } from '@/types/types';
 	import dayjs from '$lib/dayjs';
 	import { BotMessageSquare, SendHorizontal, Loader2 } from 'lucide-svelte';
     import { Input } from '@/components/ui/input';
-	import { onMount } from 'svelte';
 
 	export let conversations: Conversation[] = [];
 

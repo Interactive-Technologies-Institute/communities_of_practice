@@ -13,7 +13,7 @@ create table public.events (
 	user_id uuid references public.profiles not null,
 	title text not null,
 	description text not null,
-	image text,
+	image text not null,
 	recording_link text,
 	transcription text,
 	summary text,

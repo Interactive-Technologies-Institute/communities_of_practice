@@ -81,45 +81,77 @@
 	let backupVotingEndTime: string | null | undefined = null;
 
 	function switchToVoting() {
-	// Backup fixed fields
-	backupDate = $formData.date;
-	backupStartTime = $formData.start_time;
-	backupEndTime = $formData.end_time;
+		// Backup fixed fields
+		backupDate = $formData.date;
+		backupStartTime = $formData.start_time;
+		backupEndTime = $formData.end_time;
 
-	
-	// Restore or init voting fields
-	$formData.voting_options = backupVotingOptions.length > 0
-	? backupVotingOptions
-	: [{ date: '', start_time: '', end_time: '' }, { date: '', start_time: '', end_time: '' }];
-	
-	$formData.allow_voting = true;
-	$formData.voting_end_date = backupVotingEndDate;
-	$formData.voting_end_time = backupVotingEndTime;
+		
+		// Restore or init voting fields
+		$formData.voting_options = backupVotingOptions.length > 0
+		? backupVotingOptions
+		: [{ date: '', start_time: '', end_time: '' }, { date: '', start_time: '', end_time: '' }];
+		
+		$formData.allow_voting = true;
+		$formData.voting_end_date = backupVotingEndDate;
+		$formData.voting_end_time = backupVotingEndTime;
 
-	// Clear fixed-date inputs
-	$formData.date = null;
-	$formData.start_time = null;
-	$formData.end_time = null;
-}
+		// Clear fixed-date inputs
+		$formData.date = null;
+		$formData.start_time = null;
+		$formData.end_time = null;
+	}
 
-function switchToFixed() {
-	// Backup voting data
-	backupVotingOptions = $formData.voting_options;
-	backupVotingEndDate = $formData.voting_end_date;
-	backupVotingEndTime = $formData.voting_end_time;
+	function switchToFixed() {
+		// Backup voting data
+		backupVotingOptions = $formData.voting_options;
+		backupVotingEndDate = $formData.voting_end_date;
+		backupVotingEndTime = $formData.voting_end_time;
 
-	$formData.allow_voting = false;
+		$formData.allow_voting = false;
 
-	// Restore fixed fields
-	$formData.date = backupDate;
-	$formData.start_time = backupStartTime;
-	$formData.end_time = backupEndTime;
+		// Restore fixed fields
+		$formData.date = backupDate;
+		$formData.start_time = backupStartTime;
+		$formData.end_time = backupEndTime;
 
-	// Clear voting fields
-	$formData.voting_options = [];
-	$formData.voting_end_date = null;
-	$formData.voting_end_time = null;
-}
+		// Clear voting fields
+		$formData.voting_options = [];
+		$formData.voting_end_date = null;
+		$formData.voting_end_time = null;
+	}
+
+	async function generateTags(content: string): Promise<string[] | null> {
+		try {
+			const response = await fetch('/api/tags-ai', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ content })
+			});
+
+			return await response.json();
+		} catch (error) {
+			console.error('Error generating tags:', error);
+			return null;
+		}
+	}
+
+	let loadingTags = false;
+
+	async function handleGenerateTags() {
+		loadingTags = true;
+
+		const tags = await generateTags($formData.description);
+
+		if (tags) {
+			$formData = {
+				...$formData,
+				tags
+			};
+		}
+
+		loadingTags = false;
+	}
 
 </script>
 
@@ -146,7 +178,21 @@ function switchToFixed() {
 			</Form.Field>
 			<Form.Field {form} name="tags">
 				<Form.Control let:attrs>
-					<Form.Label>Etiquetas*</Form.Label>
+					<Form.Label class="flex justify-between items-center">
+						Etiquetas*
+						<Button
+							type="button"
+							size="sm"
+							on:click={handleGenerateTags}
+							disabled={loadingTags}
+						>
+							{#if loadingTags}
+								<Loader2 class="h-4 w-4 animate-spin" />
+							{:else}
+								Gerar por IA
+							{/if}
+						</Button>
+					</Form.Label>
 					<TagInput {...attrs} bind:value={$formData.tags} />
 					<Form.FieldErrors />
 				</Form.Control>

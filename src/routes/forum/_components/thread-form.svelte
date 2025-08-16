@@ -1,27 +1,16 @@
 <script lang="ts">
 	import InteractableImage from '@/components/interactable-image.svelte';
-	import { Button, buttonVariants } from '@/components/ui/button';
-	import { Calendar } from '@/components/ui/calendar';
+	import { Button } from '@/components/ui/button';
 	import * as Card from '@/components/ui/card';
 	import { FileInput } from '@/components/ui/file-input';
 	import * as Form from '@/components/ui/form';
 	import { Input } from '@/components/ui/input';
-	import * as Popover from '@/components/ui/popover';
 	import { TagInput } from '@/components/ui/tag-input';
 	import { Textarea } from '@/components/ui/textarea';
 	import { createThreadSchema, type CreateThreadSchema } from '@/schemas/thread';
-	import { cn } from '@/utils';
-	import {
-		DateFormatter,
-		getLocalTimeZone,
-		parseAbsolute,
-		type DateValue,
-	} from '@internationalized/date';
-	import { CalendarIcon, Loader2 } from 'lucide-svelte';
+	import { Loader2 } from 'lucide-svelte';
 	import { fileProxy, superForm, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient, type Infer } from 'sveltekit-superforms/adapters';
-	import { PUBLIC_OPENAI_API_KEY } from '$env/static/public';
-	import { OpenAI } from 'openai';
 
 	export let data: SuperValidated<Infer<CreateThreadSchema>>;
 	export let threadId: number = -1;
@@ -49,30 +38,18 @@
 		}
 	}
 
-	const openai = new OpenAI({ apiKey: PUBLIC_OPENAI_API_KEY, dangerouslyAllowBrowser: true});
-
 	let loadingTags = false;
 	let loadingSummary = false;
 
 	async function generateSummary(content: string): Promise<string | null> {
 		try {
-			const response = await openai.chat.completions.create({
-				model: 'gpt-3.5-turbo',
-				messages: [
-					{
-						role: 'system',
-						content: 'You are an assistant that reduces/summarizes forum threads on a platform for communities of practice clearly and concisely.'
-					},
-					{
-						role: 'user',
-						content: `Summarize the following thread content:\n\n${content}`
-					}
-				],
-				temperature: 0.7,
-				max_tokens: 300
+			const response = await fetch('/api/summary-ai', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ query: 'Thread: ' + content })
 			});
 
-			return response.choices[0]?.message?.content?.trim() ?? null;
+			return await response.json();
 
 		} catch (error) {
 			console.error('Error generating summary:', error);
@@ -82,29 +59,13 @@
 
 	async function generateTags(content: string): Promise<string[] | null> {
 		try {
-			const response = await openai.chat.completions.create({
-				model: 'gpt-3.5-turbo',
-				messages: [
-					{
-						role: 'system',
-						content: 'You are an assistant that suggests useful tags for discussion forum threads.'
-					},
-					{
-						role: 'user',
-						content: `Return a maximum of 4 unique tags (each between 3 and 30 characters, including spaces) that represent the following thread content as a JSON array of strings. Example: ["tag1", "tag2"]\n\nContent:\n${content}`
-					}
-				],
-				temperature: 0.7,
-				max_tokens: 100
+			const response = await fetch('/api/tags-ai', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ content })
 			});
 
-			const generated = response.choices[0]?.message?.content?.trim();
-			if (!generated) return null;
-
-			const tags: string[] = JSON.parse(generated);
-			if (Array.isArray(tags)) return tags;
-
-			return null;
+			return await response.json();
 		} catch (error) {
 			console.error('Error generating tags:', error);
 			return null;
@@ -177,7 +138,7 @@
 							{#if loadingTags}
 								<Loader2 class="h-4 w-4 animate-spin" />
 							{:else}
-								Generate Tags
+								Gerar por IA
 							{/if}
 						</Button>
 					</Form.Label>

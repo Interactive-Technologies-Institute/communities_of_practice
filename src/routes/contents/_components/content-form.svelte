@@ -13,8 +13,6 @@
 	import { zodClient, type Infer } from 'sveltekit-superforms/adapters';
 	import type { CreateContentSchema, EditContentSchema } from '@/schemas/content';
 	import type { ZodSchema } from 'zod';
-	import { PUBLIC_OPENAI_API_KEY } from '$env/static/public';
-	import { OpenAI } from 'openai';
 	import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist/legacy/build/pdf.mjs';
 	import workerUrl from 'pdfjs-dist/legacy/build/pdf.worker.mjs?url';
 	import * as mammoth from "mammoth";
@@ -42,7 +40,6 @@
 
 	let loadingDescription = false;
 	let loadingTags = false;
-	const openai = new OpenAI({ apiKey: PUBLIC_OPENAI_API_KEY, dangerouslyAllowBrowser: true});
 	const file = fileProxy(form, 'file');
 
 	$: if ($file.length > 0) {
@@ -222,54 +219,29 @@
 
 	async function generateFileDescription(content: string, type: string): Promise<string | null> {
 		try {
-			const response = await openai.chat.completions.create({
-				model: 'gpt-4',
-				messages: [
-					{
-						role: 'system',
-						content: `You are a helpful assistant describing the contents of user-uploaded ${type} files. Be clear and concise.`
-					},
-					{
-						role: 'user',
-						content: `Please describe the following ${type}:\n\n${content}`
-					}
-				],
-				temperature: 0.6,
-				max_tokens: 400
+			const response = await fetch('/api/description-ai', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ content, type }) 
 			});
 
-			return response.choices[0]?.message?.content?.trim() ?? null;
+			return await response.json();
+
 		} catch (error) {
 			console.error('Error generating description:', error);
 			return null;
 		}
 	}
 
-	async function generateTags(content: string, type: string): Promise<string[] | null> {
+	async function generateTags(content: string): Promise<string[] | null> {
 		try {
-			const response = await openai.chat.completions.create({
-				model: 'gpt-3.5-turbo',
-				messages: [
-					{
-						role: 'system',
-						content: `You are an assistant that suggests useful tags for ${type}.`
-					},
-					{
-						role: 'user',
-						content: `Return a maximum of 5 unique tags (each between 3 and 30 characters, including spaces) that represent the following ${type} as a JSON array of strings. Example: ["tag1", "tag2"]\n\nContent:\n${content}`
-					}
-				],
-				temperature: 0.7,
-				max_tokens: 100
+			const response = await fetch('/api/tags-ai', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ content })
 			});
 
-			const generated = response.choices[0]?.message?.content?.trim();
-			if (!generated) return null;
-
-			const tags: string[] = JSON.parse(generated);
-			if (Array.isArray(tags)) return tags;
-
-			return null;
+			return await response.json();
 		} catch (error) {
 			console.error('Error generating tags:', error);
 			return null;
@@ -315,7 +287,7 @@
 				loadingTags = false;
 				return;
 			}
-			const tags = await generateTags(content[0], content[1]);
+			const tags = await generateTags(content[0]);
 			if (tags) {
 				$formData = {
 					...$formData,

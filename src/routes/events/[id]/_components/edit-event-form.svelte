@@ -20,8 +20,6 @@
 	import { CalendarIcon, Loader2 } from 'lucide-svelte';
 	import { fileProxy, superForm, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient, type Infer } from 'sveltekit-superforms/adapters';
-	import { PUBLIC_OPENAI_API_KEY } from '$env/static/public';
-	import { OpenAI } from 'openai';
 
 	export let data: SuperValidated<Infer<EditEventSchema>>;
 	export let eventId: number;
@@ -34,8 +32,6 @@
 	});
 
 	const { form: formData, enhance, submitting, errors } = form;
-
-	const openai = new OpenAI({ apiKey: PUBLIC_OPENAI_API_KEY, dangerouslyAllowBrowser: true});
 
 	const df = new DateFormatter('en-US', {
 		dateStyle: 'long',
@@ -126,12 +122,15 @@
 
 	async function transcribe(audioFile: File): Promise<string | null> {
 		try {
-			const transcription = await openai.audio.transcriptions.create({
-				file: audioFile,
-				model: 'whisper-1',
-				response_format: 'text',
+			const fd = new FormData();
+    		fd.set('audio', audioFile, audioFile.name);
+
+			const response = await fetch('/api/transcription-ai', {
+				method: 'POST',
+      			body: fd  
 			});
-			return transcription;
+
+			return await response.json();
 
 		} catch (error) {
 			console.log('Error generating transcription', error);
@@ -189,23 +188,13 @@
 
 	async function generateSummary(content: string): Promise<string | null> {
 		try {
-			const response = await openai.chat.completions.create({
-				model: 'gpt-3.5-turbo',
-				messages: [
-					{
-						role: 'system',
-						content: 'You are an assistant that summarizes events / meetings based on their transcription on a platform for communities of practice clearly and concisely. Divide the topics talked about into points if possible.'
-					},
-					{
-						role: 'user',
-						content: `Summarize the following event:\n\n${content}`
-					}
-				],
-				temperature: 0.7,
-				max_tokens: 400
+			const response = await fetch('/api/summary-ai', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ query: 'Event: ' + content })
 			});
 
-			return response.choices[0]?.message?.content?.trim() ?? null;
+			return await response.json();
 
 		} catch (error) {
 			console.error('Error generating summary:', error);
@@ -213,8 +202,24 @@
 		}
 	}
 
+	async function generateTags(content: string): Promise<string[] | null> {
+		try {
+			const response = await fetch('/api/tags-ai', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ content })
+			});
+
+			return await response.json();
+		} catch (error) {
+			console.error('Error generating tags:', error);
+			return null;
+		}
+	}
+
 	let loadingTranscription = false;
 	let loadingSummary = false;
+	let loadingTags = false;
 
 	async function handleGenerateTranscription() {
 		loadingTranscription = true;
@@ -247,6 +252,21 @@
 		loadingSummary = false;
 	}
 
+	async function handleGenerateTags() {
+		loadingTags = true;
+	
+		const tags = await generateTags(`${$formData.description} ${$formData.transcription} ${$formData.summary}`);
+
+		if (tags) {
+			$formData = {
+				...$formData,
+				tags
+			};
+		}
+
+		loadingTags = false;
+	}
+
 </script>
 
 <form method="POST" enctype="multipart/form-data" use:enhance class="flex flex-col gap-y-10">
@@ -267,13 +287,6 @@
 				<Form.Control let:attrs>
 					<Form.Label>Descrição*</Form.Label>
 					<Textarea {...attrs} bind:value={$formData.description} />
-					<Form.FieldErrors />
-				</Form.Control>
-			</Form.Field>
-			<Form.Field {form} name="tags">
-				<Form.Control let:attrs>
-					<Form.Label>Etiquetas*</Form.Label>
-					<TagInput {...attrs} bind:value={$formData.tags} />
 					<Form.FieldErrors />
 				</Form.Control>
 			</Form.Field>
@@ -330,6 +343,27 @@
 						</Button>
 					</Form.Label>
 					<Textarea {...attrs} class="w-full rounded border px-3 py-2 text-sm max-h-48 overflow-auto" bind:value={$formData.summary} />
+					<Form.FieldErrors />
+				</Form.Control>
+			</Form.Field>
+			<Form.Field {form} name="tags">
+				<Form.Control let:attrs>
+					<Form.Label class="flex justify-between items-center">
+						Etiquetas*
+						<Button
+							type="button"
+							size="sm"
+							on:click={handleGenerateTags}
+							disabled={loadingTags}
+						>
+							{#if loadingTags}
+								<Loader2 class="h-4 w-4 animate-spin" />
+							{:else}
+								Gerar por IA
+							{/if}
+						</Button>
+					</Form.Label>
+					<TagInput {...attrs} bind:value={$formData.tags} />
 					<Form.FieldErrors />
 				</Form.Control>
 			</Form.Field>
