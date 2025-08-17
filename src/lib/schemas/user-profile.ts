@@ -18,8 +18,8 @@ export const updateUserProfileSchema = z.object({
 
 	interests: z
             .array(z.string())
-            .refine((interests) => interests.length <= 5, {
-                message: 'Must be less than 5 interests',
+            .refine((interests) => interests.length <= 6, {
+                message: 'Must be less than 6 interests',
             })
             .refine((interests) => {
                 return new Set(interests).size === interests.length;
@@ -29,8 +29,8 @@ export const updateUserProfileSchema = z.object({
             }, 'Interests must be between 3 and 30 characters').default([]),
 	skills: z
             .array(z.string())
-            .refine((skills) => skills.length <= 5, {
-                message: 'Must be less than 5 skills',
+            .refine((skills) => skills.length <= 6, {
+                message: 'Must be less than 6 skills',
             })
             .refine((skills) => {
                 return new Set(skills).size === skills.length;
@@ -40,8 +40,8 @@ export const updateUserProfileSchema = z.object({
             }, 'Skills must be between 3 and 30 characters').default([]),
 	education_exps: z
             .array(z.string())
-            .refine((education_exps) => education_exps.length <= 5, {
-                message: 'Must be less than 5 educational experiences',
+            .refine((education_exps) => education_exps.length <= 6, {
+                message: 'Must be less than 6 educational experiences',
             })
             .refine((education_exps) => {
                 return new Set(education_exps).size === education_exps.length;
@@ -51,8 +51,8 @@ export const updateUserProfileSchema = z.object({
             }, 'Educational experiences must be between 3 and 30 characters').default([]),
 	languages: z
             .array(z.string())
-            .refine((languages) => languages.length <= 5, {
-                message: 'Must be less than 5 languages',
+            .refine((languages) => languages.length <= 6, {
+                message: 'Must be less than 6 languages',
             })
             .refine((languages) => {
                 return new Set(languages).size === languages.length;

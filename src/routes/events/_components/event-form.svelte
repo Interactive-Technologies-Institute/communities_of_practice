@@ -194,6 +194,9 @@
 						</Button>
 					</Form.Label>
 					<TagInput {...attrs} bind:value={$formData.tags} />
+					<p class="text-xs text-muted-foreground mt-1">
+						Pressiona <kbd>Enter</kbd> para adicionar uma etiqueta
+					</p>
 					<Form.FieldErrors />
 				</Form.Control>
 			</Form.Field>

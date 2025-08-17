@@ -14,8 +14,8 @@ export const createContentSchema = z.object({
   mime_type: z.string().nullish(),
   tags: z
     .array(z.string())
-    .refine((tags) => tags.length <= 5, {
-      message: 'Must be less than 5 tags',
+    .refine((tags) => tags.length <= 4, {
+      message: 'Must be less than 4 tags',
     })
     .refine((tags) => new Set(tags).size === tags.length, 'Tags must be unique')
     .refine(
@@ -40,8 +40,8 @@ export const editContentSchema = z.object({
   mime_type: z.string().nullish(),
   tags: z
     .array(z.string())
-    .refine((tags) => tags.length <= 5, {
-      message: 'Must be less than 5 tags',
+    .refine((tags) => tags.length <= 4, {
+      message: 'Must be less than 4 tags',
     })
     .refine((tags) => new Set(tags).size === tags.length, 'Tags must be unique')
     .refine(

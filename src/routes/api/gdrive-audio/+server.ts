@@ -4,7 +4,7 @@ import { tmpdir } from 'os';
 import { join } from 'path';
 import { randomUUID } from 'crypto';
 import { writeFile, readFile, unlink } from 'fs/promises';
-import { PUBLIC_GOOGLE_DRIVE_API_KEY } from '$env/static/public';
+import { GOOGLE_DRIVE_API_KEY } from '$env/static/private';
 
 export const GET: RequestHandler = async ({ url }) => {
 	const fileId = url.searchParams.get('id');
@@ -12,7 +12,7 @@ export const GET: RequestHandler = async ({ url }) => {
 		return new Response('Missing file ID', { status: 400 });
 	}
 
-	const apiKey = PUBLIC_GOOGLE_DRIVE_API_KEY;
+	const apiKey = GOOGLE_DRIVE_API_KEY;
 	const driveUrl = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&acknowledgeAbuse=true&key=${apiKey}`;
 
 	const response = await fetch(driveUrl);

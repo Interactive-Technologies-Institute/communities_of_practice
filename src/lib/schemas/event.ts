@@ -29,8 +29,8 @@ export const createEventSchema = z
 		image: z.instanceof(File).nullish(),
 		tags: z
 			.array(z.string())
-			.refine((tags) => tags.length <= 5, {
-				message: 'Must be less than 5 tags',
+			.refine((tags) => tags.length <= 4, {
+				message: 'Must be less than 4 tags',
 			})
 			.refine((tags) => new Set(tags).size === tags.length, 'Tags must be unique')
 			.refine((tags) => tags.every((tag) => tag.length >= 3 && tag.length <= 30), 'Tags must be between 3 and 30 characters'),
@@ -210,8 +210,8 @@ export const editEventSchema = z
 		image: z.instanceof(File).nullish(),
 		tags: z
 			.array(z.string())
-			.refine((tags) => tags.length <= 5, {
-				message: 'Must be less than 5 tags',
+			.refine((tags) => tags.length <= 4, {
+				message: 'Must be less than 4 tags',
 			})
 			.refine((tags) => new Set(tags).size === tags.length, 'Tags must be unique')
 			.refine(
