@@ -1,7 +1,7 @@
 import { updateModerationInfoSchema } from '@/schemas/moderation-info.js';
 import type { ContentWithModeration } from '@/types/types';
-import { arrayQueryParam, handleFormAction, stringQueryParam } from '@/utils';
-import { error, fail } from '@sveltejs/kit';
+import { arrayQueryParam, handleFormAction, stringQueryParam, handleSignInRedirect } from '@/utils';
+import { error, fail, redirect } from '@sveltejs/kit';
 import { setFlash } from 'sveltekit-flash-message/server';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
@@ -9,6 +9,21 @@ import { OpenAI } from 'openai';
 import { OPENAI_API_KEY } from '$env/static/private';
 
 export const load = async (event) => {
+    const { session } = await event.locals.safeGetSession();
+    if (!session) {
+        return redirect(302, handleSignInRedirect(event));
+    }
+
+    const { data: userRoleData } = await event.locals.supabase
+        .from('user_roles')
+        .select('role')
+        .eq('id', session.user.id)
+        .single();
+
+    if (!userRoleData || (userRoleData.role !== 'admin' && userRoleData.role !== 'moderator')) {
+        throw redirect(302, '/');
+    }
+
     const search = stringQueryParam().decode(event.url.searchParams.get('s'));
     const fileTypes = arrayQueryParam().decode(event.url.searchParams.get('fileTypes'));
     const tags = arrayQueryParam().decode(event.url.searchParams.get('tags'));

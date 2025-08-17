@@ -52,6 +52,10 @@ export const load = async (event) => {
 	}
 
 	const eventData = await getEvent(eventId);
+
+	if (eventData.user_id !== session.user.id) {
+        return redirect(303, `/events/${eventId}`);
+    }
 	// To avoid zod validation errors
 	eventData.start_time = eventData.start_time !== null ? stripSeconds(eventData.start_time) : null;
 	eventData.end_time = eventData.end_time !== null ? stripSeconds(eventData.end_time) : null;

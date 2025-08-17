@@ -34,6 +34,10 @@ export const load = async (event) => {
 
     const contentData = await getContent(contentId);
 
+    if (contentData.user_id !== session.user.id) {
+        return redirect(303, `/contents/${contentId}`);
+    }
+
     return {
         updateForm: await superValidate(contentData, zod(editContentSchema), {
             id: 'update-content',

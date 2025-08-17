@@ -53,6 +53,10 @@ export const load = async (event) => {
 
 	const userProfileData = await getUserProfile(id);
 
+	if (userProfileData.id !== session.user.id) {
+        return redirect(303, `/users/${userProfileData.id}`);
+    }
+
 	return {
 		updateProfile: await superValidate(userProfileData, zod(updateUserProfileSchema), {
 			id: 'update-profile',

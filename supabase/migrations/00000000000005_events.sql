@@ -171,17 +171,6 @@ from public.events_voting_options vo
 left join public.events_votes v
   on v.voting_option_id = vo.id
 group by vo.event_id, vo.id;
-create function public.get_vote_option_count(voting_option_id bigint, user_id uuid default null) returns table (vote_count bigint, has_voted boolean) language sql security definer as $$
-select
-  count(*) as vote_count,
-  exists (
-    select 1
-    from public.events_votes
-    where voting_option_id = $1
-      and (user_id = $2 or $2 is null and user_id = auth.uid())
-  ) as has_voted
-from public.events_votes
-where voting_option_id = $1;
 $$;
 alter table public.events
 add column final_voting_option_id bigint references public.events_voting_options;

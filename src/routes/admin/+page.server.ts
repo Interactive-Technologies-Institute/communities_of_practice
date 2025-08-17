@@ -16,6 +16,16 @@ export const load = async (event) => {
 		return redirect(302, handleSignInRedirect(event));
 	}
 
+	const { data: userRoleData } = await event.locals.supabase
+        .from('user_roles')
+        .select('role')
+        .eq('id', session.user.id)
+        .single();
+
+    if (!userRoleData || userRoleData.role !== 'admin') {
+        throw redirect(302, '/');
+    }
+
 	let features: Feature[] = [];
 	const { data } = await event.locals.supabase
 		.from('feature_flags')

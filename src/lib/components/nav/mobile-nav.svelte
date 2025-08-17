@@ -63,18 +63,6 @@
 						Eventos
 					</a>
 				</FeatureWrapper>
-				<FeatureWrapper feature="map">
-					<a
-						href="/map"
-						on:click={() => (open = false)}
-						class={cn(
-							'transition-colors hover:text-foreground/80',
-							$page.url.pathname.startsWith('/map') ? 'text-foreground' : 'text-foreground/60'
-						)}
-					>
-						Mapa
-					</a>
-				</FeatureWrapper>
 				<FeatureWrapper feature="forum_threads">
 					<a
 						href="/forum"
@@ -97,6 +85,18 @@
 						)}
 					>
 						Conteúdos
+					</a>
+				</FeatureWrapper>
+				<FeatureWrapper feature="map">
+					<a
+						href="/map"
+						on:click={() => (open = false)}
+						class={cn(
+							'transition-colors hover:text-foreground/80',
+							$page.url.pathname.startsWith('/map') ? 'text-foreground' : 'text-foreground/60'
+						)}
+					>
+						Mapa
 					</a>
 				</FeatureWrapper>
 				<FeatureWrapper feature="users">

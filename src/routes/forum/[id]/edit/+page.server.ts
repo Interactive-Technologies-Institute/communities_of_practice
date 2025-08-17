@@ -34,6 +34,10 @@ export const load = async (event) => {
     const threadId = parseInt(event.params.id);
     const thread = await getThread(threadId);
 
+    if (thread.user_id !== session.user.id) {
+        return redirect(303, `/forum/${threadId}`);
+    }
+
     return {
         updateForm: await superValidate(thread, zod(createThreadSchema), {
             id: 'update-thread',

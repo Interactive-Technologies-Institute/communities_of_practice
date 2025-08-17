@@ -1,12 +1,27 @@
 import { updateModerationInfoSchema } from '@/schemas/moderation-info.js';
 import type { MapPinWithModeration } from '@/types/types';
-import { handleFormAction } from '@/utils';
-import { error, fail } from '@sveltejs/kit';
+import { handleFormAction, handleSignInRedirect } from '@/utils';
+import { error, fail, redirect } from '@sveltejs/kit';
 import { setFlash } from 'sveltekit-flash-message/server';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 
 export const load = async (event) => {
+	const { session } = await event.locals.safeGetSession();
+	if (!session) {
+		return redirect(302, handleSignInRedirect(event));
+	}
+
+	const { data: userRoleData } = await event.locals.supabase
+		.from('user_roles')
+		.select('role')
+		.eq('id', session.user.id)
+		.single();
+
+	if (!userRoleData || (userRoleData.role !== 'admin' && userRoleData.role !== 'moderator')) {
+		throw redirect(302, '/');
+	}
+	
 	async function getMapPins(): Promise<MapPinWithModeration[]> {
 		const query = event.locals.supabase
 			.from('map_pins_view')
