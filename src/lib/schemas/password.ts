@@ -2,12 +2,12 @@ import { z } from 'zod';
 
 export const updatePasswordSchema = z
 	.object({
-		currentPassword: z.string().min(1, { message: 'Current password is required' }),
-		newPassword: z.string().min(8, { message: 'New password must be at least 8 characters' }),
+		currentPassword: z.string().min(1, { message: 'A palavra-passe atual é obrigatória' }),
+		newPassword: z.string().min(8, { message: 'A nova palavra-passe deve ter no mínimo 8 caracteres' }),
 		confirmNewPassword: z.string(),
 	})
 	.refine((data) => data.newPassword === data.confirmNewPassword, {
-		message: "Passwords don't match",
+		message: "As palavras-passe não coincidem",
 		path: ['confirmNewPassword'],
 	});
 

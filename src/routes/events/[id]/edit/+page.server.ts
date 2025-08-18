@@ -52,7 +52,7 @@ export const load = async (event) => {
 	}
 
 	const eventData = await getEvent(eventId);
-
+	// Check if the user is the author of the event
 	if (eventData.user_id !== session.user.id) {
         return redirect(303, `/events/${eventId}`);
     }

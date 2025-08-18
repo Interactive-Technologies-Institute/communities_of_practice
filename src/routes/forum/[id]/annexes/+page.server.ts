@@ -9,6 +9,33 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { redirect } from '@sveltejs/kit';
 
 export const load = async (event) => {
+    const { session } = await event.locals.safeGetSession();
+    if (!session) {
+        return redirect(302, handleSignInRedirect(event));
+    }
+    const threadId = parseInt(event.params.id);
+    
+    async function getThreadUserId(id: number) {
+        const { data: threadData, error: threadError } = await event.locals.supabase
+        .from('forum_threads')
+        .select('user_id')
+        .eq('id', id)
+        .single();
+        
+        if (threadError) {
+            const errorMessage = 'Error fetching thread user id, please try again later.';
+            setFlash({ type: 'error', message: errorMessage }, event.cookies);
+            return error(500, errorMessage);
+        }
+
+        return threadData.user_id;
+    }
+    
+    // Check if the user is the author of the thread
+    if ((await getThreadUserId(threadId)) !== session.user.id) {
+        return redirect(303, `/forum/${threadId}`);
+    }
+    
     const search = stringQueryParam().decode(event.url.searchParams.get('search'));
     const types = arrayQueryParam().decode(event.url.searchParams.get('types'));
     const sortBy = stringQueryParam().decode(event.url.searchParams.get('sortBy'));
@@ -19,12 +46,12 @@ export const load = async (event) => {
             .from('contents_view')
             .select('*')
             .eq('moderation_status', 'approved');
-
-        if (search?.trim()) {
-            query = query.ilike('title', `%${search.trim()}%`);
-        }
-
-        const { data: contents, error: contentsError } = await query;
+            
+            if (search?.trim()) {
+                query = query.ilike('title', `%${search.trim()}%`);
+            }
+            
+            const { data: contents, error: contentsError } = await query;
 
         if (contentsError) {
             const errorMessage = 'Error fetching contents, please try again later.';
@@ -123,7 +150,6 @@ export const load = async (event) => {
         return annexedThreads?.map((row) => row.annexed_id) ?? [];
     }
 
-    const threadId = parseInt(event.params.id);
     const contents = (await getContents()).map((c) => ({ ...c, type: 'content' as const}));
     const events = (await getEvents()).map((e) => ({ ...e, type: 'event' as const}));
     const threads = (await getThreads()).map((e) => ({ ...e, type: 'thread' as const}));

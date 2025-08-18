@@ -2,16 +2,16 @@ import { z } from 'zod';
 
 export const votingOptionSchema = z
 	.object({
-		date: z.string().refine((val) => !isNaN(Date.parse(val)), 'Invalid date'),
+		date: z.string().refine((val) => !isNaN(Date.parse(val)), 'Data inválida'),
 		start_time: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, {
-			message: 'Start time must be in HH:MM format',
+			message: 'A hora de início deve estar no formato HH:MM',
 		}),
 		end_time: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, {
-			message: 'End time must be in HH:MM format',
+			message: 'A hora de fim deve estar no formato HH:MM',
 		}),
 	})
 	.refine((opt) => opt.start_time < opt.end_time, {
-		message: 'End time must be after start time',
+		message: 'A hora de fim deve ser posterior à hora de início',
 		path: ['end_time'],
 	});
 
@@ -19,36 +19,36 @@ export const createEventSchema = z
 	.object({
 		title: z
 			.string()
-			.min(5, { message: 'Title must be at least 5 characters' })
-			.max(100, { message: 'Title must be less than 100 characters' }),
+			.min(5, { message: 'O título deve ter no mínimo 5 caracteres' })
+			.max(100, { message: 'O título deve ter no máximo 100 caracteres' }),
 		description: z
 			.string()
-			.min(5, { message: 'Description must be at least 5 characters' })
-			.max(500, { message: 'Description must be less than 500 characters' }),
+			.min(5, { message: 'A descrição deve ter no mínimo 5 caracteres' })
+			.max(500, { message: 'A descrição deve ter no máximo 500 caracteres' }),
 		imageUrl: z.string().nullish(),
 		image: z.instanceof(File).nullish(),
 		tags: z
 			.array(z.string())
 			.refine((tags) => tags.length <= 4, {
-				message: 'Must be less than 4 tags',
+				message: 'Deve ter no máximo 4 etiquetas',
 			})
-			.refine((tags) => new Set(tags).size === tags.length, 'Tags must be unique')
-			.refine((tags) => tags.every((tag) => tag.length >= 3 && tag.length <= 30), 'Tags must be between 3 and 30 characters'),
+			.refine((tags) => new Set(tags).size === tags.length, 'As etiquetas devem ser únicas')
+			.refine((tags) => tags.every((tag) => tag.length >= 3 && tag.length <= 30), 'Cada etiqueta deve ter entre 3 e 30 caracteres'),
 		location: z.string()
-					.min(1, { message: 'Location is required' })
-					.max(90, { message: 'Location must be less than 90 characters' }),
+					.min(1, { message: 'A localização é obrigatória' })
+					.max(90, { message: 'A localização deve ter no máximo 90 caracteres' }),
 		allow_voting: z.boolean(),
-		date: z.string().refine((val) => !isNaN(Date.parse(val)), 'Invalid date').nullish(),
+		date: z.string().refine((val) => !isNaN(Date.parse(val)), 'Data inválida').nullish(),
 		start_time: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, {
-			message: 'Start time must be in HH:MM format',
+			message: 'A hora de início deve estar no formato HH:MM',
 		}).nullish(),
 		end_time: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, {
-			message: 'End time must be in HH:MM format',
+			message: 'A hora de fim deve estar no formato HH:MM',
 		}).nullish(),
 		voting_options: z.array(votingOptionSchema).default([]),
-		voting_end_date: z.string().nullish().refine((val) => !val || !isNaN(Date.parse(val)), 'Invalid vote deadline date'),
+		voting_end_date: z.string().nullish().refine((val) => !val || !isNaN(Date.parse(val)), 'Data limite de votação inválida'),
 		voting_end_time: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, {
-			message: 'End time must be in HH:MM format',
+			message: 'A hora limite de votação deve estar no formato HH:MM',
 		}).nullish(),
 	})
 	.refine((data) => {
@@ -57,7 +57,7 @@ export const createEventSchema = z
 		}
 		return true;
 	}, {
-		message: 'End time must be later than start time',
+		message: 'A hora de fim deve ser posterior à hora de início',
 		path: ['end_time'],
 	})
 	.refine((data) => {
@@ -69,7 +69,7 @@ export const createEventSchema = z
 
 		return deadlineDate >= today;
 	}, {
-		message: 'Voting deadline date must be today or later',
+		message: 'A data limite de votação deve ser hoje ou depois',
 		path: ['voting_end_date'],
 	})
 	.refine((data) => {
@@ -85,7 +85,7 @@ export const createEventSchema = z
 
 		return true;
 	}, {
-		message: 'The voting deadline time must be in the future',
+		message: 'A hora limite da votação deve ser no futuro',
 		path: ['voting_end_time'],
 	})
 	.refine((data) => {
@@ -103,7 +103,7 @@ export const createEventSchema = z
 
 		return true;
 	}, {
-		message: 'Voting options must be unique',
+		message: 'As opções de votação devem ser únicas',
 		path: ['voting_options'],
 	})
 
@@ -113,7 +113,7 @@ export const createEventSchema = z
 		}
 		return true;
 	}, {
-		message: 'You must provide at least two voting options',
+		message: 'Deve fornecer pelo menos duas opções de votação',
 		path: ['voting_options'],
 	})
 	.refine((data) => {
@@ -122,7 +122,7 @@ export const createEventSchema = z
 		}
 		return true;
 	}, {
-		message: 'Date is required',
+		message: 'A data é obrigatória',
 		path: ['date'],
 	})
 	.refine((data) => {
@@ -131,7 +131,7 @@ export const createEventSchema = z
 		}
 		return true;
 	}, {
-		message: 'Start time is required',
+		message: 'A hora de início é obrigatória',
 		path: ['start_time'],
 	})
 	.refine((data) => {
@@ -140,7 +140,7 @@ export const createEventSchema = z
 		}
 		return true;
 	}, {
-		message: 'End time is required',
+		message: 'A hora de fim é obrigatória',
 		path: ['end_time'],
 	})
 	.refine((data) => {
@@ -149,7 +149,7 @@ export const createEventSchema = z
 		}
 		return true;
 	}, {
-		message: 'Voting deadline date is required',
+		message: 'A data limite de votação é obrigatória',
 		path: ['voting_end_date'],
 	})
 	.refine((data) => {
@@ -158,7 +158,7 @@ export const createEventSchema = z
 		}
 		return true;
 	}, {
-		message: 'Voting end time is required',
+		message: 'A hora limite de votação é obrigatória',
 		path: ['voting_end_time'],
 	})
 	.refine((data) => {
@@ -172,7 +172,7 @@ export const createEventSchema = z
 			return opt.date >= deadlineDate;
 		});
 	}, {
-		message: 'Voting deadline date must be before or on the dates of voting options',
+		message: 'A data limite de votação deve ser anterior ou coincidir com as datas das opções de votação',
 		path: ['voting_end_date'],
 	})
 	.refine((data) => {
@@ -190,7 +190,7 @@ export const createEventSchema = z
 			return opt.start_time > deadlineTime;
 		});
 	}, {
-		message: 'Voting end time must be before voting options start times',
+		message: 'A hora limite da votação deve ser anterior às horas de início das opções de votação',
 		path: ['voting_end_time'],
 	});
 
@@ -200,51 +200,52 @@ export const editEventSchema = z
 	.object({
 		title: z
 			.string()
-			.min(5, { message: 'Title must be at least 5 characters' })
-			.max(100, { message: 'Title must be less than 100 characters' }),
+			.min(5, { message: 'O título deve ter no mínimo 5 caracteres' })
+			.max(100, { message: 'O título deve ter no máximo 100 caracteres' }),
 		description: z
 			.string()
-			.min(5, { message: 'Description must be at least 5 characters' })
-			.max(500, { message: 'Description must be less than 500 characters' }),
+			.min(5, { message: 'A descrição deve ter no mínimo 5 caracteres' })
+			.max(500, { message: 'A descrição deve ter no máximo 500 caracteres' }),
 		imageUrl: z.string().nullish(),
 		image: z.instanceof(File).nullish(),
 		tags: z
 			.array(z.string())
 			.refine((tags) => tags.length <= 4, {
-				message: 'Must be less than 4 tags',
+				message: 'Deve ter no máximo 4 etiquetas',
 			})
-			.refine((tags) => new Set(tags).size === tags.length, 'Tags must be unique')
+			.refine((tags) => new Set(tags).size === tags.length, 'As etiquetas devem ser únicas')
 			.refine(
 				(tags) => tags.every((tag) => tag.length >= 3 && tag.length <= 30),
-				'Tags must be between 3 and 30 characters'
+				'As etiquetas devem ter entre 3 e 30 caracteres'
 			),
-		location: z.string().min(1, { message: 'Location is required' }),
+		location: z.string().min(1, { message: 'A localização é obrigatória' })
+				.max(90, { message: 'A localização deve ter no máximo 90 caracteres' }),
 		recording_link: z.string().nullish(),
 		transcription: z.string().nullish(),
 		summary: z.string().nullish(),
 		allow_voting: z.boolean(),
-		date: z.string().refine((val) => !isNaN(Date.parse(val)), 'Invalid date').nullish(),
+		date: z.string().refine((val) => !isNaN(Date.parse(val)), 'Data inválida').nullish(),
 		start_time: z
 			.string()
 			.regex(/^([01]\d|2[0-3]):([0-5]\d)$/, {
-				message: 'Start time must be in HH:MM format',
+				message: 'A hora de início deve estar no formato HH:MM',
 			})
 			.nullish(),
 		end_time: z
 			.string()
 			.regex(/^([01]\d|2[0-3]):([0-5]\d)$/, {
-				message: 'End time must be in HH:MM format',
+				message: 'A hora de fim deve estar no formato HH:MM',
 			})
 			.nullish(),
 		voting_options: z.array(votingOptionSchema).default([]),
 		voting_end_date: z
 			.string()
 			.nullish()
-			.refine((val) => !val || !isNaN(Date.parse(val)), 'Invalid vote deadline date'),
+			.refine((val) => !val || !isNaN(Date.parse(val)), 'Data limite de votação inválida'),
 		voting_end_time: z
 			.string()
 			.regex(/^([01]\d|2[0-3]):([0-5]\d)$/, {
-				message: 'End time must be in HH:MM format',
+				message: 'A hora limite de votação deve estar no formato HH:MM',
 			})
 			.nullish(),
 	})
@@ -254,7 +255,7 @@ export const editEventSchema = z
 		}
 		return true;
 	}, {
-		message: 'End time must be later than start time',
+		message: 'A hora de fim deve ser posterior à hora de início',
 		path: ['end_time'],
 	})
 	.refine((data) => {
@@ -263,7 +264,7 @@ export const editEventSchema = z
 		}
 		return true;
 	}, {
-		message: 'Date is required',
+		message: 'A data é obrigatória',
 		path: ['date'],
 	})
 	.refine((data) => {
@@ -272,7 +273,7 @@ export const editEventSchema = z
 		}
 		return true;
 	}, {
-		message: 'Start time is required',
+		message: 'A hora de início é obrigatória',
 		path: ['start_time'],
 	})
 	.refine((data) => {
@@ -281,7 +282,7 @@ export const editEventSchema = z
 		}
 		return true;
 	}, {
-		message: 'End time is required',
+		message: 'A hora de fim é obrigatória',
 		path: ['end_time'],
 	})
 	.refine((data) => {
@@ -290,7 +291,7 @@ export const editEventSchema = z
 		}
 		return true;
 	}, {
-		message: 'Voting deadline date is required',
+		message: 'A data limite de votação é obrigatória',
 		path: ['voting_end_date'],
 	})
 	.refine((data) => {
@@ -299,7 +300,7 @@ export const editEventSchema = z
 		}
 		return true;
 	}, {
-		message: 'Voting end time is required',
+		message: 'A hora limite de votação é obrigatória',
 		path: ['voting_end_time'],
 	})
 	.refine((data) => {
@@ -313,7 +314,7 @@ export const editEventSchema = z
 			return opt.date >= deadlineDate;
 		});
 	}, {
-		message: 'Voting deadline date must be before or on the dates of voting options',
+		message: 'A data limite de votação deve ser anterior ou coincidir com as datas das opções de votação',
 		path: ['voting_end_date'],
 	})
 	.refine((data) => {
@@ -331,7 +332,7 @@ export const editEventSchema = z
 			return opt.start_time > deadlineTime;
 		});
 	}, {
-		message: 'Voting end time must be before voting options start times',
+		message: 'A hora limite da votação deve ser anterior às horas de início das opções de votação',
 		path: ['voting_end_time'],
 	})
 	.refine((data) => {
@@ -343,7 +344,7 @@ export const editEventSchema = z
 
 		return deadlineDate >= today;
 	}, {
-		message: 'Voting deadline date has passed and no date was set.',
+		message: 'A data limite de votação já passou e nenhuma data foi definida',
 		path: ['voting_end_date'],
 	})
 	.refine((data) => {
@@ -352,7 +353,7 @@ export const editEventSchema = z
 		const deadline = new Date(`${data.voting_end_date}T${data.voting_end_time}`);
 		return deadline > new Date();
 	}, {
-		message: 'Voting deadline time has passed and no date was set.',
+		message: 'A hora limite de votação já passou e nenhuma data foi definida',
 		path: ['voting_end_time'],
 	});
 

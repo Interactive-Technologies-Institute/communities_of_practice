@@ -4,14 +4,14 @@ export const signUpSchema = z
 	.object({
 		displayName: z
 			.string()
-			.min(5, { message: 'Display name must be at least 5 characters' })
-			.max(25, { message: 'Display name must be less than 25 characters' }),
-		email: z.string().email({ message: 'Please enter a valid email address' }),
-		password: z.string().min(8, { message: 'Password must be at least 8 characters' }),
+			.min(3, { message: 'O nome de exibição deve ter no mínimo 3 caracteres' })
+			.max(25, { message: 'O nome de exibição deve ter no máximo 25 caracteres' }),
+		email: z.string().email({ message: 'Por favor, introduza um endereço de email válido' }),
+		password: z.string().min(8, { message: 'A palavra-passe deve ter no mínimo 8 caracteres' }),
 		confirmPassword: z.string(),
 	})
 	.refine((data) => data.password === data.confirmPassword, {
-		message: 'Passwords do not match',
+		message: 'As palavras-passe não coincidem',
 		path: ['confirmPassword'],
 	});
 

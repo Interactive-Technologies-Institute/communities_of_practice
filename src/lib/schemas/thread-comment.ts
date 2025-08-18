@@ -3,8 +3,8 @@ import { z } from 'zod';
 export const createThreadCommentSchema = z.object({
     content: z
         .string()
-        .min(1, { message: 'Content must be at least 1 character' })
-        .max(5000, { message: 'Content must be less than 5000 characters' }),
+        .min(1, { message: 'O comentário deve ter no mínimo 1 carácter' })
+        .max(5000, { message: 'O comentário deve ter no máximo 5000 caracteres' }),
     parent_id: z
         .number()
         .optional()
@@ -29,8 +29,8 @@ export type ToggleThreadCommentLikeSchema = typeof toggleThreadCommentLikeSchema
 export const updateThreadCommentSchema = z.object({
 	id: z.number(),
 	content: z.string()
-        .min(1, { message: 'Content must be at least 1 character' })
-        .max(5000, { message: 'Content must be less than 5000 characters' }),
+        .min(1, { message: 'O comentário deve ter no mínimo 1 carácter' })
+        .max(5000, { message: 'O comentário deve ter no máximo 5000 caracteres' }),
 });
 
 export type UpdateThreadCommentSchema = typeof updateThreadCommentSchema;

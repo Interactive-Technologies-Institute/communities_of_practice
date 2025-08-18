@@ -1,65 +1,65 @@
 import { z } from 'zod';
 
 export const updateUserProfileSchema = z.object({
-	display_name: z.string().min(1, { message: 'Display name is required' }),
-	description: z.string().max(250, { message: 'Description must be less than 250 characters' }).nullish(),
+	display_name: z.string().min(1, { message: 'O nome de exibição é obrigatório' }),
+	description: z.string().max(250, { message: 'A descrição deve ter no máximo 250 caracteres' }).nullish(),
 	avatar: z.instanceof(File).nullish(),
 	avatarUrl: z.string().nullish(),
     avatarPath: z.string().optional(),
     avatarReset: z.coerce.boolean().optional().default(false),
 
 
-	date: z.string().regex(/^\d{2}\/\d{2}\/\d{4}$/, { message: 'Date must be in DD/MM/YYYY format' }).nullish(),
-	profession: z.string().max(100, { message: 'Profession must be less than 100 characters' }).nullish(),
+	date: z.string().regex(/^\d{2}\/\d{2}\/\d{4}$/, { message: 'A data deve estar no formato DD/MM/AAAA' }).nullish(),
+	profession: z.string().max(100, { message: 'A profissão deve ter no máximo 100 caracteres' }).nullish(),
 	website: z.string().regex(/^(https?:\/\/)?([\w\-]+\.)+[\w\-]+(\/[\w\-._~:/?#[\]@!$&'()*+,;=]*)?$/,
-    { message: 'Invalid website format' }).nullish(),
-	gender: z.string().max(50, { message: 'Gender must be less than 50 characters' }).nullish(),
+    { message: 'Website inválido' }).nullish(),
+	gender: z.string().max(50, { message: 'O género deve ter no máximo 50 caracteres' }).nullish(),
 	nationality: z.string().max(100).nullish(),
 
 	interests: z
             .array(z.string())
             .refine((interests) => interests.length <= 6, {
-                message: 'Must be less than 6 interests',
+                message: 'Deve ter no máximo 6 interesses',
             })
             .refine((interests) => {
                 return new Set(interests).size === interests.length;
-            }, 'Interests must be unique')
+            }, 'Os interesses devem ser únicos')
             .refine((interests) => {
                 return interests.every((interest) => interest.length >= 3 && interest.length <= 30);
-            }, 'Interests must be between 3 and 30 characters').default([]),
+            }, 'Cada interesse deve ter entre 3 e 30 caracteres').default([]),
 	skills: z
             .array(z.string())
             .refine((skills) => skills.length <= 6, {
-                message: 'Must be less than 6 skills',
+                message: 'Deve ter no máximo 6 competências',
             })
             .refine((skills) => {
                 return new Set(skills).size === skills.length;
-            }, 'Skills must be unique')
+            }, 'As competências devem ser únicas')
             .refine((skills) => {
                 return skills.every((skill) => skill.length >= 3 && skill.length <= 30);
-            }, 'Skills must be between 3 and 30 characters').default([]),
+            }, 'Cada competência deve ter entre 3 e 30 caracteres').default([]),
 	education_exps: z
             .array(z.string())
             .refine((education_exps) => education_exps.length <= 6, {
-                message: 'Must be less than 6 educational experiences',
+                message: 'Deve ter no máximo 6 experiências educativas',
             })
             .refine((education_exps) => {
                 return new Set(education_exps).size === education_exps.length;
-            }, 'Educational experiences must be unique')
+            }, 'As experiências educativas devem ser únicas')
             .refine((education_exps) => {
                 return education_exps.every((education_exp) => education_exp.length >= 3 && education_exp.length <= 30);
-            }, 'Educational experiences must be between 3 and 30 characters').default([]),
+            }, 'Cada experiência educativa deve ter entre 3 e 30 caracteres').default([]),
 	languages: z
             .array(z.string())
             .refine((languages) => languages.length <= 6, {
-                message: 'Must be less than 6 languages',
+                message: 'Deve ter no máximo 6 línguas',
             })
             .refine((languages) => {
                 return new Set(languages).size === languages.length;
-            }, 'Languages must be unique')
+            }, 'As línguas devem ser únicas')
             .refine((languages) => {
                 return languages.every((language) => language.length >= 3 && language.length <= 30);
-            }, 'Languages must be between 3 and 30 characters').default([]),
+            }, 'Cada língua deve ter entre 3 e 30 caracteres').default([]),
 });
 
 export type UpdateUserProfileSchema = typeof updateUserProfileSchema;

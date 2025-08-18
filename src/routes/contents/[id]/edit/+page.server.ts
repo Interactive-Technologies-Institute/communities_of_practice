@@ -33,7 +33,7 @@ export const load = async (event) => {
     }
 
     const contentData = await getContent(contentId);
-
+    // Check if the user is the author of the content
     if (contentData.user_id !== session.user.id) {
         return redirect(303, `/contents/${contentId}`);
     }

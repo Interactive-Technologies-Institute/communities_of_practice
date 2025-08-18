@@ -4,27 +4,27 @@ export const createThreadSchema = z
     .object({
         title: z
             .string()
-            .min(5, { message: 'Title must be at least 5 characters' })
-            .max(100, { message: 'Title must be less than 100 characters' }),
+            .min(5, { message: 'O título deve ter no mínimo 5 caracteres' })
+            .max(100, { message: 'O título deve ter no máximo 100 caracteres' }),
 
         content: z
             .string()
-            .min(10, { message: 'Content must be at least 10 characters' })
-            .max(5000, { message: 'Content must be less than 5000 characters' }),
+            .min(10, { message: 'O conteúdo deve ter no mínimo 10 caracteres' })
+            .max(5000, { message: 'O conteúdo deve ter no máximo 5000 caracteres' }),
         imageUrl: z.string().nullish(),
         image: z.instanceof(File).nullish(),
         summary: z.string().nullish(),
         tags: z
             .array(z.string())
             .refine((tags) => tags.length <= 4, {
-                message: 'Maximum of 4 tags',
+                message: 'Máximo de 4 etiquetas',
             })
             .refine((tags) => {
                 return new Set(tags).size === tags.length;
-            }, 'Tags must be unique')
+            }, 'As etiquetas devem ser únicas')
             .refine((tags) => {
                 return tags.every((tag) => tag.length >= 3 && tag.length <= 30);
-            }, 'Tags must be between 3 and 30 characters'),
+            }, 'As etiquetas devem ter entre 3 e 30 caracteres'),
     });
 
 export type CreateThreadSchema = typeof createThreadSchema;

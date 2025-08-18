@@ -14,6 +14,7 @@ export const load = async (event) => {
     if (!session) {
         return redirect(302, handleSignInRedirect(event));
     }
+    const threadId = parseInt(event.params.id);
 
     async function getThread(id: number) {
         const { data: threadData, error: threadError } = await event.locals.supabase
@@ -31,9 +32,8 @@ export const load = async (event) => {
         return { ...threadData, image: undefined, imageUrl: imageUrl.data.publicUrl };
     }
     
-    const threadId = parseInt(event.params.id);
     const thread = await getThread(threadId);
-
+    // Check if the user is the author of the event
     if (thread.user_id !== session.user.id) {
         return redirect(303, `/forum/${threadId}`);
     }

@@ -9,6 +9,33 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { redirect } from '@sveltejs/kit';
 
 export const load = async (event) => {
+    const { session } = await event.locals.safeGetSession();
+    if (!session) {
+        return redirect(302, handleSignInRedirect(event));
+    }
+    const contentId = parseInt(event.params.id);
+
+    async function getContentUserId(id: number){
+        const { data: contentData, error: contentError } = await event.locals.supabase
+            .from('contents')
+            .select('user_id')
+            .eq('id', id)
+            .single();
+
+        if (contentError) {
+            const errorMessage = 'Error fetching content user id, please try again later.';
+            setFlash({ type: 'error', message: errorMessage }, event.cookies);
+            return error(500, errorMessage);
+        }
+
+        return contentData.user_id;
+    }
+
+    // Check if the user is the author of the content
+    if ((await getContentUserId(contentId)) !== session.user.id) {
+        return redirect(303, `/contents/${contentId}`);
+    }
+
     const search = stringQueryParam().decode(event.url.searchParams.get('search'));
     const types = arrayQueryParam().decode(event.url.searchParams.get('types'));
     const sortBy = stringQueryParam().decode(event.url.searchParams.get('sortBy'));
@@ -123,7 +150,6 @@ export const load = async (event) => {
         return annexedThreads?.map((row) => row.annexed_id) ?? [];
     }
 
-    const contentId = parseInt(event.params.id);
     const contents = (await getContents()).map((c) => ({ ...c, type: 'content' as const}));
     const events = (await getEvents()).map((e) => ({ ...e, type: 'event' as const}));
     const threads = (await getThreads()).map((e) => ({ ...e, type: 'thread' as const}));
