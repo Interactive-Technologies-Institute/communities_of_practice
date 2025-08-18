@@ -90,7 +90,7 @@
 			</div>
 			<p class="whitespace-pre-wrap break-words mb-3 mt-3">{data.event.description}</p>
 			<div class="flex w-full justify-between items-end mt-4 text-sm text-muted-foreground">
-				<span>{data.interestCount + ' membros interessados'}</span>
+				<span>{data.interestCount} {data.interestCount === 1 ? 'membro interessado' : ' membros interessados'}</span>
 				<div class="flex flex-wrap justify-end gap-x-3 max-w-[70%]">
 					{#each data.event.tags as tag}
 						<a href={`/forum?tags=${tag}`} class="flex items-center gap-1 hover:underline">

@@ -27,7 +27,7 @@
 		</Card.Header>
 		<Card.Content>
 			<div class="max-w-2xl space-y-4">
-				<Form.Field
+				<!--<Form.Field
 					{form}
 					name="guides"
 					class="flex flex-row items-center justify-between rounded-lg border p-4"
@@ -41,7 +41,7 @@
 						</div>
 						<Switch includeInput {...attrs} bind:checked={$formData.guides} />
 					</Form.Control>
-				</Form.Field>
+				</Form.Field>-->
 				<Form.Field
 					{form}
 					name="events"
@@ -55,21 +55,6 @@
 							</Form.Description>
 						</div>
 						<Switch includeInput {...attrs} bind:checked={$formData.events} />
-					</Form.Control>
-				</Form.Field>
-				<Form.Field
-					{form}
-					name="map"
-					class="flex flex-row items-center justify-between rounded-lg border p-4"
-				>
-					<Form.Control let:attrs>
-						<div class="space-y-0.5">
-							<Form.Label>Mapa</Form.Label>
-							<Form.Description>
-								Ative esta funcionalidade para criar um mapa da sua comunidade.
-							</Form.Description>
-						</div>
-						<Switch includeInput {...attrs} bind:checked={$formData.map} />
 					</Form.Control>
 				</Form.Field>
 				<Form.Field
@@ -104,6 +89,21 @@
 				</Form.Field>
 				<Form.Field
 					{form}
+					name="map"
+					class="flex flex-row items-center justify-between rounded-lg border p-4"
+				>
+					<Form.Control let:attrs>
+						<div class="space-y-0.5">
+							<Form.Label>Mapa</Form.Label>
+							<Form.Description>
+								Ative esta funcionalidade para criar um mapa da sua comunidade.
+							</Form.Description>
+						</div>
+						<Switch includeInput {...attrs} bind:checked={$formData.map} />
+					</Form.Control>
+				</Form.Field>
+				<Form.Field
+					{form}
 					name="users"
 					class="flex flex-row items-center justify-between rounded-lg border p-4"
 				>
@@ -117,7 +117,7 @@
 						<Switch includeInput {...attrs} bind:checked={$formData.users} />
 					</Form.Control>
 				</Form.Field>
-				<Form.Field
+				<!--<Form.Field
 					{form}
 					name="docs"
 					class="flex flex-row items-center justify-between rounded-lg border p-4"
@@ -131,7 +131,7 @@
 						</div>
 						<Switch includeInput {...attrs} bind:checked={$formData.docs} />
 					</Form.Control>
-				</Form.Field>
+				</Form.Field>-->
 			</div>
 		</Card.Content>
 		<Card.Footer>

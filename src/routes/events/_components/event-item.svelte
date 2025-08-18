@@ -91,7 +91,7 @@
 				<h2 class="line-clamp-1 text-lg font-medium mt-2">{event.title}</h2>
 				<p class="line-clamp-1 text-muted-foreground">{event.description}</p>
 			</div>
-			<div class="flex w-full justify-between items-end mt-4 text-sm text-muted-foreground">
+			<div class="flex w-full justify-between items-end text-sm text-muted-foreground">
 				<div class="flex items-center gap-5">
 					<div class="flex items-center gap-1">
 						<ThumbsUp class="h-4 w-4" />

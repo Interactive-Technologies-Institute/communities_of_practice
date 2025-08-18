@@ -123,10 +123,12 @@
 
 	async function generateTags(content: string): Promise<string[] | null> {
 		try {
+			const MAX_CHARS = 25000;
+			const safeContent = content.slice(0, MAX_CHARS);
 			const response = await fetch('/api/tags-ai', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ content })
+				body: JSON.stringify({ content: safeContent })
 			});
 
 			return await response.json();

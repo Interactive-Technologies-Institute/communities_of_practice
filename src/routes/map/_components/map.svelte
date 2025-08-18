@@ -28,7 +28,7 @@
 			center: [lng, lat],
 			zoom: zoom,
 			minZoom: 1,
-			maxZoom: 15,
+			maxZoom: 9,
 		});
 		map.dragRotate.disable();
 		map.touchZoomRotate.disableRotation();

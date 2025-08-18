@@ -219,10 +219,13 @@
 
 	async function generateFileDescription(content: string, type: string): Promise<string | null> {
 		try {
+			const MAX_CHARS = 25000;
+			console.log("CONTENT: " + content);
+			const safeContent = content.slice(0, MAX_CHARS);
 			const response = await fetch('/api/description-ai', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ content, type }) 
+				body: JSON.stringify({ content: safeContent, type }) 
 			});
 
 			return await response.json();
@@ -235,10 +238,13 @@
 
 	async function generateTags(content: string): Promise<string[] | null> {
 		try {
+			const MAX_CHARS = 25000;
+			console.log("CONTENT: " + content);
+			const safeContent = content.slice(0, MAX_CHARS);
 			const response = await fetch('/api/tags-ai', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ content })
+				body: JSON.stringify({ content: safeContent })
 			});
 
 			return await response.json();

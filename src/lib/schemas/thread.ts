@@ -10,7 +10,7 @@ export const createThreadSchema = z
         content: z
             .string()
             .min(10, { message: 'O conteúdo deve ter no mínimo 10 caracteres' })
-            .max(5000, { message: 'O conteúdo deve ter no máximo 5000 caracteres' }),
+            .max(7000, { message: 'O conteúdo deve ter no máximo 7000 caracteres' }),
         imageUrl: z.string().nullish(),
         image: z.instanceof(File).nullish(),
         summary: z.string().nullish(),

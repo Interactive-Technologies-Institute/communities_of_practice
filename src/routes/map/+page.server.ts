@@ -9,6 +9,7 @@ import { zod } from 'sveltekit-superforms/adapters';
 export const load = async (event) => {
 	const id = numberQueryParam().decode(event.url.searchParams.get('id'));
 	let location: { lat: number; lng: number } | undefined;
+	const LNGLAT_DEFAULT = { lng: -8.224454, lat: 39.399872 };
 
 	if (id) {
 		location = await getLocationById(id);
@@ -111,8 +112,8 @@ export const load = async (event) => {
 		}),
 		updateForm: await superValidate(
 			{
-				lng: profileWithPin?.pin?.lng ?? 0,
-				lat: profileWithPin?.pin?.lat ?? 0,
+				lng: profileWithPin?.pin?.lng ?? LNGLAT_DEFAULT.lng,
+    			lat: profileWithPin?.pin?.lat ?? LNGLAT_DEFAULT.lat,
 			},
 			zod(createMapPinSchema),
 			{

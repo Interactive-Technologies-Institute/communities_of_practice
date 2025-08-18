@@ -182,19 +182,14 @@
 				<p class="whitespace-pre-wrap">{data.thread.summary}</p>
 			</Card>
 		{/if}
-		{#if showCommentForm}
-			<div class="w-full flex items-center gap-4 text-foreground">
-				<hr class="flex-grow border-t border-foreground" />
-				<span class="text-sm font-semibold uppercase">Formulário de comentário</span>
-				<hr class="flex-grow border-t border-foreground" />
-			</div>
-			<ThreadCommentForm data={data.createThreadCommentForm} />
-		{/if}
 		<div class="w-full flex items-center gap-4 text-foreground">
 			<hr class="flex-grow border-t border-foreground" />
 			<span class="text-sm font-semibold uppercase">Comentários</span>
 			<hr class="flex-grow border-t border-foreground" />
 		</div>
+		{#if showCommentForm}
+			<ThreadCommentForm data={data.createThreadCommentForm} />
+		{/if}
 		<SortButton bind:sortBy={$sortBy} bind:sortOrder={$sortOrder} section='comments'/>
 		{#each data.nestedComments as comment(comment.id)}
 			<ThreadCommentItem comment={comment} createForm={data.createThreadCommentForm} deleteForm={data.deleteThreadCommentForm} 

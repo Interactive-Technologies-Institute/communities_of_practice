@@ -8,20 +8,21 @@ const openai = new OpenAI({
 
 export const POST = async ({ request, locals: { supabase } }) => {
     try {
-        
         const {data: { user }} = await supabase.auth.getUser();
         if (!user) return json({ error: 'Unauthorized' }, { status: 401 });
         
+        const MAX_CHARS = 400000;
         const { query } = await request.json();
-        const input = query.replace(/\n/g, ' ');
+        // Confirm maximum size
+        const input = query.slice(0, MAX_CHARS);
         
         // Summarize using OpenAI
         const response = await openai.chat.completions.create({
-				model: 'gpt-3.5-turbo',
+				model: 'gpt-4o',
 				messages: [
 					{
 						role: 'system',
-						content: 'You are an assistant that reduces/summarizes forum threads and events on a platform for communities of practice clearly and concisely.'
+						content: 'You answer in portuguese(Portugal) and raw text without styling. You are an assistant that reduces/summarizes forum threads and events on a platform for communities of practice clearly and concisely. If appropriate, use bullet points.'
 					},
 					{
 						role: 'user',
@@ -29,7 +30,7 @@ export const POST = async ({ request, locals: { supabase } }) => {
 					}
 				],
 				temperature: 0.7,
-				max_tokens: 300
+				max_tokens: 600
 			});
 
         const summary = response.choices[0].message.content ?? '';

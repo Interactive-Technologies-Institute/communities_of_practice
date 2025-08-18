@@ -24,7 +24,7 @@ export const createEventSchema = z
 		description: z
 			.string()
 			.min(5, { message: 'A descrição deve ter no mínimo 5 caracteres' })
-			.max(500, { message: 'A descrição deve ter no máximo 500 caracteres' }),
+			.max(5000, { message: 'A descrição deve ter no máximo 5000 caracteres' }),
 		imageUrl: z.string().nullish(),
 		image: z.instanceof(File).nullish(),
 		tags: z
@@ -205,7 +205,7 @@ export const editEventSchema = z
 		description: z
 			.string()
 			.min(5, { message: 'A descrição deve ter no mínimo 5 caracteres' })
-			.max(500, { message: 'A descrição deve ter no máximo 500 caracteres' }),
+			.max(5000, { message: 'A descrição deve ter no máximo 5000 caracteres' }),
 		imageUrl: z.string().nullish(),
 		image: z.instanceof(File).nullish(),
 		tags: z

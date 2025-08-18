@@ -11,8 +11,8 @@ export const updateUserProfileSchema = z.object({
 
 	date: z.string().regex(/^\d{2}\/\d{2}\/\d{4}$/, { message: 'A data deve estar no formato DD/MM/AAAA' }).nullish(),
 	profession: z.string().max(100, { message: 'A profissão deve ter no máximo 100 caracteres' }).nullish(),
-	website: z.string().regex(/^(https?:\/\/)?([\w\-]+\.)+[\w\-]+(\/[\w\-._~:/?#[\]@!$&'()*+,;=]*)?$/,
-    { message: 'Website inválido' }).nullish(),
+	website: z.union([z.string().regex(/^(https?:\/\/)?([\w\-]+\.)+[\w\-]+(\/[\w\-._~:/?#[\]@!$&'()*+,;=]*)?$/),
+            z.literal(""),]).nullish(),
 	gender: z.string().max(50, { message: 'O género deve ter no máximo 50 caracteres' }).nullish(),
 	nationality: z.string().max(100).nullish(),
 
@@ -38,16 +38,16 @@ export const updateUserProfileSchema = z.object({
             .refine((skills) => {
                 return skills.every((skill) => skill.length >= 3 && skill.length <= 30);
             }, 'Cada competência deve ter entre 3 e 30 caracteres').default([]),
-	education_exps: z
+	education: z
             .array(z.string())
-            .refine((education_exps) => education_exps.length <= 6, {
+            .refine((education) => education.length <= 6, {
                 message: 'Deve ter no máximo 6 experiências educativas',
             })
-            .refine((education_exps) => {
-                return new Set(education_exps).size === education_exps.length;
+            .refine((education) => {
+                return new Set(education).size === education.length;
             }, 'As experiências educativas devem ser únicas')
-            .refine((education_exps) => {
-                return education_exps.every((education_exp) => education_exp.length >= 3 && education_exp.length <= 30);
+            .refine((education) => {
+                return education.every((education_exp) => education_exp.length >= 3 && education_exp.length <= 30);
             }, 'Cada experiência educativa deve ter entre 3 e 30 caracteres').default([]),
 	languages: z
             .array(z.string())

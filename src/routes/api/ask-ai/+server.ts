@@ -68,19 +68,18 @@ export const POST = async ({ request, locals: { supabase } }) => {
             contextText += `${content.trim()}\n`;
         }
 
-
 		// Ask OpenAI
 		const chatResponse = await openai.chat.completions.create({
 			model: 'gpt-3.5-turbo',
 			messages: [
 				{
 					role: 'system',
-					content: `You are a helpful assistant. Answer questions truthfully based on the following context:\n\n${contextText}. If you will give a link, make sure it's http://localhost:5173 followed by the link path.`
+					content: `You answer in portuguese(Portugal) and raw text without styling. You are a helpful assistant. Answer questions truthfully based on the following context:\n\n${contextText}. If you will give a link, make sure it's http://localhost:5173 followed by the link path.`
 				},
 				{ role: 'user', content: query }
 			],
-			max_tokens: 512,
-			temperature: 0
+			max_tokens: 600,
+			temperature: 0.2
 		});
 
 		const text = chatResponse.choices[0].message.content;

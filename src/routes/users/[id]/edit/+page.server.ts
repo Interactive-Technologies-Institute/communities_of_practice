@@ -131,7 +131,7 @@ export const actions = {
 					nationality: form.data.nationality,
 					interests: form.data.interests,
 					skills: form.data.skills,
-					education: form.data.education_exps,
+					education: form.data.education,
 					languages: form.data.languages,
 					date: form.data.date,
 				};

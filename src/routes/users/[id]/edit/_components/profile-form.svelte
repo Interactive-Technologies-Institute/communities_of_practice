@@ -137,10 +137,10 @@
 					<Form.FieldErrors />
 				</Form.Control>
 			</Form.Field>
-			<Form.Field {form} name="education_exps">
+			<Form.Field {form} name="education">
 				<Form.Control let:attrs>
 					<Form.Label>Experiências académicas</Form.Label>
-					<TagInput {...attrs} bind:value={$formData.education_exps} />
+					<TagInput {...attrs} bind:value={$formData.education} />
 					<p class="text-xs text-muted-foreground mt-1">
 						Pressiona <kbd>Enter</kbd> para adicionar uma experiência académica
 					</p>

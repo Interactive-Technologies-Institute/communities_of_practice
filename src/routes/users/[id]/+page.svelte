@@ -168,6 +168,18 @@
 		<Card.Content class="text-center flex flex-col items-center p-4 space-y-4">
 			<p>{data.userProfile.description ?? 'No description provided'}</p>
 			<div class="text-sm text-muted-foreground flex flex-col justify-center gap-2">
+				{#if data.userProfile.website}
+					<a 
+						href={data.userProfile.website.startsWith('http') 
+							? data.userProfile.website 
+							: `https://${data.userProfile.website}`}
+						target="_blank"
+						rel="noopener noreferrer"
+						class="hover:underline"
+					>
+						{data.userProfile.website}
+					</a>
+				{/if}
 				{#if data.userProfile.gender}<span>{data.userProfile.gender}</span>{/if}
 				{#if age}<span>{age} anos</span>{/if}
 				{#if data.userProfile.nationality}<span>{data.userProfile.nationality}</span>{/if}

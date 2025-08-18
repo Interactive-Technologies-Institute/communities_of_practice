@@ -12,8 +12,10 @@ export const POST = async ({ request, locals: { supabase } }) => {
         const {data: { user }} = await supabase.auth.getUser();
         if (!user) return json({ error: 'Unauthorized' }, { status: 401 });
         
+        const MAX_CHARS = 25000;
         const { content } = await request.json();
-        const input = content.replace(/\n/g, ' ');
+        // Confirm maximum size
+        const input = content.slice(0, MAX_CHARS);
 
         // Tags using OpenAI
         const response = await openai.chat.completions.create({
@@ -21,7 +23,7 @@ export const POST = async ({ request, locals: { supabase } }) => {
 				messages: [
 					{
 						role: 'system',
-						content: 'You are an assistant that suggests useful tags (each between 3 and 30 characters, including spaces) for forum threads or contents.'
+						content: 'You answer in portuguese(Portugal) and raw text without styling. You are an assistant that suggests useful tags (each between 3 and 30 characters, including spaces) for forum threads or contents.'
 					},
 					{
 						role: 'user',
@@ -29,7 +31,7 @@ export const POST = async ({ request, locals: { supabase } }) => {
 					}
 				],
 				temperature: 0.7,
-				max_tokens: 100
+				max_tokens: 300
 			});
 
         const text = response.choices[0].message.content ?? '[]';
