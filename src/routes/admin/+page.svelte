@@ -14,5 +14,5 @@
 <div class="container mb-20 flex flex-col gap-y-8 md:gap-y-10">
 	<FeaturesForm data={data.updateFeatures} />
 	<BrandingForm data={data.updateBranding} />
-	<UserTypesForm data={data.updateUserTypes} />
+	<!--<UserTypesForm data={data.updateUserTypes} />-->
 </div>

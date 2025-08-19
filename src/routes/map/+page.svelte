@@ -60,7 +60,7 @@
 								</Avatar.Root>
 								<div>
 									<p class="line-clamp-1 font-medium">{user.display_name}</p>
-									<p class="text-sm text-muted-foreground">{user.type}</p>
+									<!--<p class="text-sm text-muted-foreground">{user.type}</p>-->
 								</div>
 							</div>
 							<p class="text-sm text-muted-foreground">
@@ -82,7 +82,7 @@
 		<div
 			class="container absolute left-0 right-0 top-6 flex flex-col items-center gap-y-4 md:top-10"
 		>
-			<Select.Root
+			<!--<Select.Root
 				selected={selectedUserType}
 				onSelectedChange={(s) => {
 					selectedUserType = s;
@@ -96,7 +96,7 @@
 						<Select.Item value={userType.slug}>{userType.label}</Select.Item>
 					{/each}
 				</Select.Content>
-			</Select.Root>
+			</Select.Root>-->
 			{#if data.moderation && data.moderation[0].status !== 'approved'}
 				<ModerationBanner moderation={data.moderation} />
 			{/if}

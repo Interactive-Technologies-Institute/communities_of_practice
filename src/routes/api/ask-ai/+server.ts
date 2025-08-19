@@ -74,7 +74,7 @@ export const POST = async ({ request, locals: { supabase } }) => {
 			messages: [
 				{
 					role: 'system',
-					content: `You answer in portuguese(Portugal) and raw text without styling. You are a helpful assistant. Answer questions truthfully based on the following context:\n\n${contextText}. If you will give a link, make sure it's http://localhost:5173 followed by the link path.`
+					content: `You answer in portuguese(Portugal) and raw text without styling. You are a helpful assistant. Answer questions truthfully based on the following context:\n\n${contextText}. If you will give a link, make sure it's https://communities-of-practice.vercel.app/ followed by the link path.`
 				},
 				{ role: 'user', content: query }
 			],

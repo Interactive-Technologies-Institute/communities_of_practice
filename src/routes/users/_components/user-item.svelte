@@ -40,7 +40,11 @@
 						{roleDisplay(user.role)}
 					</Badge>
 				</div>
-				<p class="text-xs text-muted-foreground">{"Juntou-se a " + new Date(user.inserted_at).toLocaleDateString()}</p>
+				<p class="text-xs text-muted-foreground">{"Juntou-se a " + new Date(user.inserted_at).toLocaleDateString("pt-PT", {
+					day: "2-digit",
+					month: "2-digit",
+					year: "numeric"
+					})}</p>
 			</div>
 		</div>
 	</Card>

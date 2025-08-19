@@ -15,12 +15,12 @@
     $: sortOptions = section === 'forum'
     ? [
         { key: 'date_inserted', label: 'Mais Recente' },
-        { key: 'likes', label: 'Mais Likes' }
+        { key: 'likes', label: 'Mais Gostos' }
     ]
     : section === 'comments'
     ? [
         { key: 'date_inserted', label: 'Mais Recente' },
-        { key: 'likes', label: 'Mais Likes' }
+        { key: 'likes', label: 'Mais Gostos' }
     ]
     : section === 'contents'
     ? [

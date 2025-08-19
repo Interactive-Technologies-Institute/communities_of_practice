@@ -14,6 +14,7 @@
 	<Tabs.Root value={path}>
 		<Tabs.List>
 			<Tabs.TriggerLink href="/moderation/events" value="events">Eventos</Tabs.TriggerLink>
+			<Tabs.TriggerLink href="/moderation/forum" value="forum">Fórum</Tabs.TriggerLink>
 			<Tabs.TriggerLink href="/moderation/contents" value="contents">Conteúdos</Tabs.TriggerLink>
 			<!--<Tabs.TriggerLink href="/moderation/guides" value="guides">Guias</Tabs.TriggerLink>-->
 			<Tabs.TriggerLink href="/moderation/map" value="map">Mapa</Tabs.TriggerLink>

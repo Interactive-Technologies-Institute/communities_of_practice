@@ -162,7 +162,11 @@
 				</Badge>
 			</Card.Description>
 			<span class="text-sm text-muted-foreground">
-				{"Juntou-se a " + new Date(data.userProfile.inserted_at).toLocaleDateString()}
+				{"Juntou-se a " + new Date(data.userProfile.inserted_at).toLocaleDateString("pt-PT", {
+					day: "2-digit",
+					month: "2-digit",
+					year: "numeric"
+					})}
 			</span>
 		</Card.Header>
 		<Card.Content class="text-center flex flex-col items-center p-4 space-y-4">
