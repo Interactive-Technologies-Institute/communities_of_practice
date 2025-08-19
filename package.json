@@ -58,6 +58,7 @@
 		"clsx": "^2.1.1",
 		"cmdk-sv": "^0.0.18",
 		"dayjs": "^1.11.13",
+		"ffmpeg-static": "^5.2.0",
 		"formsnap": "^1.0.1",
 		"gpt-tokenizer": "^3.0.1",
 		"jwt-decode": "^4.0.0",
