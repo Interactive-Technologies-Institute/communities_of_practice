@@ -8,8 +8,8 @@ export const updateUserProfileSchema = z.object({
     avatarPath: z.string().optional(),
     avatarReset: z.coerce.boolean().optional().default(false),
 
-
-	date: z.string().regex(/^\d{2}\/\d{2}\/\d{4}$/, { message: 'A data deve estar no formato DD/MM/AAAA' }).nullish(),
+    date: z.union([z.string().regex(/^\d{2}\/\d{2}\/\d{4}$/),
+            z.literal(""),]).nullish(),
 	profession: z.string().max(100, { message: 'A profissão deve ter no máximo 100 caracteres' }).nullish(),
 	website: z.union([z.string().regex(/^(https?:\/\/)?([\w\-]+\.)+[\w\-]+(\/[\w\-._~:/?#[\]@!$&'()*+,;=]*)?$/),
             z.literal(""),]).nullish(),

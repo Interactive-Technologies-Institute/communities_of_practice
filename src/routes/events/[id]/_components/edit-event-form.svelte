@@ -316,7 +316,7 @@
 							type="button"
 							size="sm"
 							on:click={handleGenerateTranscription}
-							disabled={loadingTranscription}
+							disabled={true}
 						>
 							{#if loadingTranscription}
 								<Loader2 class="h-4 w-4 animate-spin" />
