@@ -5,11 +5,6 @@ import { join } from 'path';
 import { randomUUID } from 'crypto';
 import { writeFile, readFile, unlink } from 'fs/promises';
 import { GOOGLE_DRIVE_API_KEY } from '$env/static/private';
-import ffmpegPath from 'ffmpeg-static';
-
-export const config = {
-  runtime: 'nodejs20.x'
-};
 
 export const GET: RequestHandler = async ({ url }) => {
 	const fileId = url.searchParams.get('id');
@@ -35,7 +30,7 @@ export const GET: RequestHandler = async ({ url }) => {
 	await writeFile(tmpInput, buffer);
 
 	await new Promise((resolve, reject) => {
-		const ffmpeg = spawn(ffmpegPath as string, [
+		const ffmpeg = spawn('ffmpeg', [
 			'-i', tmpInput,
 			'-b:a', '64k',
 			'-f', 'mp3',

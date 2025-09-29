@@ -130,7 +130,7 @@
       			body: fd  
 			});
 
-			return await response.json();
+			return await response.text();
 
 		} catch (error) {
 			console.log('Error generating transcription', error);
@@ -316,7 +316,7 @@
 							type="button"
 							size="sm"
 							on:click={handleGenerateTranscription}
-							disabled={true}
+							disabled={loadingTranscription}
 						>
 							{#if loadingTranscription}
 								<Loader2 class="h-4 w-4 animate-spin" />
