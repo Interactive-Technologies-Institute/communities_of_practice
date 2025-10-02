@@ -72,13 +72,6 @@
 				</Marker>
 			{/if}
 		{/each}
-		<Marker lat={38.7341425} lng={-9.1246718}>
-			<div
-				class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-primary"
-			>
-				<Store class="h-5 w-5 text-primary-foreground" />
-			</div>
-		</Marker>
 		<div
 			class="container absolute left-0 right-0 top-6 flex flex-col items-center gap-y-4 md:top-10"
 		>
