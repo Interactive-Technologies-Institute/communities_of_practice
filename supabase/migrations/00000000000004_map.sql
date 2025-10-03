@@ -23,8 +23,8 @@ insert into public.map_pins_moderation (map_pin_id, user_id, status, comment)
 values (
 		new.id,
 		new.user_id,
-		'pending'::moderation_status,
-		'Pending moderation'
+		'approved'::moderation_status,
+		'Auto-approved'
 	);
 return new;
 end;
